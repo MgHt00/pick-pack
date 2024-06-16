@@ -27,6 +27,11 @@ jobs:
       - name: List files in js directory
         run: ls -la js/
 
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Create gh-pages branch if not exists
         run: |
           git fetch origin
