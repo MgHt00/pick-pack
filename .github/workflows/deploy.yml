@@ -27,6 +27,19 @@ jobs:
       - name: List files in js directory
         run: ls -la js/
 
+      - name: Create gh-pages branch if not exists
+        run: |
+          git fetch origin
+          if git rev-parse --verify origin/gh-pages; then
+            echo "Branch gh-pages exists"
+          else
+            echo "Creating gh-pages branch"
+            git checkout --orphan gh-pages
+            git reset --hard
+            git commit --allow-empty -m "Initializing gh-pages branch"
+            git push origin gh-pages
+          fi
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
