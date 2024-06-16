@@ -13,15 +13,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
       - name: Replace API keys
         run: |
           sed -i 's/%%CONSUMER_KEY%%/${{ secrets.CONSUMER_KEY }}/' js/pack.js
           sed -i 's/%%CONSUMER_SECRET%%/${{ secrets.CONSUMER_SECRET }}/' js/pack.js
+
+      - name: Print current directory
+        run: pwd
+
+      - name: List files in current directory
+        run: ls -la
+
+      - name: List files in js directory
+        run: ls -la js/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
