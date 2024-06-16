@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>MMLS Packer</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      background-color: #222222;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Check Barcode</h1>
+  <section id="order-container">
+    <input type="text" id="order-input" placeholder="Input order number">
+    <button id="load-order-btn">Load Order</button>
+  </section>
+
+  <!--section id="message-container">
+    <p id="order-message">&nbsp;</p>
+  </section-->
+
+  <section id="SKU-container">
+    
+  </section>
+
+  <section id="scan-container">
+    <input type="text" id="barcode-input" placeholder="Scan barcode">
+    <button id="check-barcode-btn">Check Barcode</button>
+  </section>
+
+  <section id="message-container"></section>
+  <section id="progress-container"></section>
+
+  <script src="pack.js"></script>
+</body>
+
+</html>
