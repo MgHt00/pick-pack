@@ -18,19 +18,13 @@ jobs:
         with:
           node-version: '14'
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./ # Adjust if you have a different directory structure
-
-      - name: Build project
+      - name: Replace API keys
         run: |
-          echo "CONSUMER_KEY=${{ secrets.CONSUMER_KEY }}" >> .env
-          echo "CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET }}" >> .env
-          npm run build
-        working-directory: ./ # Adjust if you have a different directory structure
+          sed -i 's/%%CONSUMER_KEY%%/${{ secrets.CONSUMER_KEY }}/' js/pack.js
+          sed -i 's/%%CONSUMER_SECRET%%/${{ secrets.CONSUMER_SECRET }}/' js/pack.js
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build # Adjust if you have a different build directory
+          publish_dir: ./ # Adjust if you have a different publish directory
