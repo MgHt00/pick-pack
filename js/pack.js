@@ -1,5 +1,7 @@
+
 const consumerKey = '%%CONSUMER_KEY%%';
 const consumerSecret = '%%CONSUMER_SECRET%%';
+
 
 let orderItems = []; // to fetch all info of an order
 let orderedSKUs = []; // to keep the ordered SKUs
