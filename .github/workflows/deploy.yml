@@ -34,6 +34,11 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Commit changes
+        run: |
+          git add js/pack.js
+          git commit -m "Replace API keys"
+
       - name: Create gh-pages branch if not exists
         run: |
           git fetch origin
@@ -61,3 +66,4 @@ jobs:
         with:
           personal_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           publish_dir: ./ # Adjust if you have a different publish directory
+          publish_branch: gh-pages
