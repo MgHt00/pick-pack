@@ -23,7 +23,7 @@ jobs:
       - name: Print current directory
         run: pwd
 
-      - name: List files in current directory
+      - name: List files in the current directory
         run: ls -la
 
       - name: List files in js directory
