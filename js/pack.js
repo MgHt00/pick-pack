@@ -1,7 +1,9 @@
+import { consumerKey, consumerSecret } from './config.js';
 
+/*
 const consumerKey = 'ck_2c623eb59a0d402737750dc26c82bf0b11298816';
 const consumerSecret = 'cs_99211764913a428f22e7a4e39b67f58ec4011c7a';
-
+*/
 
 let orderItems = []; // to fetch all info of an order
 let orderedSKUs = []; // to keep the ordered SKUs
