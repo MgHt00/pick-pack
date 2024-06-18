@@ -31,13 +31,13 @@ jobs:
 
       - name: Merge main into gh-pages
         run: |
-          git merge main --no-edit
+          git merge main --allow-unrelated-histories --no-edit
           if [ $? -ne 0 ]; then
             echo "Merge conflict detected, aborting merge."
             git merge --abort
             exit 1
           fi
-
+          
       - name: Push changes
         run: git push origin gh-pages
         env:
