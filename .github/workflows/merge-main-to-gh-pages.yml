@@ -1,0 +1,44 @@
+name: Merge main to gh-pages
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # This runs every Monday at midnight UTC
+  push:
+    branches:
+      - main
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: git fetch --all
+
+      - name: Checkout gh-pages branch
+        run: git checkout gh-pages
+
+      - name: Merge main into gh-pages
+        run: |
+          git merge main --no-edit
+          if [ $? -ne 0 ]; then
+            echo "Merge conflict detected, aborting merge."
+            git merge --abort
+            exit 1
+          fi
+
+      - name: Push changes
+        run: git push origin gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
