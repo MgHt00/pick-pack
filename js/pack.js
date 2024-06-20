@@ -8,25 +8,20 @@ let orderedSKUs = []; // to keep the ordered SKUs
 const orderInput = document.querySelector("#order-input");
 const loadOrderBtn = document.querySelector("#load-order-btn");
 const skuContainer = document.querySelector("#SKU-container");
-//const orderMessage = document.querySelector("#message-container");
 const barcodeInput = document.querySelector("#barcode-input");
 const checkBarcodeBtn = document.querySelector("#check-barcode-btn");
 const messageContainer = document.querySelector("#message-container");
 const messageParagraph = document.querySelector("#message-paragraph");
 const progressContainer = document.querySelector("#progress-container");
 const successMessage = "All SKUs matched with barcodes successfully.";
-let orderID = 0;
+let orderID = 0;js/pack.js
 let totalSKUs = 0;
-
-// Reset everything at the start.
-resetAll();
-
-// temporary
-//checkOrderNote(65783);
 
 // To ensure that the DOM is fully loaded before the script executes
 document.addEventListener("DOMContentLoaded", function() {
   orderInput.focus(); // focus on the input at start.
+  resetAll(); // Reset everything at the start.
+  // MOVED from outside to inside.
 });
 
 // Add Event Listeners
@@ -67,6 +62,9 @@ function resetAll() {
   progressContainer.innerHTML = "";
   disableBarcode();
   messageParagraph.textContent = "Load an order.";
+  orderItems = []; // NEW line
+  orderedSKUs = []; // NEW line
+  totalSKUs = 0; // NEW line
 }
 
 // To load an order with a user input
@@ -95,7 +93,7 @@ async function loadOrder() {
   }
 
   messageParagraph.textContent = "Order loading...";
-  fetchOrderItems(orderID);
+  await fetchOrderItems(orderID); // ADD await
 }
 
 // Fetch SKUs from the user-input order number
@@ -120,7 +118,6 @@ async function fetchOrderItems(orderId) {
     }
   } catch (error) {
     console.error('Error fetching order data:', error);
-
     messageParagraph.textContent = "Order Not found!";
     messageParagraph.style.color = "red";
     orderInput.value = "";
@@ -205,15 +202,8 @@ async function checkBarcode() {
   if (orderedSKUs.length === 0) {
     disableBarcode();
     messageParagraph.textContent = "Order complete!";
-  }
-
-  /* Uncomment the following block to add a success note to the order*/
-
-  // After checking barcodes, if all SKUs are matched
-  if (orderedSKUs.length === 0) {
-    const orderId = orderID;
-    /*appendOrderNote(orderId, successMessage);*/
-    await appendOrderNoteAndChangeStatus(orderId, successMessage);
+    const orderId = orderID; // MOVED line (from duplicated 'if')
+    await appendOrderNoteAndChangeStatus(orderId, successMessage); // MOVED line (from duplicated 'if')
   }
 }
 
