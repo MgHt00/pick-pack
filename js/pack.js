@@ -14,7 +14,7 @@ const messageContainer = document.querySelector("#message-container");
 const messageParagraph = document.querySelector("#message-paragraph");
 const progressContainer = document.querySelector("#progress-container");
 const successMessage = "All SKUs matched with barcodes successfully.";
-let orderID = 0;js/pack.js
+let orderID = 0;
 let totalSKUs = 0;
 
 // To ensure that the DOM is fully loaded before the script executes
