@@ -43,3 +43,172 @@ body {
 
   padding: 10px 20px; /* block: 10px; inline: 20px; */
 }
+
+header {
+  margin-block-end: 15px;
+}
+
+header h1 {
+  font-size: 32px;
+  line-height: 48px;
+}
+
+#frame-load-order,
+#frame-scan-barcode {
+  background-color: #F0F2FA;
+  border-radius: 10px;
+  inline-size: auto;
+  margin-block-end: 15px;
+  padding: 10px 20px;
+}
+
+.order-input-container {
+  /* Auto layout */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 4px;
+
+  width: 264px;
+  height: 79px;
+
+
+  /* Inside auto layout */
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.input-top {
+  box-sizing: border-box;
+
+  /* Auto layout */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 16px;
+  gap: 10px;
+
+  width: 264px;
+  height: 58px;
+
+  /* Primary */
+  border: 1px solid #5570F1;
+  border-radius: 8px;
+
+  /* Inside auto layout */
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.input-content {
+  /* Auto layout */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 8px;
+
+  width: 232px;
+  height: 42px;
+
+
+  /* Inside auto layout */
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 1;
+}
+
+.label-order {
+  margin: 0 auto;
+  width: 232px;
+  height: 15px;
+
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 15px;
+  /* identical to box height */
+
+  /* Primary */
+  color: #5570F1;
+
+
+  /* Inside auto layout */
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.input-order {
+  margin: 0 auto;
+  width: 232px;
+  height: 19px;
+
+  background-color: transparent;
+  outline: none;
+  border: none;
+  
+  /* Input/Placeholder */
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+  
+  color: #5E6366;
+  
+  
+  /* Inside auto layout */
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.input-bottom {
+  /* Auto layout */
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 10px;
+
+  width: 264px;
+  height: 17px;
+
+  /* Inside auto layout */
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.helper {
+  /* Helper text goes here */
+
+  width: 259px;
+  height: 17px;
+
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 17px;
+  /* identical to box height */
+
+  color: #ABAFB1;
+
+  /* Inside auto layout */
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
