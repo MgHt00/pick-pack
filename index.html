@@ -35,24 +35,47 @@
   </header>
 
   <section id="frame-load-order">
-    <div class="input">
+    <div class="order-input-container">
       <div class="input-top">
         <div class="input-content">
           <label class="label-order" for="input">Enter Order Number:</label>
           <input class="input-order" id="order-input" placeholder="Input order number">
         </div>
       </div>
-      <div class="bottom">
+      <div class="input-bottom">
         <div class="helper">
           Enter and order number and press Load.
         </div>
       </div>
+    </div>
+    <div class="load-btn-container">
+      <button class="load-btn-text" id="load-order-btn">Load</button>
+    </div>
+    <div class="order-message-container">
+      Ready to begin.
     </div>
   </section>
 
   <section id="frame-scan-barcode">
     frame-scan-barcode
   </section>
+
+
+  <section id="message-container">
+    <p id="message-paragraph">&nbsp;</p>
+  </section>
+
+  <section id="SKU-container">
+    
+  </section>
+
+  <section id="scan-container">
+    <input type="text" id="barcode-input" placeholder="Scan barcode">
+    <button id="check-barcode-btn">Check Barcode</button>
+  </section>
+
+  
+  <section id="progress-container"></section>
 
   <script type="module" src="js/pack.js"></script>
 </body>

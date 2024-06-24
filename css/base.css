@@ -5,28 +5,6 @@
   box-sizing: border-box;
 }
 
-/*body {
-  background-color: #222222;
-  display: flex;
-  justify-content: center;
-  height: 100vh;
-
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-#main-container {
-  inline-size: 334px;
-  background-color: #ffffff;
-  margin-block-start: 20px;
-  margin-block-end: 20px;
-  padding-block-start: 10px;
-  padding-block-end: 10px;
-  padding-inline-start: 20px;
-  padding-inline-end: 20px;
-}*/
-
 html {
   background-color: #222222;
 }
@@ -45,12 +23,12 @@ body {
 }
 
 header {
-  margin-block-end: 15px;
+  margin-block-end: 10px;
 }
 
 header h1 {
-  font-size: 32px;
-  line-height: 48px;
+  font-size: 24px;
+  line-height: auto;
 }
 
 #frame-load-order,
@@ -59,7 +37,11 @@ header h1 {
   border-radius: 10px;
   inline-size: auto;
   margin-block-end: 15px;
-  padding: 10px 20px;
+  padding: 15px;
+
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
 }
 
 .order-input-container {
@@ -70,13 +52,13 @@ header h1 {
   padding: 0px;
   gap: 4px;
 
-  width: 264px;
+  /*width: 264px;*/
+  width: 100%;
   height: 79px;
-
 
   /* Inside auto layout */
   flex: none;
-  order: 0;
+  /*order: 0;*/
   align-self: stretch;
   flex-grow: 0;
 }
@@ -91,7 +73,8 @@ header h1 {
   padding: 8px 16px;
   gap: 10px;
 
-  width: 264px;
+  /*width: 264px;*/
+  width: 100%;
   height: 58px;
 
   /* Primary */
@@ -100,7 +83,7 @@ header h1 {
 
   /* Inside auto layout */
   flex: none;
-  order: 0;
+  /*order: 0;*/
   align-self: stretch;
   flex-grow: 0;
 }
@@ -114,20 +97,22 @@ header h1 {
   padding: 0px;
   gap: 8px;
 
-  width: 232px;
+  /*width: 232px;*/
+  width: 100%;
   height: 42px;
 
 
   /* Inside auto layout */
   flex: none;
-  order: 0;
+  /*order: 0;*/
   align-self: stretch;
   flex-grow: 1;
 }
 
 .label-order {
   margin: 0 auto;
-  width: 232px;
+  /*width: 232px;*/
+  width: 100%;
   height: 15px;
 
   font-family: 'Inter';
@@ -143,14 +128,15 @@ header h1 {
 
   /* Inside auto layout */
   flex: none;
-  order: 0;
+  /*order: 0;*/
   align-self: stretch;
   flex-grow: 0;
 }
 
 .input-order {
   margin: 0 auto;
-  width: 232px;
+  width: 100%;
+  /*width: 232px;*/
   height: 19px;
 
   background-color: transparent;
@@ -169,7 +155,7 @@ header h1 {
   
   /* Inside auto layout */
   flex: none;
-  order: 1;
+  /*order: 1;*/
   align-self: stretch;
   flex-grow: 0;
 }
@@ -182,12 +168,13 @@ header h1 {
   padding: 0px;
   gap: 10px;
 
-  width: 264px;
+  /*width: 264px;*/
+  width: 100%;
   height: 17px;
 
   /* Inside auto layout */
   flex: none;
-  order: 1;
+  /*order: 1;*/
   align-self: stretch;
   flex-grow: 0;
 }
@@ -195,7 +182,8 @@ header h1 {
 .helper {
   /* Helper text goes here */
 
-  width: 259px;
+  /*width: 259px;*/
+  width: 100%;
   height: 17px;
 
   font-family: 'Inter';
@@ -209,6 +197,62 @@ header h1 {
 
   /* Inside auto layout */
   flex: none;
-  order: 0;
+  /*order: 0;*/
+  flex-grow: 0;
+}
+
+
+.load-btn-container {
+  box-sizing: border-box;
+
+  /* Auto layout */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  gap: 8px;
+
+  /*width: 264px;*/
+  width: 100%;
+  height: 41px;
+
+  background: #FFFFFF;
+  border: 1px solid rgba(60, 60, 67, 0.3);
+  border-radius: 8px;
+
+  /* Inside auto layout */
+  flex: none;
+  /*order: 2;*/
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.load-btn-text {
+  width: 39px;
+  height: 24px;
+
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 24px;
+  /* identical to box height, or 150% */
+
+  color: #000000;
+
+  /* Inside auto layout */
+  flex: none;
+  /*order: 0;*/
+  flex-grow: 0;
+
+  background-color: inherit;
+  border: none;
+}
+
+.order-message-container {
+  flex: none;
+  /*order: 3;*/
+  align-self: center;
   flex-grow: 0;
 }
