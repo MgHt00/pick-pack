@@ -20,10 +20,14 @@ body {
   font-style: normal;
 
   padding: 10px 20px; /* block: 10px; inline: 20px; */
+
+  display: flex;
+  flex-flow: column;
+  gap: 10px
 }
 
 header {
-  margin-block-end: 10px;
+  /*margin-block-end: 10px;*/
 }
 
 header h1 {
@@ -36,7 +40,7 @@ header h1 {
   background-color: #F0F2FA;
   border-radius: 10px;
   inline-size: auto;
-  margin-block-end: 15px;
+  /*margin-block-end: 15px;*/
   padding: 15px;
 
   display: flex;
