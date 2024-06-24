@@ -48,9 +48,9 @@
         </div>
       </div>
     </div>
-    <div class="load-btn-container">
-      <button class="load-btn-text" id="load-order-btn">Load</button>
-    </div>
+    <button class="load-btn-container" id="load-order-btn">
+      Load
+    </button>
   </section>
 
   <section class="order-message-container">
@@ -58,7 +58,23 @@
   </section>
 
   <section id="frame-scan-barcode">
-    frame-scan-barcode
+    <div class="barcode-input-container">
+      <div class="input-top">
+        <div class="input-content">
+          <label class="label-order" for="input">Enter Order Number:</label>
+          <input class="input-order" id="barcode-input" type="text" placeholder="Scan barcode">
+          <!--input type="text" id="barcode-input" placeholder="Scan barcode"-->
+        </div>
+      </div>
+      <div class="input-bottom">
+        <div class="helper">
+          Scan product barcode and press Check.
+        </div>
+      </div>
+    </div>
+    <button class="load-btn-container" id="check-barcode-btn">
+      Check
+    </button>
   </section>
 
 
@@ -71,8 +87,8 @@
   </section>
 
   <section id="scan-container">
-    <input type="text" id="barcode-input" placeholder="Scan barcode">
-    <button id="check-barcode-btn">Check Barcode</button>
+    
+    
   </section>
 
   
