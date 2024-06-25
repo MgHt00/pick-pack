@@ -8,6 +8,8 @@ let orderedSKUs = []; // to keep the ordered SKUs
 const orderInput = document.querySelector("#order-input");
 const loadOrderBtn = document.querySelector("#load-order-btn");
 const skuContainer = document.querySelector("#SKU-container");
+const barcodeInputTop = document.querySelector("#barcode-input-top");
+const barcodeLabel = document.querySelector("#barcode-label");
 const barcodeInput = document.querySelector("#barcode-input");
 const checkBarcodeBtn = document.querySelector("#check-barcode-btn");
 const messageContainer = document.querySelector("#message-container");
@@ -43,12 +45,16 @@ barcodeInput.addEventListener("keydown", function(event) {
 
 // To disable barcode input and button
 function disableBarcode() {
+  barcodeInputTop.classList.add("disabled");
+  barcodeLabel.classList.add("disabled");
   barcodeInput.disabled = true;
   checkBarcodeBtn.disabled = true;
 }
 
 // To enable barcode input and button
 function enableBarcode() {
+  barcodeInputTop.classList.remove("disabled");
+  barcodeLabel.classList.remove("disabled");
   barcodeInput.disabled = false;
   checkBarcodeBtn.disabled = false;
 }
@@ -58,6 +64,8 @@ function resetAll() {
   orderInput.value = "";
   orderInput.focus();
   messageParagraph.textContent = "";
+  messageParagraph.classList.remove("order-not-found");
+  messageParagraph.classList.remove("loaded");
   skuContainer.innerHTML = "";
   progressContainer.innerHTML = "";
   disableBarcode();
@@ -72,7 +80,7 @@ async function loadOrder() {
   orderID = orderInput.value; // Read the order ID before resetting
   if (!orderID) {
     messageParagraph.textContent = "Please enter an order ID.";
-    messageParagraph.style.color = "red";
+    //messageParagraph.style.color = "red";
     return;
   }
 
@@ -85,6 +93,7 @@ async function loadOrder() {
   const isOrderChecked = await checkOrderNote(orderID, successMessage);
   if (isOrderChecked) {
     messageParagraph.textContent = "Order already checked.";
+    messageParagraph.classList.add("checked");
     /*messageParagraph.style.color = "blue";
     messageParagraph.style.background = "silver";*/
     orderInput.value = "";
@@ -119,7 +128,8 @@ async function fetchOrderItems(orderId) {
   } catch (error) {
     console.error('Error fetching order data:', error);
     messageParagraph.textContent = "Order Not found!";
-    messageParagraph.style.color = "red";
+    //messageParagraph.style.color = "red";
+    messageParagraph.classList.add("order-not-found");
     orderInput.value = "";
     orderInput.focus();
     return; // Exit the function if there is an error
@@ -142,6 +152,7 @@ async function fetchOrderItems(orderId) {
     }   
   }
   messageParagraph.textContent = `${orderId} Loaded.`;
+  messageParagraph.classList.add("loaded");
   enableBarcode();
   barcodeInput.focus();
 }

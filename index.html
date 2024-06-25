@@ -4,7 +4,9 @@
 <head>
   <title>MMLS Pick and Pack</title>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ux.css">
 </head>
 
 <body>
@@ -53,16 +55,16 @@
     </button>
   </section>
 
-  <section class="order-message-container">
-      Ready to begin.
+  <section class="order-message-container loaded" id="message-paragraph">
+      Load an order
   </section>
 
   <section id="frame-scan-barcode">
     <div class="barcode-input-container">
-      <div class="input-top">
+      <div class="input-top disabled" id="barcode-input-top">
         <div class="input-content">
-          <label class="label-order" for="input">Enter Order Number:</label>
-          <input class="input-order" id="barcode-input" type="text" placeholder="Scan barcode">
+          <label class="label-order disabled" id="barcode-label" for="input">Scan Barcode:</label>
+          <input class="input-order" id="barcode-input" type="text" placeholder="">
           <!--input type="text" id="barcode-input" placeholder="Scan barcode"-->
         </div>
       </div>
@@ -72,14 +74,14 @@
         </div>
       </div>
     </div>
-    <button class="load-btn-container" id="check-barcode-btn">
+    <button class="load-btn-container disabled" id="check-barcode-btn">
       Check
     </button>
   </section>
 
 
   <section id="message-container">
-    <p id="message-paragraph">&nbsp;</p>
+    <!--p id="message-paragraph">&nbsp;</p-->
   </section>
 
   <section id="SKU-container">
