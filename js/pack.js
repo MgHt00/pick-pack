@@ -15,7 +15,7 @@ const barcodeLabel = document.querySelector("#barcode-label");
 const barcodeInput = document.querySelector("#barcode-input");
 const checkBarcodeBtn = document.querySelector("#check-barcode-btn");
 const messageContainer = document.querySelector("#message-container");
-const messageParagraph = document.querySelector("#message-paragraph");
+const frameOrderMessage = document.querySelector("#frame-order-message");
 const progressContainer = document.querySelector("#progress-container");
 const successMessage = "All SKUs matched with barcodes successfully.";
 let orderID = 0;
@@ -64,13 +64,13 @@ function enableBarcode() {
 function resetAll() {
   orderInput.value = "";
   orderInput.focus();
-  messageParagraph.textContent = "";
-  messageParagraph.classList.remove("order-not-found");
-  messageParagraph.classList.remove("loaded");
+  frameOrderMessage.textContent = "";
+  frameOrderMessage.classList.remove("order-not-found");
+  frameOrderMessage.classList.remove("loaded");
   skuContainer.innerHTML = "";
   progressContainer.innerHTML = "";
   disableBarcode();
-  messageParagraph.textContent = "Load an order.";
+  frameOrderMessage.textContent = "Load an order.";
   orderItems = []; // NEW line
   orderedSKUs = []; // NEW line
   totalSKUs = 0; // NEW line
@@ -82,8 +82,8 @@ function resetAll() {
 async function loadOrder() {
   orderID = orderInput.value; // Read the order ID before resetting
   if (!orderID) {
-    messageParagraph.textContent = "Please enter an order ID.";
-    //messageParagraph.style.color = "red";
+    frameOrderMessage.textContent = "Please enter an order ID.";
+    //frameOrderMessage.style.color = "red";
     return;
   }
 
@@ -95,14 +95,14 @@ async function loadOrder() {
   // awaited properly within the loadOrder function.
   const isOrderChecked = await checkOrderNote(orderID, successMessage);
   if (isOrderChecked) {
-    messageParagraph.textContent = "Order already checked.";
-    messageParagraph.classList.add("checked");
+    frameOrderMessage.textContent = "Order already checked.";
+    frameOrderMessage.classList.add("checked");
     orderInput.value = "";
     orderInput.focus();
     return;
   }
 
-  messageParagraph.textContent = "Order loading...";
+  frameOrderMessage.textContent = "Order loading...";
   await fetchOrderItems(orderID); // ADD await
 }
 
@@ -127,8 +127,8 @@ async function fetchOrderItems(orderId) {
     }
   } catch (error) {
     console.error('Error fetching order data:', error);
-    messageParagraph.textContent = "Order Not found!";
-    messageParagraph.classList.add("order-not-found");
+    frameOrderMessage.textContent = "Order Not found!";
+    frameOrderMessage.classList.add("order-not-found");
     orderInput.value = "";
     orderInput.focus();
     return; // Exit the function if there is an error
@@ -150,11 +150,11 @@ async function fetchOrderItems(orderId) {
       skuContainer.append(sku);
     }   
   }
-  messageParagraph.textContent = `${orderId} Loaded.`;
-  messageParagraph.classList.add("loaded");
+  frameOrderMessage.textContent = `${orderId} Loaded.`;
+  frameOrderMessage.classList.add("loaded");
   frameLoadOrder.classList.add("hidden");
   frameScanBarcode.classList.remove("hidden");
-  messageParagraph.classList.add("transition");
+  frameOrderMessage.classList.add("transition");
   frameScanBarcode.classList.add("transition");
   enableBarcode();
   barcodeInput.focus();
@@ -186,7 +186,7 @@ async function checkBarcode() {
   // Iterate through the ordered SKUs to find a match
   for (let i = 0; i < orderedSKUs.length; i++) {
     if (barcode === orderedSKUs[i]) {
-      messageParagraph.textContent = "";
+      frameOrderMessage.textContent = "";
       checkedSKUparagraph.textContent = orderedSKUs[i];
       // If scanned barcode is same as orderedSKU, matched SKU is removed from the SKU-container
       // and put it in the progress-container; loop until the end of orderedSKUs array.
@@ -207,7 +207,7 @@ async function checkBarcode() {
 
   // If no matching SKU is found
   if (!skuFound) {
-    messageParagraph.textContent = "Wrong Product";
+    frameOrderMessage.textContent = "Wrong Product";
     barcodeInput.value = "";
     barcodeInput.focus();
   }
@@ -215,7 +215,7 @@ async function checkBarcode() {
   // Check if all SKUs are scanned
   if (orderedSKUs.length === 0) {
     disableBarcode();
-    messageParagraph.textContent = "Order complete!";
+    frameOrderMessage.textContent = "Order complete!";
     const orderId = orderID; // MOVED line (from duplicated 'if')
     await appendOrderNoteAndChangeStatus(orderId, successMessage); // MOVED line (from duplicated 'if')
   }
@@ -298,7 +298,7 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
 }
 
 async function checkOrderNote(orderId, successMessage) {
-  messageParagraph.textContent = "Order loading...";
+  frameOrderMessage.textContent = "Order loading...";
 
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
   const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
