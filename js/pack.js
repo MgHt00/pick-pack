@@ -5,9 +5,11 @@ const consumerSecret = '%%CONSUMER_SECRET%%';*/
 
 let orderItems = []; // to fetch all info of an order
 let orderedSKUs = []; // to keep the ordered SKUs
+const frameLoadOrder = document.querySelector("#frame-load-order");
 const orderInput = document.querySelector("#order-input");
 const loadOrderBtn = document.querySelector("#load-order-btn");
 const skuContainer = document.querySelector("#SKU-container");
+const frameScanBarcode = document.querySelector("#frame-scan-barcode");
 const barcodeInputTop = document.querySelector("#barcode-input-top");
 const barcodeLabel = document.querySelector("#barcode-label");
 const barcodeInput = document.querySelector("#barcode-input");
@@ -23,7 +25,6 @@ let totalSKUs = 0;
 document.addEventListener("DOMContentLoaded", function() {
   orderInput.focus(); // focus on the input at start.
   resetAll(); // Reset everything at the start.
-  // MOVED from outside to inside.
 });
 
 // Add Event Listeners
@@ -73,6 +74,8 @@ function resetAll() {
   orderItems = []; // NEW line
   orderedSKUs = []; // NEW line
   totalSKUs = 0; // NEW line
+  frameLoadOrder.classList.remove("hidden");
+  frameScanBarcode.classList.add("hidden");
 }
 
 // To load an order with a user input
@@ -94,8 +97,6 @@ async function loadOrder() {
   if (isOrderChecked) {
     messageParagraph.textContent = "Order already checked.";
     messageParagraph.classList.add("checked");
-    /*messageParagraph.style.color = "blue";
-    messageParagraph.style.background = "silver";*/
     orderInput.value = "";
     orderInput.focus();
     return;
@@ -108,7 +109,6 @@ async function loadOrder() {
 // Fetch SKUs from the user-input order number
 async function fetchOrderItems(orderId) {
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
-  /*const url = `/wp-json/wc/v3/orders/${orderId}`;*/
   const url = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
 
   try {
@@ -128,7 +128,6 @@ async function fetchOrderItems(orderId) {
   } catch (error) {
     console.error('Error fetching order data:', error);
     messageParagraph.textContent = "Order Not found!";
-    //messageParagraph.style.color = "red";
     messageParagraph.classList.add("order-not-found");
     orderInput.value = "";
     orderInput.focus();
@@ -153,6 +152,10 @@ async function fetchOrderItems(orderId) {
   }
   messageParagraph.textContent = `${orderId} Loaded.`;
   messageParagraph.classList.add("loaded");
+  frameLoadOrder.classList.add("hidden");
+  frameScanBarcode.classList.remove("hidden");
+  messageParagraph.classList.add("transition");
+  frameScanBarcode.classList.add("transition");
   enableBarcode();
   barcodeInput.focus();
 }
@@ -175,7 +178,7 @@ async function checkBarcode() {
     const errorParagraph = document.createElement("p");
     errorParagraph.textContent = "Please scan a barcode.";
     errorParagraph.setAttribute("id", "barcodeError");
-    errorParagraph.style.color = "red";
+    //errorParagraph.style.color = "red";
     progressContainer.append(errorParagraph);
     return;
   }

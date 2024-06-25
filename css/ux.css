@@ -21,3 +21,12 @@
 .order-not-found {
   color: red;
 }
+
+#frame-load-order.hidden,
+#frame-scan-barcode.hidden {
+  display: none;
+}
+
+.transition {
+  transition: margin-top 0.5s ease;
+}
