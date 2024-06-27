@@ -6,6 +6,7 @@ body.start {
 #frame-order-message.hidden,
 .load-btn-container.hidden,
 #frame-load-order.hidden,
+#frame-SKU-container.hidden,
 #frame-scan-barcode.hidden {
   display: none;
 

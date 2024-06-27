@@ -19,7 +19,7 @@ const checkBarcodeBtn = document.querySelector("#check-barcode-btn");
 const messageContainer = document.querySelector("#message-container");
 const frameOrderMessage = document.querySelector("#frame-order-message");
 const orderMessage = document.querySelector("#order-message");
-const progressContainer = document.querySelector("#progress-container");
+const frameProgressContainer = document.querySelector("#frame-progress-container");
 const successMessage = "All SKUs matched with barcodes successfully.";
 let orderID = 0;
 let totalSKUs = 0;
@@ -72,8 +72,9 @@ function resetAll() {
   orderMessage.classList.remove("order-not-found");
   orderMessage.classList.remove("loaded");
   resetBtn.classList.add("hidden");
+  frameSKUContainer.classList.add("hidden");
   frameSKUContainer.innerHTML = "";
-  progressContainer.innerHTML = "";
+  frameProgressContainer.innerHTML = "";
   disableBarcode();
   //orderMessage.textContent = "Ready to begin.";
   orderItems = []; // NEW line
@@ -152,6 +153,8 @@ async function fetchOrderItems(orderId) {
     const quantity = Number(orderItem["quantity"]);
     /*console.log(`Order quantity ${quantity}`);*/
 
+    frameSKUContainer.classList.remove("hidden");
+
     // Add ordered SKU to the `orderedSKUs` array, and increment the counter.
     for (let i = 0; i < quantity; i++) {
       orderedSKUs[totalSKUs++] = orderItem["sku"];
@@ -220,18 +223,18 @@ async function checkBarcode() {
     errorParagraph.textContent = "Please scan a barcode.";
     errorParagraph.setAttribute("id", "barcodeError");
     //errorParagraph.style.color = "red";
-    progressContainer.append(errorParagraph);
+    frameProgressContainer.append(errorParagraph);
     return;
   }
 
   // Iterate through the ordered SKUs to find a match
   for (let i = 0; i < orderedSKUs.length; i++) {
     if (barcode === orderedSKUs[i]) {
-      orderMessage.textContent = "";
+      ///orderMessage.textContent = "";
       checkedSKUparagraph.textContent = orderedSKUs[i];
       // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
       // and put it in the progress-container; loop until the end of orderedSKUs array.
-      progressContainer.append(checkedSKUparagraph);
+      frameProgressContainer.append(checkedSKUparagraph);
       document.querySelector(`#${orderedSKUs[i]}`).remove();
 
       // Remove scanned SKU from orderedSKUs array.
