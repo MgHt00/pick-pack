@@ -41,10 +41,12 @@ body.start {
 }
 
 .checked {
-  /*color: #007AFF;*/
-  color: #33a24e;
+  color: #007AFF;
+  /*color: #33a24e;*/
+  text-align: center;
 }
 
 .order-not-found {
   color: red;
+  text-align: center;
 }

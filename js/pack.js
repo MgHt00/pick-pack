@@ -105,7 +105,7 @@ async function loadOrder() {
   frameOrderMessage.classList.remove("hidden");
   const isOrderChecked = await checkOrderNote(orderID, successMessage);
   if (isOrderChecked) {
-    orderMessage.textContent = "Order already checked.";
+    orderMessage.innerHTML = "Order already checked.<br>Enter another order.";
     orderMessage.classList.add("checked");
     orderInput.value = "";
     orderInput.focus();
@@ -120,13 +120,23 @@ async function loadOrder() {
 async function fetchOrderItems(orderId) {
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
   const url = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
+  const timeout = 10000; // Set a timeout limit in milliseconds
 
   try {
-    const response = await axios.get(url, {
-      headers: {
-        'Authorization': `Basic ${auth}`
-      }
-    });
+    // Create a timeout promise
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Request timed out")), timeout)
+    );
+
+    // Fetch the order data with a race between the request and the timeout
+    const response = await Promise.race([
+      axios.get(url, {
+        headers: {
+          'Authorization': `Basic ${auth}`
+        }
+      }),
+      timeoutPromise
+    ]);
 
     // Assign WooCommerce order into `orderItems`
     if (response.data && response.data.line_items) {
@@ -135,14 +145,6 @@ async function fetchOrderItems(orderId) {
     } else {
       throw new Error("Order not found");
     }
-  } catch (error) {
-    console.error('Error fetching order data:', error);
-    orderMessage.textContent = "Order Not found!";
-    orderMessage.classList.add("order-not-found");
-    orderInput.value = "";
-    orderInput.focus();
-    return; // Exit the function if there is an error
-  }
 
   // To fetch ordered SKUs
   for (let orderItem of orderItems) {
@@ -160,6 +162,7 @@ async function fetchOrderItems(orderId) {
       skuContainer.append(sku);
     }   
   }
+
   bodyElement.classList.remove("start");
   bodyElement.classList.add("transition");
 
@@ -176,7 +179,27 @@ async function fetchOrderItems(orderId) {
 
   enableBarcode();
   barcodeInput.focus();
-}
+  
+} catch (error) {
+    console.error('Error fetching order data:', error);
+
+    // Handle specific error messages
+    if (error.message === "Request timed out") {
+      orderMessage.innerHTML = "Order loading timed out. Please try again.";
+    } else if (error.response && error.response.status === 404) {
+      orderMessage.innerHTML = "Order not found!";
+    } else {
+      orderMessage.innerHTML = "Error loading order.<br>Please try again.";
+    }
+
+    orderMessage.classList.add("order-not-found");
+    orderInput.value = "";
+    orderInput.focus();
+    return; // Exit the function if there is an error
+  }
+} 
+
+
 
 // To match scanned-SKUs with ordered-SKUs
 async function checkBarcode() {
