@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="css/ux.css">
 </head>
 
-<body>
+<body class="start">
   <header>
     <h1>Pick & Pack</h1>
   </header>
@@ -19,7 +19,7 @@
       <div class="input-top">
         <div class="input-content">
           <label class="label-order" for="input">Enter Order Number:</label>
-          <input class="input-order" id="order-input" placeholder="Input order number">
+          <input class="input-order" id="order-input" placeholder="">
         </div>
       </div>
       <div class="input-bottom">
@@ -33,11 +33,14 @@
     </button>
   </section>
 
-  <section class="order-message-container loaded" id="frame-order-message">
-      Load an order
+  <section id="frame-order-message" class="hidden">
+      <p id="order-message">Load an order</p>
+      <button class="load-btn-container hidden" id="reset-btn">
+        Reset
+      </button>
   </section>
 
-  <section id="frame-scan-barcode">
+  <section id="frame-scan-barcode" class="hidden">
     <div class="barcode-input-container">
       <div class="input-top disabled" id="barcode-input-top">
         <div class="input-content">

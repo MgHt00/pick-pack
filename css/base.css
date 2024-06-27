@@ -36,6 +36,7 @@ header h1 {
 }
 
 #frame-load-order,
+#frame-order-message,
 #frame-scan-barcode {
   background-color: #F0F2FA;
   border-radius: 10px;
@@ -244,11 +245,11 @@ header h1 {
   border: none;
 }
 
-.order-message-container {
-  border-radius: 10px;
-  inline-size: auto;
+#frame-order-message {
+  align-items: center;
+}
 
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+#order-message {
+  font-weight: 500;
+  font-style: normal;
 }

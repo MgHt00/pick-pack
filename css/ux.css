@@ -1,7 +1,33 @@
-.order-message-container.loaded {
-  background-color: #F0F2FA;
+body.start {
+  /* Uncomment this if you want the start screen to be vertically-aligned. */
+  /* justify-content: center; */
+}
+
+#frame-order-message.hidden,
+.load-btn-container.hidden,
+#frame-load-order.hidden,
+#frame-scan-barcode.hidden {
+  display: none;
+
+  /*opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  gap: 0;
+  overflow: hidden;
+  visibility: collapse;
+  pointer-events: none; /* Prevent interaction with hidden elements */
+}
+
+.transition {
+  /*transition: margin-top 0.5s ease;*/
+  transition: opacity 0.5s ease, height 0.5s ease;
+  opacity: 1;
+  /*height: auto;*/
+}
+
+.loaded {
   color: #007AFF;
-  padding: 10px;
 }
 
 .input-top.disabled {
@@ -15,18 +41,10 @@
 }
 
 .checked {
-  color: #007AFF;
+  /*color: #007AFF;*/
+  color: #33a24e;
 }
 
 .order-not-found {
   color: red;
-}
-
-#frame-load-order.hidden,
-#frame-scan-barcode.hidden {
-  display: none;
-}
-
-.transition {
-  transition: margin-top 0.5s ease;
 }
