@@ -67,21 +67,29 @@ function enableBarcode() {
 // To reset when Load Order is pressed.
 function resetAll() {
   bodyElement.classList.add("start");
+
+  frameLoadOrder.classList.remove("hidden");
+
   frameOrderMessage.classList.add("hidden");
   orderMessage.textContent = "";
-  orderMessage.classList.remove("order-not-found");
+  orderMessage.classList.remove("error-message");
   orderMessage.classList.remove("loaded");
   resetBtn.classList.add("hidden");
+
   frameSKUContainer.classList.add("hidden");
   frameSKUContainer.innerHTML = "";
+
+  frameProgressContainer.classList.add("hidden");
   frameProgressContainer.innerHTML = "";
+
+  frameScanBarcode.classList.add("hidden");
+  
   disableBarcode();
   //orderMessage.textContent = "Ready to begin.";
-  orderItems = []; // NEW line
-  orderedSKUs = []; // NEW line
-  totalSKUs = 0; // NEW line
-  frameLoadOrder.classList.remove("hidden");
-  frameScanBarcode.classList.add("hidden");
+  orderItems = []; 
+  orderedSKUs = [];
+  totalSKUs = 0; 
+  
   orderInput.value = "";
   orderInput.focus();
 }
@@ -89,7 +97,7 @@ function resetAll() {
 // To load an order with a user input
 async function loadOrder() {
   frameOrderMessage.classList.remove("hidden");
-  orderMessage.classList.remove("checked");
+  orderMessage.classList.remove("success-message");
   orderID = orderInput.value; // Read the order ID before resetting
   if (!orderID) {
     orderMessage.textContent = "Enter an order ID to load.";
@@ -107,7 +115,7 @@ async function loadOrder() {
   const isOrderChecked = await checkOrderNote(orderID, successMessage);
   if (isOrderChecked) {
     orderMessage.innerHTML = "Order already checked.<br>Enter another order.";
-    orderMessage.classList.add("checked");
+    orderMessage.classList.add("success-message");
     orderInput.value = "";
     orderInput.focus();
     return;
@@ -195,7 +203,7 @@ async function fetchOrderItems(orderId) {
       orderMessage.innerHTML = "Error loading order.<br>Please try again.";
     }
 
-    orderMessage.classList.add("order-not-found");
+    orderMessage.classList.add("error-message");
     orderInput.value = "";
     orderInput.focus();
     return; // Exit the function if there is an error
@@ -206,6 +214,8 @@ async function fetchOrderItems(orderId) {
 
 // To match scanned-SKUs with ordered-SKUs
 async function checkBarcode() {
+  frameProgressContainer.classList.remove("hidden");
+
   const barcode = barcodeInput.value;
   const checkedSKUparagraph = document.createElement("p");
   const existingError = document.querySelector("#barcodeError");
@@ -220,7 +230,8 @@ async function checkBarcode() {
   // Display error if barcode input is empty
   if (!barcode) {
     const errorParagraph = document.createElement("p");
-    errorParagraph.textContent = "Please scan a barcode.";
+    errorParagraph.textContent = "Scan a barcode to check.";
+    errorParagraph.classList.add("error-message");
     errorParagraph.setAttribute("id", "barcodeError");
     //errorParagraph.style.color = "red";
     frameProgressContainer.append(errorParagraph);
