@@ -10,7 +10,7 @@ const frameLoadOrder = document.querySelector("#frame-load-order");
 const orderInput = document.querySelector("#order-input");
 const loadOrderBtn = document.querySelector("#load-order-btn");
 const resetBtn = document.querySelector("#reset-btn");
-const skuContainer = document.querySelector("#SKU-container");
+const frameSKUContainer = document.querySelector("#frame-SKU-container");
 const frameScanBarcode = document.querySelector("#frame-scan-barcode");
 const barcodeInputTop = document.querySelector("#barcode-input-top");
 const barcodeLabel = document.querySelector("#barcode-label");
@@ -72,7 +72,7 @@ function resetAll() {
   orderMessage.classList.remove("order-not-found");
   orderMessage.classList.remove("loaded");
   resetBtn.classList.add("hidden");
-  skuContainer.innerHTML = "";
+  frameSKUContainer.innerHTML = "";
   progressContainer.innerHTML = "";
   disableBarcode();
   //orderMessage.textContent = "Ready to begin.";
@@ -159,7 +159,7 @@ async function fetchOrderItems(orderId) {
       const sku = document.createElement("p");
       sku.setAttribute("id", `${orderItem["sku"]}`);
       sku.textContent = orderItem["sku"];
-      skuContainer.append(sku);
+      frameSKUContainer.append(sku);
     }   
   }
 
@@ -229,7 +229,7 @@ async function checkBarcode() {
     if (barcode === orderedSKUs[i]) {
       orderMessage.textContent = "";
       checkedSKUparagraph.textContent = orderedSKUs[i];
-      // If scanned barcode is same as orderedSKU, matched SKU is removed from the SKU-container
+      // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
       // and put it in the progress-container; loop until the end of orderedSKUs array.
       progressContainer.append(checkedSKUparagraph);
       document.querySelector(`#${orderedSKUs[i]}`).remove();
