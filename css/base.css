@@ -1,0 +1,257 @@
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: #222222;
+}
+
+body {
+  background-color: #ffffff;
+  inline-size: 334px;
+  margin: 20px auto;
+  height: calc(100vh - 40px);
+
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+
+  padding: 10px 20px; /* block: 10px; inline: 20px; */
+
+  display: flex;
+  flex-flow: column;
+  gap: 10px
+}
+
+header {
+  /*margin-block-end: 10px;*/
+}
+
+header h1 {
+  font-size: 24px;
+  line-height: auto;
+}
+
+#frame-load-order,
+#frame-order-message,
+#frame-SKU-container,
+#frame-progress-container,
+#frame-scan-barcode {
+  background-color: #F0F2FA;
+  border-radius: 10px;
+  inline-size: auto;
+  padding: 15px;
+
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
+}
+
+.order-input-container {
+  /* Auto layout */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 4px;
+
+  /*width: 264px;*/
+  width: 100%;
+  height: 79px;
+
+  /* Inside auto layout */
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.input-top {
+  box-sizing: border-box;
+
+  /* Auto layout */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 16px;
+  gap: 10px;
+
+  /*width: 264px;*/
+  width: 100%;
+  height: 58px;
+
+  /* Primary */
+  border: 1px solid #5570F1;
+  border-radius: 8px;
+
+  /* Inside auto layout */
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.input-content {
+  /* Auto layout */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 8px;
+
+  /*width: 232px;*/
+  width: 100%;
+  height: 42px;
+
+  /* Inside auto layout */
+  flex: none;
+  align-self: stretch;
+  flex-grow: 1;
+}
+
+.label-order {
+  margin: 0 auto;
+  width: 100%;
+  height: 15px;
+
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 15px;
+
+  /* Primary */
+  color: #5570F1;
+
+  /* Inside auto layout */
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.input-order {
+  margin: 0 auto;
+  width: 100%;
+  height: 19px;
+
+  background-color: transparent;
+  outline: none;
+  border: none;
+  
+  /* Input/Placeholder */
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+  
+  color: #5E6366;
+  
+  /* Inside auto layout */
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.input-bottom {
+  /* Auto layout */
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 10px;
+
+  /*width: 264px;*/
+  width: 100%;
+  height: 17px;
+
+  /* Inside auto layout */
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.helper {
+  /* Helper text goes here */
+
+  width: 100%;
+  height: 17px;
+
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 17px;
+
+  color: #ABAFB1;
+
+  /* Inside auto layout */
+  flex: none;
+  flex-grow: 0;
+}
+
+
+.load-btn-container {
+  box-sizing: border-box;
+
+  /* Auto layout */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  gap: 8px;
+
+  /*width: 264px;*/
+  width: 100%;
+  height: 41px;
+
+  background: #FFFFFF;
+  border: 1px solid rgba(60, 60, 67, 0.3);
+  border-radius: 8px;
+
+  /* button text (load-btn-text) */
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 24px;
+
+  /* Inside auto layout */
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.load-btn-text {
+  width: 39px;
+  height: 24px;
+
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 24px;
+  /* identical to box height, or 150% */
+
+  color: #000000;
+
+  /* Inside auto layout */
+  flex: none;
+  /*order: 0;*/
+  flex-grow: 0;
+
+  background-color: inherit;
+  border: none;
+}
+
+#frame-order-message,
+#frame-progress-container {
+  align-items: center;
+}
+
+#frame-SKU-container {
+  font-size: 15px;
+}

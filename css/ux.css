@@ -1,0 +1,66 @@
+body.start {
+  /* Uncomment this if you want the start screen to be vertically-aligned. */
+  /* justify-content: center; */
+}
+
+header.hidden,
+#frame-order-message.hidden,
+.load-btn-container.hidden,
+#frame-load-order.hidden,
+#frame-SKU-container.hidden,
+#frame-progress-container.hidden,
+#frame-scan-barcode.hidden {
+  display: none;
+
+  /*opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  gap: 0;
+  overflow: hidden;
+  visibility: collapse;
+  pointer-events: none; /* Prevent interaction with hidden elements */
+}
+
+.transition {
+  /*transition: margin-top 0.5s ease;*/
+  transition: opacity 0.5s ease, height 0.5s ease;
+  opacity: 1;
+  /*height: auto;*/
+}
+
+.loaded {
+  color: #007AFF;
+}
+
+.input-top.disabled {
+  background-color: #F2F4F5;
+  border: 1px solid #DDE2E5;
+  border-radius: 8px;
+}
+
+.label-order.disabled {
+  color: rgba(94, 99, 102, 0.6);
+}
+
+.success-message {
+  color: #007AFF;
+  /*color: #33a24e;*/
+  text-align: center;
+}
+
+.error-message {
+  color: red;
+  text-align: center;
+}
+
+#frame-SKU-container p:not(:last-child) {
+  border-bottom: 1px dashed rgba(60, 60, 67, 0.3);
+  padding-bottom: 4px;
+}
+
+#frame-SKU-container p.checked-sku {
+  text-decoration: line-through;
+  color: rgba(60, 60, 67, 0.3);
+  border-bottom: 1px dashed rgba(60, 60, 67, 0.1);
+}
