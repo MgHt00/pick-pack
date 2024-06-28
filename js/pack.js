@@ -6,6 +6,7 @@ const consumerSecret = '%%CONSUMER_SECRET%%';*/
 let orderItems = []; // to fetch all info of an order
 let orderedSKUs = []; // to keep the ordered SKUs
 const bodyElement = document.body;
+const headerElement = document.querySelector("#frame-header");
 const frameLoadOrder = document.querySelector("#frame-load-order");
 const orderInput = document.querySelector("#order-input");
 const loadOrderBtn = document.querySelector("#load-order-btn");
@@ -67,6 +68,7 @@ function enableBarcode() {
 // To reset when Load Order is pressed.
 function resetAll() {
   bodyElement.classList.add("start");
+  headerElement.classList.remove("hidden");
 
   frameLoadOrder.classList.remove("hidden");
 
@@ -177,6 +179,8 @@ async function fetchOrderItems(orderId) {
   bodyElement.classList.remove("start");
   bodyElement.classList.add("transition");
 
+  headerElement.classList.add("hidden");
+
   orderMessage.textContent = `${orderId} Loaded.`;
   orderMessage.classList.add("loaded");
 
@@ -245,8 +249,16 @@ async function checkBarcode() {
       checkedSKUparagraph.textContent = orderedSKUs[i];
       // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
       // and put it in the progress-container; loop until the end of orderedSKUs array.
-      frameProgressContainer.append(checkedSKUparagraph);
-      document.querySelector(`#${orderedSKUs[i]}`).remove();
+      
+      /* temp
+      frameProgressContainer.append(checkedSKUparagraph); */
+      frameProgressContainer.classList.remove("error-message");
+      frameProgressContainer.innerHTML = "Correct!! Scan another.";
+      frameProgressContainer.classList.add("success-message");
+      
+      /* temp 
+      document.querySelector(`#${orderedSKUs[i]}`).remove(); */
+      document.querySelector(`#${orderedSKUs[i]}`).classList.add("checked-sku");
 
       // Remove scanned SKU from orderedSKUs array.
       console.log(`Before splice: ${orderedSKUs}`);
@@ -262,7 +274,10 @@ async function checkBarcode() {
 
   // If no matching SKU is found
   if (!skuFound) {
-    orderMessage.textContent = "Wrong Product";
+    //orderMessage.textContent = "Wrong Product";
+    frameProgressContainer.classList.remove("success-message");
+    frameProgressContainer.innerHTML = "Wrong Product";
+    frameProgressContainer.classList.add("error-message");
     barcodeInput.value = "";
     barcodeInput.focus();
   }
@@ -271,6 +286,8 @@ async function checkBarcode() {
   if (orderedSKUs.length === 0) {
     disableBarcode();
     orderMessage.textContent = "Order complete!";
+    frameProgressContainer.classList.add("hidden");
+    resetBtn.textContent = "Scan a new order";
     const orderId = orderID; // MOVED line (from duplicated 'if')
     await appendOrderNoteAndChangeStatus(orderId, successMessage); // MOVED line (from duplicated 'if')
   }

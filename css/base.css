@@ -251,3 +251,7 @@ header h1 {
 #frame-progress-container {
   align-items: center;
 }
+
+#frame-SKU-container {
+  font-size: 15px;
+}

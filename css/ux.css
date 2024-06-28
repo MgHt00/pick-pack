@@ -3,6 +3,7 @@ body.start {
   /* justify-content: center; */
 }
 
+header.hidden,
 #frame-order-message.hidden,
 .load-btn-container.hidden,
 #frame-load-order.hidden,
@@ -55,7 +56,7 @@ body.start {
 
 #frame-SKU-container p:not(:last-child) {
   border-bottom: 1px dashed rgba(60, 60, 67, 0.3);
-  padding-bottom: 5px;
+  padding-bottom: 4px;
 }
 
 #frame-SKU-container p.checked-sku {
