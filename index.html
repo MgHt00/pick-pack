@@ -4,40 +4,78 @@
 <head>
   <title>MMLS Pick and Pack</title>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <style>
-    body {
-      background-color: #222222;
-      color: white;
-    }
-  </style>
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/ux.css">
 </head>
 
-<body>
-  <h1>Check Barcode</h1>
-  <section id="order-container">
-    <input type="text" id="order-input" placeholder="Input order number">
-    <button id="load-order-btn">Load Order</button>
+<body class="start">
+  <header id="frame-header">
+    <h1>Pick & Pack</h1>
+  </header>
+
+  <section id="frame-load-order">
+    <div class="order-input-container">
+      <div class="input-top">
+        <div class="input-content">
+          <label class="label-order" for="input">Enter Order Number:</label>
+          <input class="input-order" id="order-input" placeholder="">
+        </div>
+      </div>
+      <div class="input-bottom">
+        <div class="helper">
+          Enter and order number and press Load.
+        </div>
+      </div>
+    </div>
+    <button class="load-btn-container" id="load-order-btn">
+      Load
+    </button>
   </section>
+
+  <section id="frame-order-message" class="hidden">
+      <p id="order-message">Load an order</p>
+      <button class="load-btn-container hidden" id="reset-btn">
+        Reset
+      </button>
+  </section>
+
+  <section id="frame-SKU-container" class="hidden"></section>
+
+  <section id="frame-progress-container" class="hidden"></section>
+
+  <section id="frame-scan-barcode" class="hidden">
+    <div class="barcode-input-container">
+      <div class="input-top disabled" id="barcode-input-top">
+        <div class="input-content">
+          <label class="label-order disabled" id="barcode-label" for="input">Scan Barcode:</label>
+          <input class="input-order" id="barcode-input" type="text" placeholder="">
+          <!--input type="text" id="barcode-input" placeholder="Scan barcode"-->
+        </div>
+      </div>
+      <div class="input-bottom">
+        <div class="helper">
+          Scan product barcode and press Check.
+        </div>
+      </div>
+    </div>
+    <button class="load-btn-container disabled" id="check-barcode-btn">
+      Check
+    </button>
+  </section>
+
 
   <section id="message-container">
-    <p id="message-paragraph">&nbsp;</p>
-  </section>
-
-  <!--section id="message-container">
-    <p id="order-message">&nbsp;</p>
-  </section-->
-
-  <section id="SKU-container">
-    
+    <!--p id="message-paragraph">&nbsp;</p-->
   </section>
 
   <section id="scan-container">
-    <input type="text" id="barcode-input" placeholder="Scan barcode">
-    <button id="check-barcode-btn">Check Barcode</button>
+    
+    
   </section>
 
   
-  <section id="progress-container"></section>
+  
 
   <script type="module" src="js/pack.js"></script>
 </body>

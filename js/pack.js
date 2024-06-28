@@ -1,18 +1,26 @@
-/*import { consumerKey, consumerSecret } from './config.js';*/
+import { consumerKey, consumerSecret } from './config.js';
 
-const consumerKey = 'ck_2c623eb59a0d402737750dc26c82bf0b11298816';
-const consumerSecret = 'cs_99211764913a428f22e7a4e39b67f58ec4011c7a';
+/*const consumerKey = 'ck_2c623eb59a0d402737750dc26c82bf0b11298816';
+const consumerSecret = 'cs_99211764913a428f22e7a4e39b67f58ec4011c7a';*/
 
 let orderItems = []; // to fetch all info of an order
 let orderedSKUs = []; // to keep the ordered SKUs
+const bodyElement = document.body;
+const headerElement = document.querySelector("#frame-header");
+const frameLoadOrder = document.querySelector("#frame-load-order");
 const orderInput = document.querySelector("#order-input");
 const loadOrderBtn = document.querySelector("#load-order-btn");
-const skuContainer = document.querySelector("#SKU-container");
+const resetBtn = document.querySelector("#reset-btn");
+const frameSKUContainer = document.querySelector("#frame-SKU-container");
+const frameScanBarcode = document.querySelector("#frame-scan-barcode");
+const barcodeInputTop = document.querySelector("#barcode-input-top");
+const barcodeLabel = document.querySelector("#barcode-label");
 const barcodeInput = document.querySelector("#barcode-input");
 const checkBarcodeBtn = document.querySelector("#check-barcode-btn");
 const messageContainer = document.querySelector("#message-container");
-const messageParagraph = document.querySelector("#message-paragraph");
-const progressContainer = document.querySelector("#progress-container");
+const frameOrderMessage = document.querySelector("#frame-order-message");
+const orderMessage = document.querySelector("#order-message");
+const frameProgressContainer = document.querySelector("#frame-progress-container");
 const successMessage = "All SKUs matched with barcodes successfully.";
 let orderID = 0;
 let totalSKUs = 0;
@@ -21,12 +29,12 @@ let totalSKUs = 0;
 document.addEventListener("DOMContentLoaded", function() {
   orderInput.focus(); // focus on the input at start.
   resetAll(); // Reset everything at the start.
-  // MOVED from outside to inside.
 });
 
 // Add Event Listeners
 checkBarcodeBtn.addEventListener("click", checkBarcode);
 loadOrderBtn.addEventListener("click", loadOrder);
+resetBtn.addEventListener("click", resetAll);
 
 // Add event listener for the "Enter" key press within the input field
 orderInput.addEventListener("keydown", function(event) {
@@ -43,71 +51,103 @@ barcodeInput.addEventListener("keydown", function(event) {
 
 // To disable barcode input and button
 function disableBarcode() {
+  barcodeInputTop.classList.add("disabled");
+  barcodeLabel.classList.add("disabled");
   barcodeInput.disabled = true;
   checkBarcodeBtn.disabled = true;
 }
 
 // To enable barcode input and button
 function enableBarcode() {
+  barcodeInputTop.classList.remove("disabled");
+  barcodeLabel.classList.remove("disabled");
   barcodeInput.disabled = false;
   checkBarcodeBtn.disabled = false;
 }
 
 // To reset when Load Order is pressed.
 function resetAll() {
+  bodyElement.classList.add("start");
+  headerElement.classList.remove("hidden");
+
+  frameLoadOrder.classList.remove("hidden");
+
+  frameOrderMessage.classList.add("hidden");
+  orderMessage.textContent = "";
+  orderMessage.classList.remove("error-message");
+  orderMessage.classList.remove("loaded");
+  resetBtn.classList.add("hidden");
+
+  frameSKUContainer.classList.add("hidden");
+  frameSKUContainer.innerHTML = "";
+
+  frameProgressContainer.classList.add("hidden");
+  frameProgressContainer.innerHTML = "";
+
+  frameScanBarcode.classList.add("hidden");
+  
+  disableBarcode();
+  //orderMessage.textContent = "Ready to begin.";
+  orderItems = []; 
+  orderedSKUs = [];
+  totalSKUs = 0; 
+  
   orderInput.value = "";
   orderInput.focus();
-  messageParagraph.textContent = "";
-  skuContainer.innerHTML = "";
-  progressContainer.innerHTML = "";
-  disableBarcode();
-  messageParagraph.textContent = "Load an order.";
-  orderItems = []; // NEW line
-  orderedSKUs = []; // NEW line
-  totalSKUs = 0; // NEW line
 }
 
 // To load an order with a user input
 async function loadOrder() {
+  frameOrderMessage.classList.remove("hidden");
+  orderMessage.classList.remove("success-message");
   orderID = orderInput.value; // Read the order ID before resetting
   if (!orderID) {
-    messageParagraph.textContent = "Please enter an order ID.";
-    messageParagraph.style.color = "red";
+    orderMessage.textContent = "Enter an order ID to load.";
+    //orderMessage.style.color = "red";
+    orderInput.focus();
     return;
   }
 
   resetAll();
-  console.log("resetAll() is called.");
 
   // Check if the order has already been checked
   // Need to ensure that the checkOrderNote function is called and 
   // awaited properly within the loadOrder function.
+  frameOrderMessage.classList.remove("hidden");
   const isOrderChecked = await checkOrderNote(orderID, successMessage);
   if (isOrderChecked) {
-    messageParagraph.textContent = "Order already checked.";
-    /*messageParagraph.style.color = "blue";
-    messageParagraph.style.background = "silver";*/
+    orderMessage.innerHTML = "Order already checked.<br>Enter another order.";
+    orderMessage.classList.add("success-message");
     orderInput.value = "";
     orderInput.focus();
     return;
   }
 
-  messageParagraph.textContent = "Order loading...";
+  orderMessage.textContent = "Order loading...";
   await fetchOrderItems(orderID); // ADD await
 }
 
 // Fetch SKUs from the user-input order number
 async function fetchOrderItems(orderId) {
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
-  /*const url = `/wp-json/wc/v3/orders/${orderId}`;*/
   const url = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
+  const timeout = 10000; // Set a timeout limit in milliseconds
 
   try {
-    const response = await axios.get(url, {
-      headers: {
-        'Authorization': `Basic ${auth}`
-      }
-    });
+    // Create a timeout promise
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Request timed out")), timeout)
+    );
+
+    // Fetch the order data with a race between the request and the timeout
+    const response = await Promise.race([
+      axios.get(url, {
+        headers: {
+          'Authorization': `Basic ${auth}`
+        }
+      }),
+      timeoutPromise
+    ]);
 
     // Assign WooCommerce order into `orderItems`
     if (response.data && response.data.line_items) {
@@ -116,20 +156,14 @@ async function fetchOrderItems(orderId) {
     } else {
       throw new Error("Order not found");
     }
-  } catch (error) {
-    console.error('Error fetching order data:', error);
-    messageParagraph.textContent = "Order Not found!";
-    messageParagraph.style.color = "red";
-    orderInput.value = "";
-    orderInput.focus();
-    return; // Exit the function if there is an error
-  }
 
   // To fetch ordered SKUs
   for (let orderItem of orderItems) {
     // Get `quantity` property from and `orderItem` object
     const quantity = Number(orderItem["quantity"]);
     /*console.log(`Order quantity ${quantity}`);*/
+
+    frameSKUContainer.classList.remove("hidden");
 
     // Add ordered SKU to the `orderedSKUs` array, and increment the counter.
     for (let i = 0; i < quantity; i++) {
@@ -138,16 +172,54 @@ async function fetchOrderItems(orderId) {
       const sku = document.createElement("p");
       sku.setAttribute("id", `${orderItem["sku"]}`);
       sku.textContent = orderItem["sku"];
-      skuContainer.append(sku);
+      frameSKUContainer.append(sku);
     }   
   }
-  messageParagraph.textContent = `${orderId} Loaded.`;
+
+  bodyElement.classList.remove("start");
+  bodyElement.classList.add("transition");
+
+  headerElement.classList.add("hidden");
+
+  orderMessage.textContent = `${orderId} Loaded.`;
+  orderMessage.classList.add("loaded");
+
+  frameLoadOrder.classList.add("hidden");
+  frameScanBarcode.classList.remove("hidden");
+
+  orderMessage.classList.add("transition");
+  resetBtn.classList.remove("hidden");
+
+  frameScanBarcode.classList.add("transition");
+
   enableBarcode();
   barcodeInput.focus();
-}
+  
+} catch (error) {
+    console.error('Error fetching order data:', error);
+
+    // Handle specific error messages
+    if (error.message === "Request timed out") {
+      orderMessage.innerHTML = "Order loading timed out. Please try again.";
+    } else if (error.response && error.response.status === 404) {
+      orderMessage.innerHTML = "Order not found!";
+    } else {
+      orderMessage.innerHTML = "Error loading order.<br>Please try again.";
+    }
+
+    orderMessage.classList.add("error-message");
+    orderInput.value = "";
+    orderInput.focus();
+    return; // Exit the function if there is an error
+  }
+} 
+
+
 
 // To match scanned-SKUs with ordered-SKUs
 async function checkBarcode() {
+  frameProgressContainer.classList.remove("hidden");
+
   const barcode = barcodeInput.value;
   const checkedSKUparagraph = document.createElement("p");
   const existingError = document.querySelector("#barcodeError");
@@ -162,22 +234,31 @@ async function checkBarcode() {
   // Display error if barcode input is empty
   if (!barcode) {
     const errorParagraph = document.createElement("p");
-    errorParagraph.textContent = "Please scan a barcode.";
+    errorParagraph.textContent = "Scan a barcode to check.";
+    errorParagraph.classList.add("error-message");
     errorParagraph.setAttribute("id", "barcodeError");
-    errorParagraph.style.color = "red";
-    progressContainer.append(errorParagraph);
+    //errorParagraph.style.color = "red";
+    frameProgressContainer.append(errorParagraph);
     return;
   }
 
   // Iterate through the ordered SKUs to find a match
   for (let i = 0; i < orderedSKUs.length; i++) {
     if (barcode === orderedSKUs[i]) {
-      messageParagraph.textContent = "";
+      ///orderMessage.textContent = "";
       checkedSKUparagraph.textContent = orderedSKUs[i];
-      // If scanned barcode is same as orderedSKU, matched SKU is removed from the SKU-container
+      // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
       // and put it in the progress-container; loop until the end of orderedSKUs array.
-      progressContainer.append(checkedSKUparagraph);
-      document.querySelector(`#${orderedSKUs[i]}`).remove();
+      
+      /* temp
+      frameProgressContainer.append(checkedSKUparagraph); */
+      frameProgressContainer.classList.remove("error-message");
+      frameProgressContainer.innerHTML = "Correct!! Scan another.";
+      frameProgressContainer.classList.add("success-message");
+      
+      /* temp 
+      document.querySelector(`#${orderedSKUs[i]}`).remove(); */
+      document.querySelector(`#${orderedSKUs[i]}`).classList.add("checked-sku");
 
       // Remove scanned SKU from orderedSKUs array.
       console.log(`Before splice: ${orderedSKUs}`);
@@ -193,7 +274,10 @@ async function checkBarcode() {
 
   // If no matching SKU is found
   if (!skuFound) {
-    messageParagraph.textContent = "Wrong Product";
+    //orderMessage.textContent = "Wrong Product";
+    frameProgressContainer.classList.remove("success-message");
+    frameProgressContainer.innerHTML = "Wrong Product";
+    frameProgressContainer.classList.add("error-message");
     barcodeInput.value = "";
     barcodeInput.focus();
   }
@@ -201,7 +285,9 @@ async function checkBarcode() {
   // Check if all SKUs are scanned
   if (orderedSKUs.length === 0) {
     disableBarcode();
-    messageParagraph.textContent = "Order complete!";
+    orderMessage.textContent = "Order complete!";
+    frameProgressContainer.classList.add("hidden");
+    resetBtn.textContent = "Scan a new order";
     const orderId = orderID; // MOVED line (from duplicated 'if')
     await appendOrderNoteAndChangeStatus(orderId, successMessage); // MOVED line (from duplicated 'if')
   }
@@ -284,7 +370,7 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
 }
 
 async function checkOrderNote(orderId, successMessage) {
-  messageParagraph.textContent = "Order loading...";
+  orderMessage.textContent = "Order loading...";
 
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
   const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
