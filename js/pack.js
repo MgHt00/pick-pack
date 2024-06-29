@@ -17,7 +17,6 @@ const barcodeInputTop = document.querySelector("#barcode-input-top");
 const barcodeLabel = document.querySelector("#barcode-label");
 const barcodeInput = document.querySelector("#barcode-input");
 const checkBarcodeBtn = document.querySelector("#check-barcode-btn");
-const messageContainer = document.querySelector("#message-container");
 const frameOrderMessage = document.querySelector("#frame-order-message");
 const orderMessage = document.querySelector("#order-message");
 const frameProgressContainer = document.querySelector("#frame-progress-container");
@@ -80,6 +79,7 @@ function resetAll() {
 
   orderMessage.textContent = "";
   orderMessage.className = "";
+  resetBtn.textContent =  "Reset";
   resetBtn.classList.add("hidden");
 
   frameSKUContainer.className = "";
@@ -258,14 +258,10 @@ async function checkBarcode() {
       // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
       // and put it in the progress-container; loop until the end of orderedSKUs array.
       
-      /* temp
-      frameProgressContainer.append(checkedSKUparagraph); */
       frameProgressContainer.classList.remove("error-message");
       frameProgressContainer.innerHTML = "Correct!! Scan another.";
       frameProgressContainer.classList.add("success-message");
       
-      /* temp 
-      document.querySelector(`#${orderedSKUs[i]}`).remove(); */
       document.querySelector(`#${orderedSKUs[i]}`).classList.add("checked-sku");
 
       // Remove scanned SKU from orderedSKUs array.
@@ -297,12 +293,15 @@ async function checkBarcode() {
     disableBarcode();
     orderMessage.textContent = "Order complete!";
     orderMessage.classList.add("order-complete");
+
+    frameSKUContainer.classList.add("hidden");
     frameProgressContainer.classList.add("hidden");
-    resetBtn.textContent = "Scan a new order";
+    frameScanBarcode.classList.add("hidden");
+
+    resetBtn.textContent = "Check a new order";
     const orderId = orderID; // MOVED line (from duplicated 'if')
 
     await appendOrderNoteAndChangeStatus(orderId, successMessage); // MOVED line (from duplicated 'if')
-   /*console.log("appendOrderNoteAndChangeStatus() is called");*/
   }
 }
 

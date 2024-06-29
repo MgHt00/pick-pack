@@ -211,9 +211,9 @@ header h1 {
 
   /* button text (load-btn-text) */
   font-family: "Poppins", sans-serif;
-  font-weight: 500;
+  font-weight: 400;
   font-style: normal;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 24px;
 
   /* Inside auto layout */
