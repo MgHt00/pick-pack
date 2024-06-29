@@ -49,6 +49,11 @@ header.hidden,
   text-align: center;
 }
 
+.order-complete {
+  color: #33a24e;
+  font-weight: 600;
+}
+
 .error-message {
   color: red;
   text-align: center;

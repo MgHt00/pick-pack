@@ -68,22 +68,29 @@ function enableBarcode() {
 // To reset when Load Order is pressed.
 function resetAll() {
   bodyElement.classList.add("start");
+
+  headerElement.className = "";
   headerElement.classList.remove("hidden");
 
+  frameLoadOrder.className = "";
   frameLoadOrder.classList.remove("hidden");
 
+  frameOrderMessage.className = "";
   frameOrderMessage.classList.add("hidden");
+
   orderMessage.textContent = "";
-  orderMessage.classList.remove("error-message");
-  orderMessage.classList.remove("loaded");
+  orderMessage.className = "";
   resetBtn.classList.add("hidden");
 
+  frameSKUContainer.className = "";
   frameSKUContainer.classList.add("hidden");
   frameSKUContainer.innerHTML = "";
 
+  frameProgressContainer.className = "";
   frameProgressContainer.classList.add("hidden");
   frameProgressContainer.innerHTML = "";
 
+  frameScanBarcode.className = "";
   frameScanBarcode.classList.add("hidden");
   
   disableBarcode();
@@ -233,6 +240,7 @@ async function checkBarcode() {
 
   // Display error if barcode input is empty
   if (!barcode) {
+    frameProgressContainer.innerHTML = "";
     const errorParagraph = document.createElement("p");
     errorParagraph.textContent = "Scan a barcode to check.";
     errorParagraph.classList.add("error-message");
@@ -275,9 +283,11 @@ async function checkBarcode() {
   // If no matching SKU is found
   if (!skuFound) {
     //orderMessage.textContent = "Wrong Product";
+
     frameProgressContainer.classList.remove("success-message");
     frameProgressContainer.innerHTML = "Wrong Product";
     frameProgressContainer.classList.add("error-message");
+    
     barcodeInput.value = "";
     barcodeInput.focus();
   }
@@ -286,10 +296,13 @@ async function checkBarcode() {
   if (orderedSKUs.length === 0) {
     disableBarcode();
     orderMessage.textContent = "Order complete!";
+    orderMessage.classList.add("order-complete");
     frameProgressContainer.classList.add("hidden");
     resetBtn.textContent = "Scan a new order";
     const orderId = orderID; // MOVED line (from duplicated 'if')
+
     await appendOrderNoteAndChangeStatus(orderId, successMessage); // MOVED line (from duplicated 'if')
+   /*console.log("appendOrderNoteAndChangeStatus() is called");*/
   }
 }
 
