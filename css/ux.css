@@ -76,8 +76,14 @@ header.hidden,
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+/* Define hover state with subtle animation */
 .load-btn-container:hover {
-  /* Define hover state with subtle animation */
   background-color: rgba(240, 240, 240, 0.1);
   transform: scale(0.99);
+}
+
+/* Define active state with subtle animation */
+.load-btn-container:active {
+  background-color: rgba(240, 240, 240, 0.2);
+  transform: scale(0.97);
 }
