@@ -47,7 +47,8 @@ header h1 {
   gap: 10px;
 }
 
-.order-input-container {
+.order-input-container,
+.barcode-input-container {
   /* Auto layout */
   display: flex;
   flex-direction: column;
@@ -227,7 +228,7 @@ header h1 {
   height: 24px;
 
   font-family: "Poppins", sans-serif;
-  font-weight: 500;
+  font-weight: 400;
   font-style: normal;
   font-size: 15px;
   line-height: 24px;

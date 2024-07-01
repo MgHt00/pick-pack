@@ -299,9 +299,12 @@ async function checkBarcode() {
     frameScanBarcode.classList.add("hidden");
 
     resetBtn.textContent = "Check a new order";
-    const orderId = orderID; // MOVED line (from duplicated 'if')
+    const orderId = orderID; 
 
-    await appendOrderNoteAndChangeStatus(orderId, successMessage); // MOVED line (from duplicated 'if')
+    /* TEMP COMMENT 
+    await appendOrderNoteAndChangeStatus(orderId, successMessage);
+    */
+    console.log("appendOrderNoteAndChangeStatus() is called");
   }
 }
 
