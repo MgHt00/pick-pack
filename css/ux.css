@@ -69,3 +69,15 @@ header.hidden,
   color: rgba(60, 60, 67, 0.3);
   border-bottom: 1px dashed rgba(60, 60, 67, 0.1);
 }
+
+/* Animations */
+.load-btn-container {
+  /* Add transition for animation */
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.load-btn-container:hover {
+  /* Define hover state with subtle animation */
+  background-color: rgba(240, 240, 240, 0.1);
+  transform: scale(0.99);
+}
