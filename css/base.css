@@ -6,11 +6,11 @@
 }
 
 html {
-  background-color: #222222;
+  background-color: #fefefe;
 }
 
 body {
-  background-color: #ffffff;
+  background-color: #fefefe;
   inline-size: 334px;
   margin: 0px auto;
   /*min-height: calc(100vh - 20px);*/
