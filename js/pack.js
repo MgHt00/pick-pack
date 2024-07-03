@@ -254,9 +254,9 @@ async function checkBarcode() {
     resetBtn.textContent = "Check a new order";
     const orderId = orderID; 
 
-    /* TEMP COMMENT 
+    /* TEMP COMMENT */
     await appendOrderNoteAndChangeStatus(orderId, successMessage);
-    */
+    
     console.log("appendOrderNoteAndChangeStatus() is called");
   }
 }
