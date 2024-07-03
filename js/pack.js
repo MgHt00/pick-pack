@@ -1,7 +1,7 @@
-import { consumerKey, consumerSecret } from './config.js';
+/*import { consumerKey, consumerSecret } from './config.js';*/
 
-/*const consumerKey = '%%CONSUMER_KEY%%';
-const consumerSecret = '%%CONSUMER_SECRET%%';*/
+const consumerKey = '%%CONSUMER_KEY%%';
+const consumerSecret = '%%CONSUMER_SECRET%%';
 
 let orderItems = []; // to fetch all info of an order
 let orderedSKUs = []; // to keep the ordered SKUs
@@ -254,9 +254,9 @@ async function checkBarcode() {
     resetBtn.textContent = "Check a new order";
     const orderId = orderID; 
 
-    /* TEMP COMMENT 
+    /* TEMP COMMENT */
     await appendOrderNoteAndChangeStatus(orderId, successMessage);
-    */
+    
     console.log("appendOrderNoteAndChangeStatus() is called");
   }
 }
