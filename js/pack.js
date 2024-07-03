@@ -17,7 +17,6 @@ const barcodeInputTop = document.querySelector("#barcode-input-top");
 const barcodeLabel = document.querySelector("#barcode-label");
 const barcodeInput = document.querySelector("#barcode-input");
 const checkBarcodeBtn = document.querySelector("#check-barcode-btn");
-const messageContainer = document.querySelector("#message-container");
 const frameOrderMessage = document.querySelector("#frame-order-message");
 const orderMessage = document.querySelector("#order-message");
 const frameProgressContainer = document.querySelector("#frame-progress-container");
@@ -25,18 +24,17 @@ const successMessage = "All SKUs matched with barcodes successfully.";
 let orderID = 0;
 let totalSKUs = 0;
 
+// EVENT: Listeners
 // To ensure that the DOM is fully loaded before the script executes
 document.addEventListener("DOMContentLoaded", function() {
   orderInput.focus(); // focus on the input at start.
   resetAll(); // Reset everything at the start.
 });
 
-// Add Event Listeners
 checkBarcodeBtn.addEventListener("click", checkBarcode);
 loadOrderBtn.addEventListener("click", loadOrder);
 resetBtn.addEventListener("click", resetAll);
 
-// Add event listener for the "Enter" key press within the input field
 orderInput.addEventListener("keydown", function(event) {
   if (event.key === "Enter") {
     loadOrder();
@@ -49,61 +47,15 @@ barcodeInput.addEventListener("keydown", function(event) {
   }
 });
 
-// To disable barcode input and button
-function disableBarcode() {
-  barcodeInputTop.classList.add("disabled");
-  barcodeLabel.classList.add("disabled");
-  barcodeInput.disabled = true;
-  checkBarcodeBtn.disabled = true;
-}
-
-// To enable barcode input and button
-function enableBarcode() {
-  barcodeInputTop.classList.remove("disabled");
-  barcodeLabel.classList.remove("disabled");
-  barcodeInput.disabled = false;
-  checkBarcodeBtn.disabled = false;
-}
-
-// To reset when Load Order is pressed.
-function resetAll() {
-  bodyElement.classList.add("start");
-  headerElement.classList.remove("hidden");
-
-  frameLoadOrder.classList.remove("hidden");
-
-  frameOrderMessage.classList.add("hidden");
-  orderMessage.textContent = "";
-  orderMessage.classList.remove("error-message");
-  orderMessage.classList.remove("loaded");
-  resetBtn.classList.add("hidden");
-
-  frameSKUContainer.classList.add("hidden");
-  frameSKUContainer.innerHTML = "";
-
-  frameProgressContainer.classList.add("hidden");
-  frameProgressContainer.innerHTML = "";
-
-  frameScanBarcode.classList.add("hidden");
-  
-  disableBarcode();
-  //orderMessage.textContent = "Ready to begin.";
-  orderItems = []; 
-  orderedSKUs = [];
-  totalSKUs = 0; 
-  
-  orderInput.value = "";
-  orderInput.focus();
-}
-
-// To load an order with a user input
+// FUNCTION: To load an order with a user input
 async function loadOrder() {
   frameOrderMessage.classList.remove("hidden");
   orderMessage.classList.remove("success-message");
   orderID = orderInput.value; // Read the order ID before resetting
   if (!orderID) {
+    playWrongSound();
     orderMessage.textContent = "Enter an order ID to load.";
-    //orderMessage.style.color = "red";
+    //playBeepSound();
     orderInput.focus();
     return;
   }
@@ -120,6 +72,7 @@ async function loadOrder() {
     orderMessage.classList.add("success-message");
     orderInput.value = "";
     orderInput.focus();
+    playWrongSound();
     return;
   }
 
@@ -127,7 +80,7 @@ async function loadOrder() {
   await fetchOrderItems(orderID); // ADD await
 }
 
-// Fetch SKUs from the user-input order number
+// FUNCTION: Fetch SKUs from the user-input order number
 async function fetchOrderItems(orderId) {
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
   const url = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
@@ -183,6 +136,7 @@ async function fetchOrderItems(orderId) {
 
   orderMessage.textContent = `${orderId} Loaded.`;
   orderMessage.classList.add("loaded");
+  playBeepSound();
 
   frameLoadOrder.classList.add("hidden");
   frameScanBarcode.classList.remove("hidden");
@@ -208,6 +162,7 @@ async function fetchOrderItems(orderId) {
     }
 
     orderMessage.classList.add("error-message");
+    playWrongSound();
     orderInput.value = "";
     orderInput.focus();
     return; // Exit the function if there is an error
@@ -215,8 +170,7 @@ async function fetchOrderItems(orderId) {
 } 
 
 
-
-// To match scanned-SKUs with ordered-SKUs
+// FUNCTION: To match scanned-SKUs with ordered-SKUs
 async function checkBarcode() {
   frameProgressContainer.classList.remove("hidden");
 
@@ -233,12 +187,14 @@ async function checkBarcode() {
 
   // Display error if barcode input is empty
   if (!barcode) {
+    frameProgressContainer.innerHTML = "";
     const errorParagraph = document.createElement("p");
     errorParagraph.textContent = "Scan a barcode to check.";
     errorParagraph.classList.add("error-message");
     errorParagraph.setAttribute("id", "barcodeError");
     //errorParagraph.style.color = "red";
     frameProgressContainer.append(errorParagraph);
+    playWrongSound();
     return;
   }
 
@@ -246,18 +202,14 @@ async function checkBarcode() {
   for (let i = 0; i < orderedSKUs.length; i++) {
     if (barcode === orderedSKUs[i]) {
       ///orderMessage.textContent = "";
-      checkedSKUparagraph.textContent = orderedSKUs[i];
+      //checkedSKUparagraph.textContent = orderedSKUs[i];
       // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
       // and put it in the progress-container; loop until the end of orderedSKUs array.
       
-      /* temp
-      frameProgressContainer.append(checkedSKUparagraph); */
       frameProgressContainer.classList.remove("error-message");
       frameProgressContainer.innerHTML = "Correct!! Scan another.";
       frameProgressContainer.classList.add("success-message");
       
-      /* temp 
-      document.querySelector(`#${orderedSKUs[i]}`).remove(); */
       document.querySelector(`#${orderedSKUs[i]}`).classList.add("checked-sku");
 
       // Remove scanned SKU from orderedSKUs array.
@@ -266,6 +218,7 @@ async function checkBarcode() {
       console.log(`After splice: ${orderedSKUs}`);
 
       skuFound = true;
+      playBeepSound();
       barcodeInput.value = "";
       barcodeInput.focus();
       break; // To exit the loop immediately after processing the matched SKU.
@@ -275,9 +228,12 @@ async function checkBarcode() {
   // If no matching SKU is found
   if (!skuFound) {
     //orderMessage.textContent = "Wrong Product";
+
     frameProgressContainer.classList.remove("success-message");
     frameProgressContainer.innerHTML = "Wrong Product";
     frameProgressContainer.classList.add("error-message");
+    
+    playWrongSound();
     barcodeInput.value = "";
     barcodeInput.focus();
   }
@@ -285,14 +241,27 @@ async function checkBarcode() {
   // Check if all SKUs are scanned
   if (orderedSKUs.length === 0) {
     disableBarcode();
+    //playCorrectSound();
+    playCompleteSound();
+
     orderMessage.textContent = "Order complete!";
+    orderMessage.classList.add("order-complete");
+
+    frameSKUContainer.classList.add("hidden");
     frameProgressContainer.classList.add("hidden");
-    resetBtn.textContent = "Scan a new order";
-    const orderId = orderID; // MOVED line (from duplicated 'if')
-    await appendOrderNoteAndChangeStatus(orderId, successMessage); // MOVED line (from duplicated 'if')
+    frameScanBarcode.classList.add("hidden");
+
+    resetBtn.textContent = "Check a new order";
+    const orderId = orderID; 
+
+    /* TEMP COMMENT 
+    await appendOrderNoteAndChangeStatus(orderId, successMessage);
+    */
+    console.log("appendOrderNoteAndChangeStatus() is called");
   }
 }
 
+// FUNCTION: 
 async function appendOrderNote(orderId, successMessage) {
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
   const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
@@ -324,6 +293,7 @@ async function appendOrderNote(orderId, successMessage) {
   }
 }
 
+// FUNCTION: 
 async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
   const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
@@ -369,6 +339,7 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
   }
 }
 
+// FUNCTION:
 async function checkOrderNote(orderId, successMessage) {
   orderMessage.textContent = "Order loading...";
 
@@ -402,4 +373,131 @@ async function checkOrderNote(orderId, successMessage) {
     console.error('Error appending order note:', error);
     return false; // In case of error, consider the order as not checked
   }
+}
+
+// MISC functions
+// FUNCTION: To disable barcode input and button
+function disableBarcode() {
+  barcodeInputTop.classList.add("disabled");
+  barcodeLabel.classList.add("disabled");
+  barcodeInput.disabled = true;
+  checkBarcodeBtn.disabled = true;
+}
+
+// FUNCTION: To enable barcode input and button
+function enableBarcode() {
+  barcodeInputTop.classList.remove("disabled");
+  barcodeLabel.classList.remove("disabled");
+  barcodeInput.disabled = false;
+  checkBarcodeBtn.disabled = false;
+}
+
+// FUNCTION: To reset when Load Order is pressed.
+function resetAll() {
+  bodyElement.classList.add("start");
+
+  headerElement.className = "";
+  headerElement.classList.remove("hidden");
+
+  frameLoadOrder.className = "";
+  frameLoadOrder.classList.remove("hidden");
+
+  frameOrderMessage.className = "";
+  frameOrderMessage.classList.add("hidden");
+
+  orderMessage.textContent = "";
+  orderMessage.className = "";
+  resetBtn.textContent =  "Reset";
+  resetBtn.classList.add("hidden");
+
+  frameSKUContainer.className = "";
+  frameSKUContainer.classList.add("hidden");
+  frameSKUContainer.innerHTML = "";
+
+  frameProgressContainer.className = "";
+  frameProgressContainer.classList.add("hidden");
+  frameProgressContainer.innerHTML = "";
+
+  frameScanBarcode.className = "";
+  frameScanBarcode.classList.add("hidden");
+  
+  disableBarcode();
+  //orderMessage.textContent = "Ready to begin.";
+  orderItems = []; 
+  orderedSKUs = [];
+  totalSKUs = 0; 
+  
+  orderInput.value = "";
+  orderInput.focus();
+}
+
+// Sounds
+function playBeepSound() {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+
+  oscillator.type = 'square';
+  oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 note
+  gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + 0.1); // Play sound for 0.1 seconds
+}
+
+function playCorrectSound() {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(600, audioCtx.currentTime); // Custom frequency
+  gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
+}
+
+function playWrongSound() {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+
+  /*
+  oscillator.type = 'triangle';
+  oscillator.frequency.setValueAtTime(200, audioCtx.currentTime); // Custom frequency
+  gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
+  */
+
+  oscillator.type = 'sawtooth';
+  oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
+  gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
+}
+
+function playCompleteSound() {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+
+  oscillator.type = 'sawtooth';
+  oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
+  gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + 0.5); // Play sound for 0.5 seconds
 }
