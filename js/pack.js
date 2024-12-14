@@ -13,6 +13,13 @@ const globalInstance = new Global();
 const soundInstance = new soundManager();
 
 (function initialize(){
+  console.groupCollapsed("initialize()");
+  globalInstance
+    .hideFrameOrderMessage()
+    .hideFrameSKUContainer()
+    .hideFrameProgressContainer()
+    .hideFrameScanBarcode();
+
   globalInstance.checkBarcodeBtn.addEventListener("click", checkBarcode);
   globalInstance.loadOrderBtn.addEventListener("click", loadOrder);
   globalInstance.resetBtn.addEventListener("click", resetAll);
@@ -35,6 +42,7 @@ const soundInstance = new soundManager();
       checkBarcode();
     }
   });
+  console.groupEnd();
 })();
 
 // FUNCTION: To load an order with a user input

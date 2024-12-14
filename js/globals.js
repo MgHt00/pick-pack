@@ -25,6 +25,49 @@ export default class Global {
     return document.querySelector("#order-input").value;
   }
 
+  // hide functions
+  hideFrameOrderMessage() {
+    console.log("hideFrameOrderMessage()");
+    return this.addClass(this.frameOrderMessage, "hidden"); // The preceding `return this` enables method chaining.
+  }
+
+  hideFrameSKUContainer() {
+    console.log("hideFrameSKUContainer()");
+    return this.addClass(this.frameSKUContainer, "hidden");
+  }
+
+  hideFrameProgressContainer() {
+    console.log("hideFrameProgressContainer()");
+    return this.addClass(this.frameProgressContainer, "hidden");
+  }
+
+  hideFrameScanBarcode() {
+    console.log("hideFrameScanBarcode()");
+    return this.addClass(this.frameScanBarcode, "hidden");
+  }
+
+  // show functions
+  showFrameOrderMessage() {
+    console.log("showFrameOrderMessage()");
+    return this.removeClass(this.frameOrderMessage, "hidden"); 
+  }
+
+  showFrameSKUContainer() {
+    console.log("showFrameSKUContainer()");
+    return this.removeClass(this.frameSKUContainer, "hidden"); 
+  }
+
+  showFrameProgressContainer() {
+    console.log("showFrameProgressContainer()");
+    return this.removeClass(this.frameProgressContainer, "hidden"); 
+  }
+
+  showFrameScanBarcode() {
+    console.log("showFrameScanBarcoder()");
+    return this.removeClass(this.frameScanBarcode, "hidden"); 
+  }
+
+  // other functions
   insertInnerHTML(targetElement, content) {
     targetElement.innerHtml = content;
     return this;
