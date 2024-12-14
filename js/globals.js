@@ -25,6 +25,12 @@ export default class Global {
     return document.querySelector("#order-input").value;
   }
 
+  resetOrderInput() {
+    this.orderInput.value = "";
+    this.orderInput.focus();
+    return this;
+  }
+
   // hide functions
   hideFrameOrderMessage() {
     console.log("hideFrameOrderMessage()");
@@ -67,22 +73,19 @@ export default class Global {
     return this.removeClass(this.frameScanBarcode, "hidden"); 
   }
 
+  // text insertion functions
+  updateOrderMessage(content) {
+    console.log("orderMessageContent()");
+    return this.insertTextContent(this.orderMessage, content);
+  }
+
   // other functions
   insertInnerHTML(targetElement, content) {
     targetElement.innerHtml = content;
     return this;
   }
 
-  insertTextContent(targetElement, content) {
-    targetElement.textContent = content;
-    return this;
-  }
-
-  resetOrderInput() {
-    this.orderInput.value = "";
-    this.orderInput.focus();
-    return this;
-  }
+  
 }
 
 Object.assign(Global.prototype, generalFunctions);

@@ -57,7 +57,7 @@ async function loadOrder() {
   if (!orderID) {
     soundInstance.playWrongSound();
     globalInstance
-      .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
+      .updateOrderMessage("Enter an order ID to load.")
       .orderInput.focus();
     console.groupEnd();
     return;

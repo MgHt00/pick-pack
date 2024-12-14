@@ -15,5 +15,8 @@ export const generalFunctions = {
     return this;
   },
 
-  // Add more utility functions here as needed
+  insertTextContent(targetElement, content) {
+    targetElement.textContent = content;
+    return this;
+  }
 };
