@@ -10,6 +10,7 @@ let orderID = 0;
 let totalSKUs = 0;
 
 const globalInstance = new Global();
+const soundInstance = new soundManager();
 
 (function initialize(){
   globalInstance.checkBarcodeBtn.addEventListener("click", checkBarcode);
@@ -38,6 +39,7 @@ const globalInstance = new Global();
 
 // FUNCTION: To load an order with a user input
 async function loadOrder() {
+  console.groupCollapsed("loadOrder()");
   globalInstance
     .removeClass(globalInstance.frameOrderMessage, "hidden")
     .removeClass(globalInstance.orderMessage, "success-message");
@@ -45,10 +47,11 @@ async function loadOrder() {
   orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
 
   if (!orderID) {
-    playWrongSound();
+    soundInstance.playWrongSound();
     globalInstance
       .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
       .orderInput.focus();
+    console.groupEnd();
     return;
   }
 
@@ -65,12 +68,14 @@ async function loadOrder() {
       .insertInnerHTML(globalInstance.orderMessage, "Order already checked.<br>Enter another order.")
       .addClass(globalInstance.orderMessage, "success-message")
       .resetOrderInput();
-    playWrongSound();
+    soundInstance.playWrongSound();
+    console.groupEnd();
     return;
   }
 
   globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading...");
   await fetchOrderItems(orderID); 
+  console.groupEnd();
 }
 
 // FUNCTION: Fetch SKUs from the user-input order number
@@ -129,7 +134,7 @@ async function fetchOrderItems(orderId) {
 
   globalInstance.orderMessage.textContent = `${orderId} Loaded.`;
   globalInstance.orderMessage.classList.add("loaded");
-  playBeepSound();
+  soundInstance.playBeepSound();
 
   globalInstance.frameLoadOrder.classList.add("hidden");
   globalInstance.frameScanBarcode.classList.remove("hidden");
@@ -155,7 +160,7 @@ async function fetchOrderItems(orderId) {
     }
 
     globalInstance.orderMessage.classList.add("error-message");
-    playWrongSound();
+    soundInstance.playWrongSound();
     globalInstance.orderInput.value = "";
     globalInstance.orderInput.focus();
     return; // Exit the function if there is an error
@@ -187,7 +192,7 @@ async function checkBarcode() {
     errorParagraph.setAttribute("id", "barcodeError");
     //errorParagraph.style.color = "red";
     globalInstance.frameProgressContainer.append(errorParagraph);
-    playWrongSound();
+    soundInstance.playWrongSound();
     return;
   }
 
@@ -211,7 +216,7 @@ async function checkBarcode() {
       console.log(`After splice: ${orderedSKUs}`);
 
       skuFound = true;
-      playBeepSound();
+      soundInstance.playBeepSound();
       globalInstance.barcodeInput.value = "";
       globalInstance.barcodeInput.focus();
       break; // To exit the loop immediately after processing the matched SKU.
@@ -226,7 +231,7 @@ async function checkBarcode() {
     globalInstance.frameProgressContainer.innerHTML = "Wrong Product";
     globalInstance.frameProgressContainer.classList.add("error-message");
     
-    playWrongSound();
+    soundInstance.playWrongSound();
     globalInstance.barcodeInput.value = "";
     globalInstance.barcodeInput.focus();
   }
@@ -234,8 +239,8 @@ async function checkBarcode() {
   // Check if all SKUs are scanned
   if (orderedSKUs.length === 0) {
     disableBarcode();
-    //playCorrectSound();
-    playCompleteSound();
+    //soundInstance.playCorrectSound();
+    soundInstance.playCompleteSound();
 
     globalInstance.orderMessage.textContent = "Order complete!";
     globalInstance.orderMessage.classList.add("order-complete");
@@ -424,73 +429,85 @@ function resetAll() {
   globalInstance.orderInput.focus();
 }
 
-// Sounds
-function playBeepSound() {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
+function soundManager() {
+  function playBeepSound() {
+    console.log("playBeepSound() played.");
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+  
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 note
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
+  
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+  
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.1); // Play sound for 0.1 seconds
+  }
+  
+  function playCorrectSound() {
+    console.log("playCorrectSound() played");
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+  
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(600, audioCtx.currentTime); // Custom frequency
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
+  
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+  
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
+  }
+  
+  function playWrongSound() {
+    console.log("playWrongSound() played");
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+  
+    /*
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(200, audioCtx.currentTime); // Custom frequency
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
+    */
+  
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
+  
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+  
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
+  }
+  
+  function playCompleteSound() {
+    console.log("playCompleteSound() played");
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+  
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
+  
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+  
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.5); // Play sound for 0.5 seconds
+  }
 
-  oscillator.type = 'square';
-  oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 note
-  gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-
-  oscillator.start();
-  oscillator.stop(audioCtx.currentTime + 0.1); // Play sound for 0.1 seconds
-}
-
-function playCorrectSound() {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-
-  oscillator.type = 'sine';
-  oscillator.frequency.setValueAtTime(600, audioCtx.currentTime); // Custom frequency
-  gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-
-  oscillator.start();
-  oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
-}
-
-function playWrongSound() {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-
-  /*
-  oscillator.type = 'triangle';
-  oscillator.frequency.setValueAtTime(200, audioCtx.currentTime); // Custom frequency
-  gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
-  */
-
-  oscillator.type = 'sawtooth';
-  oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
-  gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-
-  oscillator.start();
-  oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
-}
-
-function playCompleteSound() {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-
-  oscillator.type = 'sawtooth';
-  oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
-  gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-
-  oscillator.start();
-  oscillator.stop(audioCtx.currentTime + 0.5); // Play sound for 0.5 seconds
+  return {
+    playBeepSound,
+    playCorrectSound,
+    playWrongSound,
+    playCompleteSound,
+  }
 }
