@@ -432,10 +432,16 @@ function resetAll() {
 function soundManager() {
   function playBeepSound() {
     console.log("playBeepSound() played.");
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+    // Modern browsers require the AudioContext to be created or resumed after a user interaction (like a click or keypress) due to auto-play policies.
+    // Error occours when this line is moved outside. 
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-  
+    // oscillator and gainNode should be created within each function that plays a sound. 
+    // ...This ensures they are fresh instances each time the function is called.
+    // An oscillator can only be started and stopped once, and it cannot be reused. 
+    // ...Keeping it outside the function causes the error when you try to restart it. 
+
     oscillator.type = 'square';
     oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 note
     gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
@@ -449,7 +455,7 @@ function soundManager() {
   
   function playCorrectSound() {
     console.log("playCorrectSound() played");
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
   
@@ -466,15 +472,9 @@ function soundManager() {
   
   function playWrongSound() {
     console.log("playWrongSound() played");
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
-  
-    /*
-    oscillator.type = 'triangle';
-    oscillator.frequency.setValueAtTime(200, audioCtx.currentTime); // Custom frequency
-    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
-    */
   
     oscillator.type = 'sawtooth';
     oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
@@ -489,7 +489,7 @@ function soundManager() {
   
   function playCompleteSound() {
     console.log("playCompleteSound() played");
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
   
