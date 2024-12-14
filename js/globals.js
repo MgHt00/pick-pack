@@ -1,3 +1,5 @@
+import { generalFunctions } from "./generals.js";
+
 export default class Global {
   constructor() {
     this.bodyElement = document.body;
@@ -23,32 +25,6 @@ export default class Global {
     return document.querySelector("#order-input").value;
   }
 
-  removeClass(targetElements = null, className) {
-    console.log("removeClass()");
-    if (!targetElements) return this; // Return early if no elements are provided
-
-    // Ensure targetElements is an array
-    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
-    targetElements.forEach(element => {
-      element.classList.remove(className);
-    });
-    
-    return this;
-  }
-
-  addClass(targetElements = null, className) {
-    console.log("addClass()");
-    if (!targetElements) return this; // Return early if no elements are provided
-
-    // Ensure targetElements is an array
-    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
-    targetElements.forEach(element => {
-      element.classList.add(className);
-    });
-
-    return this;
-  }
-
   insertInnerHTML(targetElement, content) {
     targetElement.innerHtml = content;
     return this;
@@ -65,3 +41,5 @@ export default class Global {
     return this;
   }
 }
+
+Object.assign(Global.prototype, generalFunctions);
