@@ -1,3 +1,5 @@
 .env
 # Ignore config file with API keys
 js/config.js
+# Ignore VS code files
+*.code-workspace
