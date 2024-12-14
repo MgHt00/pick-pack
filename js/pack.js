@@ -376,16 +376,20 @@ async function checkOrderNote(orderId, successMessage) {
 // MISC functions
 // FUNCTION: To disable barcode input and button
 function disableBarcode() {
-  globalInstance.barcodeInputTop.classList.add("disabled");
-  globalInstance.barcodeLabel.classList.add("disabled");
+  console.log("disableBarcode() is called.");
+  globalInstance
+    .addClass(globalInstance.barcodeInputTop, "disabled")
+    .addClass(globalInstance.barcodeLabel, "disabled");
   globalInstance.barcodeInput.disabled = true;
   globalInstance.checkBarcodeBtn.disabled = true;
 }
 
 // FUNCTION: To enable barcode input and button
 function enableBarcode() {
-  globalInstance.barcodeInputTop.classList.remove("disabled");
-  globalInstance.barcodeLabel.classList.remove("disabled");
+  console.log("enableBarcode() is called");
+  globalInstance
+    .removeClass(globalInstance.barcodeInputTop, "disabled")
+    .removeClass(globalInstance.barcodeLabel, "disabled")
   globalInstance.barcodeInput.disabled = false;
   globalInstance.checkBarcodeBtn.disabled = false;
 }
