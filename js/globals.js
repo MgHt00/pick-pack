@@ -19,7 +19,8 @@ export default class Global {
   }
 
   readOrderInputValue() {
-    return document.querySelector("#order-input");
+    console.log(document.querySelector("#order-input").value);
+    return document.querySelector("#order-input").value;
   }
 
   removeClass(targetElement, className) {
