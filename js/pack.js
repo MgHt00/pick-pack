@@ -4,6 +4,11 @@ import Global from './globals.js';
 /*const consumerKey = '%%CONSUMER_KEY%%';
 const consumerSecret = '%%CONSUMER_SECRET%%';*/
 
+let orderItems = []; // to fetch all info of an order
+let orderedSKUs = []; // to keep the ordered SKUs
+let orderID = 0;
+let totalSKUs = 0;
+
 const globalInstance = new Global();
 
 (function initialize(){
@@ -31,53 +36,41 @@ const globalInstance = new Global();
   });
 })();
 
-let orderItems = []; // to fetch all info of an order
-let orderedSKUs = []; // to keep the ordered SKUs
-let orderID = 0;
-let totalSKUs = 0;
-
 // FUNCTION: To load an order with a user input
 async function loadOrder() {
-  /*globalInstance.frameOrderMessage.classList.remove("hidden");
-  globalInstance.orderMessage.classList.remove("success-message");*/
   globalInstance
     .removeClass(globalInstance.frameOrderMessage, "hidden")
     .removeClass(globalInstance.orderMessage, "success-message");
 
-  orderID = globalInstance.orderInput.value; // Read the order ID before resetting
+  orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
 
   if (!orderID) {
     playWrongSound();
-    globalInstance.orderMessage.textContent = "Enter an order ID to load.";
-    //playBeepSound();
-    globalInstance.orderInput.focus();
+    globalInstance
+      .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
+      .orderInput.focus();
     return;
   }
 
-  resetAll();
+  resetAll(); // reset everything before loading new order
 
   // Check if the order has already been checked
   // Need to ensure that the checkOrderNote function is called and 
   // awaited properly within the loadOrder function.
-
-  /*globalInstance.frameOrderMessage.classList.remove("hidden");*/
   globalInstance.removeClass(globalInstance.frameOrderMessage, "hidden");
 
   const isOrderChecked = await checkOrderNote(orderID, globalInstance.successMessage);
   if (isOrderChecked) {
-    /*globalInstance.orderMessage.innerHTML = "Order already checked.<br>Enter another order.";
-    globalInstance.orderMessage.classList.add("success-message");*/
-    globalInstance.insertInnerHTML(globalInstance.orderMessage, "Order already checked.<br>Enter another order.");
-    globalInstance.addClass(globalInstance.orderMessage, "success-message");
-    globalInstance.orderInput.value = "";
-    globalInstance.orderInput.focus();
+    globalInstance
+      .insertInnerHTML(globalInstance.orderMessage, "Order already checked.<br>Enter another order.")
+      .addClass(globalInstance.orderMessage, "success-message")
+      .resetOrderInput();
     playWrongSound();
     return;
   }
 
-  /*globalInstance.orderMessage.textContent = "Order loading...";*/
   globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading...");
-  await fetchOrderItems(orderID); // ADD await
+  await fetchOrderItems(orderID); 
 }
 
 // FUNCTION: Fetch SKUs from the user-input order number

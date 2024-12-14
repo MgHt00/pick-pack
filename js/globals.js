@@ -18,8 +18,8 @@ export default class Global {
     this.successMessage = "All SKUs matched with barcodes successfully.";
   }
 
-  readValue() {
-    
+  readOrderInputValue() {
+    return document.querySelector("#order-input");
   }
 
   removeClass(targetElement, className) {
@@ -39,6 +39,12 @@ export default class Global {
 
   insertTextContent(targetElement, content) {
     targetElement.textContent = content;
+    return this;
+  }
+
+  resetOrderInput() {
+    this.orderInput.value = "";
+    this.orderInput.focus();
     return this;
   }
 }
