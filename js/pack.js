@@ -376,7 +376,7 @@ async function checkOrderNote(orderId, successMessage) {
 // MISC functions
 // FUNCTION: To disable barcode input and button
 function disableBarcode() {
-  console.log("disableBarcode() is called.");
+  console.log("disableBarcode()");
   globalInstance
     .addClass(globalInstance.barcodeInputTop, "disabled")
     .addClass(globalInstance.barcodeLabel, "disabled");
@@ -386,7 +386,7 @@ function disableBarcode() {
 
 // FUNCTION: To enable barcode input and button
 function enableBarcode() {
-  console.log("enableBarcode() is called");
+  console.log("enableBarcode()");
   globalInstance
     .removeClass(globalInstance.barcodeInputTop, "disabled")
     .removeClass(globalInstance.barcodeLabel, "disabled")

@@ -23,13 +23,29 @@ export default class Global {
     return document.querySelector("#order-input").value;
   }
 
-  removeClass(targetElement, className) {
-    targetElement.classList.remove(className);
+  removeClass(targetElements = null, className) {
+    console.log("removeClass()");
+    if (!targetElements) return this; // Return early if no elements are provided
+
+    // Ensure targetElements is an array
+    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
+    targetElements.forEach(element => {
+      element.classList.remove(className);
+    });
+    
     return this;
   }
 
-  addClass(targetElement, className) {
-    targetElement.classList.add(className);
+  addClass(targetElements = null, className) {
+    console.log("addClass()");
+    if (!targetElements) return this; // Return early if no elements are provided
+
+    // Ensure targetElements is an array
+    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
+    targetElements.forEach(element => {
+      element.classList.add(className);
+    });
+
     return this;
   }
 
