@@ -1,4 +1,4 @@
-import { generalFunctions } from "./generals.js";
+import { classManager } from "./generals.js";
 
 export default class Global {
   constructor() {
@@ -88,4 +88,4 @@ export default class Global {
   
 }
 
-Object.assign(Global.prototype, generalFunctions);
+Object.assign(Global.prototype, classManager);

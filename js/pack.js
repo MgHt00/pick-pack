@@ -382,6 +382,9 @@ async function checkOrderNote(orderId, successMessage) {
 }
 
 // MISC functions
+function helperFunctions() {
+  
+}
 // FUNCTION: To disable barcode input and button
 function disableBarcode() {
   console.log("disableBarcode()");
