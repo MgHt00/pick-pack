@@ -49,8 +49,8 @@ const soundInstance = new soundManager();
 async function loadOrder() {
   console.groupCollapsed("loadOrder()");
   globalInstance
-    .removeClass(globalInstance.frameOrderMessage, "hidden")
-    .removeClass(globalInstance.orderMessage, "success-message");
+    .showFrameOrderMessage()
+    .removeClassFromOrderMessage("success-message");
 
   orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
 
@@ -64,24 +64,23 @@ async function loadOrder() {
   }
 
   resetAll(); // reset everything before loading new order
+  globalInstance.showFrameOrderMessage(); // need to show again because of `resetAll()`
 
   // Check if the order has already been checked
   // Need to ensure that the checkOrderNote function is called and 
   // awaited properly within the loadOrder function.
-  globalInstance.removeClass(globalInstance.frameOrderMessage, "hidden");
-
   const isOrderChecked = await checkOrderNote(orderID, globalInstance.successMessage);
   if (isOrderChecked) {
     globalInstance
-      .insertInnerHTML(globalInstance.orderMessage, "Order already checked.<br>Enter another order.")
-      .addClass(globalInstance.orderMessage, "success-message")
+      .setOrderMessageInnerHTML("Order already checked.<br>Enter another order.")
+      .addClassToOrderMessage("success-message")
       .resetOrderInput();
     soundInstance.playWrongSound();
     console.groupEnd();
     return;
   }
 
-  globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading...");
+  globalInstance.updateOrderMessage("Order loading...");
   await fetchOrderItems(orderID); 
   console.groupEnd();
 }

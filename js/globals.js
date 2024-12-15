@@ -1,4 +1,4 @@
-import { classManager } from "./generals.js";
+import { classManager, contentManager } from "./generals.js";
 
 export default class Global {
   constructor() {
@@ -21,7 +21,7 @@ export default class Global {
   }
 
   readOrderInputValue() {
-    console.log(document.querySelector("#order-input").value);
+    console.log("Order input:", document.querySelector("#order-input").value);
     return document.querySelector("#order-input").value;
   }
 
@@ -73,19 +73,27 @@ export default class Global {
     return this.removeClass(this.frameScanBarcode, "hidden"); 
   }
 
+  // class changes functions
+  addClassToOrderMessage(className) {
+    console.log("addClassToOrderMessage():", className);
+    return this.addClass(this.orderMessage, className);
+  }
+
+  removeClassFromOrderMessage(className) {
+    console.log("removeClassFromOrderMessage():", className);
+    return this.removeClass(this.orderMessage, className);
+  }
+
   // text insertion functions
   updateOrderMessage(content) {
-    console.log("orderMessageContent()");
+    console.log("orderMessageContent():", content);
     return this.insertTextContent(this.orderMessage, content);
   }
-
-  // other functions
-  insertInnerHTML(targetElement, content) {
-    targetElement.innerHtml = content;
-    return this;
-  }
-
   
+  updateOrderMessageInnerHTML(content) {
+    console.log("updateOrderMessageInnerHTML():", content);
+    return this.insertInnerHTML(this.orderMessage, content);
+  }
 }
 
-Object.assign(Global.prototype, classManager);
+Object.assign(Global.prototype, classManager, contentManager);

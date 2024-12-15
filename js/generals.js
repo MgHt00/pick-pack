@@ -33,12 +33,16 @@ export const classManager = {
     });
   },
 
+};
+
+export const contentManager = {
   insertTextContent(targetElement, content) {
     targetElement.textContent = content;
     return this;
   },
-};
 
-export const contentManager = {
-
+  insertInnerHTML(targetElement, content) {
+    targetElement.innerHtml = content;
+    return this;
+  },
 }
