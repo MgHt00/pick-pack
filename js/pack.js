@@ -404,12 +404,11 @@ async function checkOrderNote(orderId, successMessage) {
 
 // MISC functions
 function helperFunctions() {
+  
   function disableBarcode() { //To disable barcode input and button
     console.groupCollapsed("disableBarcode()");
     globalInstance
-      .addClass(globalInstance.barcodeInputTop, "disabled")
-      .addClass(globalInstance.barcodeLabel, "disabled");
-    globalInstance
+      .changeBarcodeBundleClass({mode: "add", className: "disabled"})
       .disableBarcodeInput()
       .disableCheckBarcodeBtn();
     console.groupEnd();
@@ -421,8 +420,7 @@ function helperFunctions() {
 }
 
 
-// FUNCTION: To enable barcode input and button
-function enableBarcode() {
+function enableBarcode() { // To enable barcode input and button
   console.info("enableBarcode()");
   globalInstance
     .removeClass(globalInstance.barcodeInputTop, "disabled")

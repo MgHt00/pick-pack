@@ -84,6 +84,27 @@ export default class Global {
     return this.removeClass(this.orderMessage, className);
   }
 
+  changeBarcodeBundleClass({mode, className}) {
+    console.info(`changeBarcodeBundleClass(): mode: ${mode}, className: ${className}`);
+    switch (mode) {
+      case "add":
+        return this.addClass([
+          this.barcodeInputTop, 
+          this.barcodeLabel
+        ], className);
+
+      case "remove":
+        return this.removeClass([
+          this.barcodeInputTop, 
+          this.barcodeLabel
+        ], className);
+
+      default:
+        console.warn("Invalid mode.");
+        return this;
+    }
+  }
+
   // text insertion functions
   updateOrderMessage(content) {
     console.info("orderMessageContent():", content);
@@ -96,6 +117,12 @@ export default class Global {
   }
 
   // enable / disable functions
+  enableBarcodeInput() {
+    console.info("disableBarcodeInput()");
+    this.barcodeInput.disabled = false;
+    return this;
+  }
+
   disableBarcodeInput() {
     console.info("disableBarcodeInput()");
     this.barcodeInput.disabled = true;
