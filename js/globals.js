@@ -118,7 +118,7 @@ export default class Global {
 
   // enable / disable functions
   enableBarcodeInput() {
-    console.info("disableBarcodeInput()");
+    console.info("enableBarcodeInput()");
     this.barcodeInput.disabled = false;
     return this;
   }
@@ -126,6 +126,12 @@ export default class Global {
   disableBarcodeInput() {
     console.info("disableBarcodeInput()");
     this.barcodeInput.disabled = true;
+    return this;
+  }
+
+  enableCheckBarcodeBtn() {
+    console.info("enableCheckBarcodeBtn()");
+    this.checkBarcodeBtn.disabled = false;
     return this;
   }
 

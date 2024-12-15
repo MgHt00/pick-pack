@@ -173,7 +173,7 @@ async function fetchOrderItems(orderId) {
 
   globalInstance.frameScanBarcode.classList.add("transition");
 
-  enableBarcode();
+  helperInstance.enableBarcode();
   globalInstance.barcodeInput.focus();
   
 } catch (error) {
@@ -404,7 +404,7 @@ async function checkOrderNote(orderId, successMessage) {
 
 // MISC functions
 function helperFunctions() {
-  
+
   function disableBarcode() { //To disable barcode input and button
     console.groupCollapsed("disableBarcode()");
     globalInstance
@@ -414,20 +414,23 @@ function helperFunctions() {
     console.groupEnd();
   }
 
+  function enableBarcode() { // To enable barcode input and button
+    console.groupCollapsed("enableBarcode()");
+    globalInstance
+      .changeBarcodeBundleClass({mode: "remove", className: "disabled"})
+      .enableBarcodeInput()
+      .enableCheckBarcodeBtn();
+    console.groupEnd();
+  }
+
   return {
     disableBarcode,
+    enableBarcode,
   }
 }
 
 
-function enableBarcode() { // To enable barcode input and button
-  console.info("enableBarcode()");
-  globalInstance
-    .removeClass(globalInstance.barcodeInputTop, "disabled")
-    .removeClass(globalInstance.barcodeLabel, "disabled")
-  globalInstance.barcodeInput.disabled = false;
-  globalInstance.checkBarcodeBtn.disabled = false;
-}
+
 
 // FUNCTION: To reset when Load Order is pressed.
 function resetAll() {
