@@ -24,35 +24,29 @@ const soundInstance = soundManager();
   listenerInstance
     .generalListeners();
 
-  // EVENT: Listeners
-  
-
-  globalInstance.orderInput.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      loadOrder();
-    }
-  });
-
-  globalInstance.barcodeInput.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      checkBarcode();
-    }
-  });
   console.groupEnd();
 })();
 
 function listenerManager() {
   function generalListeners() {
+    console.info("generalListeners()");
+
+    // To ensure that the DOM is fully loaded before the script executes
+    document.addEventListener("DOMContentLoaded", DOMloaded);
+
+    // click listeners
     globalInstance.checkBarcodeBtn.addEventListener("click", checkBarcode);
     globalInstance.loadOrderBtn.addEventListener("click", loadOrder);
     globalInstance.resetBtn.addEventListener("click", resetAll);
+    
+    // key listeners
+    globalInstance.orderInput.addEventListener("keydown", handleOrderInputKey); // don't need to manually pass `event`, the browser takes care of providing the event object.
+    globalInstance.barcodeInput.addEventListener("keydown", handleBarcodeInputKey);
+  }
 
-    // To ensure that the DOM is fully loaded before the script executes
-    document.addEventListener("DOMContentLoaded", function() {
-      console.log("listenerManager() - DOMContentLoaded;");
-      globalInstance.orderInput.focus(); // focus on the input at start.
-      resetAll(); // Reset everything at the start.
-    });
+  function DOMloaded() {
+    globalInstance.orderInput.focus(); // focus on the input at start.
+    resetAll(); // Reset everything at the start.
   }
 
   function handleOrderInputKey(event) {
@@ -61,9 +55,14 @@ function listenerManager() {
     }
   }
 
+  function handleBarcodeInputKey(event) {
+    if (event.key === "Enter") {
+      checkBarcode();
+    }
+  }
+
   return {
     generalListeners,
-    handleOrderInputKey,
   }
 }
 
@@ -132,7 +131,7 @@ async function fetchOrderItems(orderId) {
     // Assign WooCommerce order into `orderItems`
     if (response.data && response.data.line_items) {
       orderItems = response.data.line_items;
-      console.log(orderItems);
+      console.info(orderItems);
     } else {
       throw new Error("Order not found");
     }
@@ -141,7 +140,7 @@ async function fetchOrderItems(orderId) {
   for (let orderItem of orderItems) {
     // Get `quantity` property from and `orderItem` object
     const quantity = Number(orderItem["quantity"]);
-    /*console.log(`Order quantity ${quantity}`);*/
+    /*console.info(`Order quantity ${quantity}`);*/
 
     globalInstance.frameSKUContainer.classList.remove("hidden");
 
@@ -240,9 +239,9 @@ async function checkBarcode() {
       document.querySelector(`#${orderedSKUs[i]}`).classList.add("checked-sku");
 
       // Remove scanned SKU from orderedSKUs array.
-      console.log(`Before splice: ${orderedSKUs}`);
+      console.info(`Before splice: ${orderedSKUs}`);
       orderedSKUs.splice(i, 1);
-      console.log(`After splice: ${orderedSKUs}`);
+      console.info(`After splice: ${orderedSKUs}`);
 
       skuFound = true;
       soundInstance.playBeepSound();
@@ -284,7 +283,7 @@ async function checkBarcode() {
     /* TEMP COMMENT */
     await appendOrderNoteAndChangeStatus(orderId, globalInstance.successMessage);
     
-    console.log("appendOrderNoteAndChangeStatus() is called");
+    console.info("appendOrderNoteAndChangeStatus() is called");
   }
 }
 
@@ -314,7 +313,7 @@ async function appendOrderNote(orderId, successMessage) {
     });
 
     // Log the full response object to inspect where updated notes are located
-    console.log('Order note added successfully:', response.data);
+    console.info('Order note added successfully:', response.data);
   } catch (error) {
     console.error('Error appending order note:', error);
   }
@@ -345,7 +344,7 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
       },
     });
 
-    console.log('Order note added successfully:', noteResponse.data);
+    console.info('Order note added successfully:', noteResponse.data);
 
     // If the note is added successfully, change the order status to 'packed'
     const orderUpdate = {
@@ -359,7 +358,7 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
       },
     });
 
-    console.log('Order status updated successfully:', orderResponse.data);
+    console.info('Order status updated successfully:', orderResponse.data);
 
   } catch (error) {
     console.error('Error appending order note or updating order status:', error);
@@ -386,9 +385,9 @@ async function checkOrderNote(orderId, successMessage) {
     const existingNotes = response.data || [];
 
     for(let i = 0; i<existingNotes.length; i++) {
-      /*console.log(existingNotes[i].note);*/
+      /*console.info(existingNotes[i].note);*/
       if (existingNotes[i].note === successMessage){
-        console.log("Retrun true");
+        console.info("Retrun true");
         return true;
       }
     }
@@ -408,7 +407,7 @@ function helperFunctions() {
 }
 // FUNCTION: To disable barcode input and button
 function disableBarcode() {
-  console.log("disableBarcode()");
+  console.info("disableBarcode()");
   globalInstance
     .addClass(globalInstance.barcodeInputTop, "disabled")
     .addClass(globalInstance.barcodeLabel, "disabled");
@@ -418,7 +417,7 @@ function disableBarcode() {
 
 // FUNCTION: To enable barcode input and button
 function enableBarcode() {
-  console.log("enableBarcode()");
+  console.info("enableBarcode()");
   globalInstance
     .removeClass(globalInstance.barcodeInputTop, "disabled")
     .removeClass(globalInstance.barcodeLabel, "disabled")
@@ -467,7 +466,7 @@ function resetAll() {
 
 function soundManager() {
   function playBeepSound() {
-    console.log("playBeepSound() played.");
+    console.info("playBeepSound() played.");
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
     // Modern browsers require the AudioContext to be created or resumed after a user interaction (like a click or keypress) due to auto-play policies.
     // Error occours when this line is moved outside. 
@@ -490,7 +489,7 @@ function soundManager() {
   }
   
   function playCorrectSound() {
-    console.log("playCorrectSound() played");
+    console.info("playCorrectSound() played");
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
@@ -507,7 +506,7 @@ function soundManager() {
   }
   
   function playWrongSound() {
-    console.log("playWrongSound() played");
+    console.info("playWrongSound() played");
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
@@ -524,7 +523,7 @@ function soundManager() {
   }
   
   function playCompleteSound() {
-    console.log("playCompleteSound() played");
+    console.info("playCompleteSound() played");
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
