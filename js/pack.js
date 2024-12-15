@@ -12,6 +12,7 @@ let totalSKUs = 0;
 const globalInstance = new Global();
 const listenerInstance = listenerManager();
 const soundInstance = soundManager();
+const helperInstance = helperFunctions();
 
 (function initialize(){
   console.groupCollapsed("initialize()");
@@ -266,7 +267,7 @@ async function checkBarcode() {
 
   // Check if all SKUs are scanned
   if (orderedSKUs.length === 0) {
-    disableBarcode();
+    helperInstance.disableBarcode();
     //soundInstance.playCorrectSound();
     soundInstance.playCompleteSound();
 
@@ -403,17 +404,22 @@ async function checkOrderNote(orderId, successMessage) {
 
 // MISC functions
 function helperFunctions() {
-  
+  function disableBarcode() { //To disable barcode input and button
+    console.groupCollapsed("disableBarcode()");
+    globalInstance
+      .addClass(globalInstance.barcodeInputTop, "disabled")
+      .addClass(globalInstance.barcodeLabel, "disabled");
+    globalInstance
+      .disableBarcodeInput()
+      .disableCheckBarcodeBtn();
+    console.groupEnd();
+  }
+
+  return {
+    disableBarcode,
+  }
 }
-// FUNCTION: To disable barcode input and button
-function disableBarcode() {
-  console.info("disableBarcode()");
-  globalInstance
-    .addClass(globalInstance.barcodeInputTop, "disabled")
-    .addClass(globalInstance.barcodeLabel, "disabled");
-  globalInstance.barcodeInput.disabled = true;
-  globalInstance.checkBarcodeBtn.disabled = true;
-}
+
 
 // FUNCTION: To enable barcode input and button
 function enableBarcode() {
@@ -454,7 +460,7 @@ function resetAll() {
   globalInstance.frameScanBarcode.className = "";
   globalInstance.frameScanBarcode.classList.add("hidden");
   
-  disableBarcode();
+  helperInstance.disableBarcode();
   //globalInstance.orderMessage.textContent = "Ready to begin.";
   orderItems = []; 
   orderedSKUs = [];

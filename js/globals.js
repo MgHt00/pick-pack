@@ -21,7 +21,7 @@ export default class Global {
   }
 
   readOrderInputValue() {
-    console.log("Order input:", document.querySelector("#order-input").value);
+    console.info("Order input:", document.querySelector("#order-input").value);
     return document.querySelector("#order-input").value;
   }
 
@@ -33,66 +33,79 @@ export default class Global {
 
   // hide functions
   hideFrameOrderMessage() {
-    console.log("hideFrameOrderMessage()");
+    console.info("hideFrameOrderMessage()");
     return this.addClass(this.frameOrderMessage, "hidden"); // The preceding `return this` enables method chaining.
   }
 
   hideFrameSKUContainer() {
-    console.log("hideFrameSKUContainer()");
+    console.info("hideFrameSKUContainer()");
     return this.addClass(this.frameSKUContainer, "hidden");
   }
 
   hideFrameProgressContainer() {
-    console.log("hideFrameProgressContainer()");
+    console.info("hideFrameProgressContainer()");
     return this.addClass(this.frameProgressContainer, "hidden");
   }
 
   hideFrameScanBarcode() {
-    console.log("hideFrameScanBarcode()");
+    console.info("hideFrameScanBarcode()");
     return this.addClass(this.frameScanBarcode, "hidden");
   }
 
   // show functions
   showFrameOrderMessage() {
-    console.log("showFrameOrderMessage()");
+    console.info("showFrameOrderMessage()");
     return this.removeClass(this.frameOrderMessage, "hidden"); 
   }
 
   showFrameSKUContainer() {
-    console.log("showFrameSKUContainer()");
+    console.info("showFrameSKUContainer()");
     return this.removeClass(this.frameSKUContainer, "hidden"); 
   }
 
   showFrameProgressContainer() {
-    console.log("showFrameProgressContainer()");
+    console.info("showFrameProgressContainer()");
     return this.removeClass(this.frameProgressContainer, "hidden"); 
   }
 
   showFrameScanBarcode() {
-    console.log("showFrameScanBarcoder()");
+    console.info("showFrameScanBarcoder()");
     return this.removeClass(this.frameScanBarcode, "hidden"); 
   }
 
   // class changes functions
   addClassToOrderMessage(className) {
-    console.log("addClassToOrderMessage():", className);
+    console.info("addClassToOrderMessage():", className);
     return this.addClass(this.orderMessage, className);
   }
 
   removeClassFromOrderMessage(className) {
-    console.log("removeClassFromOrderMessage():", className);
+    console.info("removeClassFromOrderMessage():", className);
     return this.removeClass(this.orderMessage, className);
   }
 
   // text insertion functions
   updateOrderMessage(content) {
-    console.log("orderMessageContent():", content);
+    console.info("orderMessageContent():", content);
     return this.insertTextContent(this.orderMessage, content);
   }
   
-  updateOrderMessageInnerHTML(content) {
-    console.log("updateOrderMessageInnerHTML():", content);
+  setOrderMessageInnerHTML(content) {
+    console.info("updateOrderMessageInnerHTML():", content);
     return this.insertInnerHTML(this.orderMessage, content);
+  }
+
+  // enable / disable functions
+  disableBarcodeInput() {
+    console.info("disableBarcodeInput()");
+    this.barcodeInput.disabled = true;
+    return this;
+  }
+
+  disableCheckBarcodeBtn() {
+    console.info("disableCheckBarcodeBtn()");
+    this.checkBarcodeBtn.disabled = true;
+    return this;
   }
 }
 
