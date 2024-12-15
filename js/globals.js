@@ -31,6 +31,19 @@ export default class Global {
     return this;
   }
 
+  toggleFrameOrderMessage(mode) {
+    console.info(`toggleFrameOrderMessage(): mode: ${mode}`);
+    switch(mode) {
+      case "show":
+        return this.removeClass(this.frameOrderMessage, "hidden"); // The preceding `return this` enables method chaining.
+      case "hide":
+        return this.addClass(this.frameOrderMessage, "hidden"); // The preceding `return this` enables method chaining.
+      default:
+        console.warn("Invalid mode. Use 'show' or 'hide'.");
+        return this;
+    }
+  }
+
   // hide functions
   hideFrameOrderMessage() {
     console.info("hideFrameOrderMessage()");
@@ -100,7 +113,7 @@ export default class Global {
         ], className);
 
       default:
-        console.warn("Invalid mode.");
+        console.warn("Invalid mode. Use 'add' or 'remove'.");
         return this;
     }
   }
