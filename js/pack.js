@@ -10,7 +10,8 @@ let orderID = 0;
 let totalSKUs = 0;
 
 const globalInstance = new Global();
-const soundInstance = new soundManager();
+const listenerInstance = listenerManager();
+const soundInstance = soundManager();
 
 (function initialize(){
   console.groupCollapsed("initialize()");
@@ -20,16 +21,11 @@ const soundInstance = new soundManager();
     .hideFrameProgressContainer()
     .hideFrameScanBarcode();
 
-  globalInstance.checkBarcodeBtn.addEventListener("click", checkBarcode);
-  globalInstance.loadOrderBtn.addEventListener("click", loadOrder);
-  globalInstance.resetBtn.addEventListener("click", resetAll);
+  listenerInstance
+    .generalListeners();
 
   // EVENT: Listeners
-  // To ensure that the DOM is fully loaded before the script executes
-  document.addEventListener("DOMContentLoaded", function() {
-    globalInstance.orderInput.focus(); // focus on the input at start.
-    resetAll(); // Reset everything at the start.
-  });
+  
 
   globalInstance.orderInput.addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
@@ -44,6 +40,32 @@ const soundInstance = new soundManager();
   });
   console.groupEnd();
 })();
+
+function listenerManager() {
+  function generalListeners() {
+    globalInstance.checkBarcodeBtn.addEventListener("click", checkBarcode);
+    globalInstance.loadOrderBtn.addEventListener("click", loadOrder);
+    globalInstance.resetBtn.addEventListener("click", resetAll);
+
+    // To ensure that the DOM is fully loaded before the script executes
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log("listenerManager() - DOMContentLoaded;");
+      globalInstance.orderInput.focus(); // focus on the input at start.
+      resetAll(); // Reset everything at the start.
+    });
+  }
+
+  function handleOrderInputKey(event) {
+    if (event.key === "Enter") {
+      loadOrder();
+    }
+  }
+
+  return {
+    generalListeners,
+    handleOrderInputKey,
+  }
+}
 
 // FUNCTION: To load an order with a user input
 async function loadOrder() {
