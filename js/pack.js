@@ -22,14 +22,14 @@ const soundInstance = soundManager();
     .hideFrameScanBarcode();
 
   listenerInstance
-    .generalListeners();
+    .loadListeners();
 
   console.groupEnd();
 })();
 
 function listenerManager() {
-  function generalListeners() {
-    console.info("generalListeners()");
+  function loadListeners() {
+    console.info("loadListeners()");
 
     // To ensure that the DOM is fully loaded before the script executes
     document.addEventListener("DOMContentLoaded", DOMloaded);
@@ -62,7 +62,7 @@ function listenerManager() {
   }
 
   return {
-    generalListeners,
+    loadListeners,
   }
 }
 
