@@ -1,9 +1,9 @@
 export const classManager = {
+  // ---------- Helper Functions ----------
   removeClass(targetElements = null, className) {
     if (!targetElements) return this; // Return early if no elements are provided
   
-    // Ensure targetElements is an array
-    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
+    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements]; // Ensure targetElements is an array
   
     targetElements.forEach(element => {
       element.classList.remove(className);
@@ -33,13 +33,23 @@ export const classManager = {
     });
   },
 
-  // Helper Functions
-  toggleFrameVisibility(mode, target) {
-    const stack = new Error().stack;     // (For console.log) To get the stack trace and parse the caller's function name dynamically.
-    const callerName = stack.split("\n")[2]?.trim().split(" ")[1] || "Unknown";
+  retrieveCallerFunctionName() {
+    const stack = new Error().stack; // Get the stack trace
+    const stackLines = stack.split("\n");
+  
+    // Retrieve the 3rd entry in the stack trace (index 3) to get the original caller (Check detail at cheat sheets from gitHub)
+    const callerLine = stackLines[3]?.trim();
+    let callerName = callerLine?.split(" ")[1] || "Unknown";
+  
+    // Remove the class or object prefix (e.g., "Global.toggleFrameOrderMessage" becomes "toggleFrameOrderMessage")
+    callerName = callerName.includes(".") ? callerName.split(".").pop() : callerName;
+  
+    return callerName;
+  },  
 
-    console.info(`toggleFrameVisibility() called by ${callerName}, mode: ${mode}`);
-
+  // ---------- Interface Functions ----------
+  toggleFrameVisibility(mode, target) {    
+    console.info(`toggleFrameVisibility() called by ${this.retrieveCallerFunctionName()}, mode: ${mode}`);
     switch(mode) {
       case "show":
         return this.removeClass(target, "hidden"); // The preceding `return this` enables method chaining.
@@ -47,6 +57,19 @@ export const classManager = {
         return this.addClass(target, "hidden"); 
       default:
         console.warn("Invalid mode. Use 'show' or 'hide'.");
+        return this;
+    }
+  },
+
+  toggleFrameClass(mode, className, target) {
+    console.info(`toggleFrameClass() called by ${this.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
+    switch(mode) {
+      case "add":
+        return this.addClass(target, className);
+      case "remove":
+        return this.removeClass(target, className);
+      default:
+        console.warn("Invalid mode. Use 'add' or 'remove'.");
         return this;
     }
   },

@@ -31,28 +31,6 @@ export default class Global {
     return this;
   }
 
-  // Helper Functions
-  toggleFrameVisibility(mode, target) {
-    const stack = new Error().stack;     // (For console.log) To get the stack trace and parse the caller's function name dynamically.
-    const callerName = stack.split("\n")[2]?.trim().split(" ")[1] || "Unknown";
-
-    console.info(`toggleFrameVisibility() called by ${callerName}, mode: ${mode}`);
-
-    switch(mode) {
-      case "show":
-        return this.removeClass(target, "hidden"); // The preceding `return this` enables method chaining.
-      case "hide":
-        return this.addClass(target, "hidden"); 
-      default:
-        console.warn("Invalid mode. Use 'show' or 'hide'.");
-        return this;
-    }
-  }
-
-  toggleClass(mode, className, target) {
-
-  }
-
   // Visibility changes functions
   toggleFrameOrderMessage(mode) {
     return this.toggleFrameVisibility(mode, this.frameOrderMessage);
