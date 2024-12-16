@@ -33,22 +33,26 @@ export default class Global {
 
   // Visibility changes functions
   toggleFrameOrderMessage(mode) {
-    return this.toggleFrameVisibility(mode, this.frameOrderMessage);
+    return this.toggleFrameVisibility({mode, target: this.frameOrderMessage});
   }
 
   toggleFrameSKUContainer(mode) {
-    return this.toggleFrameVisibility(mode, this.frameSKUContainer);
+    return this.toggleFrameVisibility({mode, target: this.frameSKUContainer});
   }
 
   toggleFrameProgressContainer(mode) {
-    return this.toggleFrameVisibility(mode, this.frameProgressContainer);
+    return this.toggleFrameVisibility({mode, target: this.frameProgressContainer});
   }
 
   toggleFrameScanBarcode(mode) {
-    return this.toggleFrameVisibility(mode, this.frameScanBarcode);
+    return this.toggleFrameVisibility({mode, target: this.frameScanBarcode});
   }
 
   // class changes functions
+  toggleOrderMessageClass(mode, className) {
+    return this.toggleClass(mode, )
+  }
+
   addClassToOrderMessage(className) {
     console.info("addClassToOrderMessage():", className);
     return this.addClass(this.orderMessage, className);

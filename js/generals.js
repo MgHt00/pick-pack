@@ -48,7 +48,7 @@ export const classManager = {
   },  
 
   // ---------- Interface Functions ----------
-  toggleFrameVisibility(mode, target) {    
+  toggleFrameVisibility({mode, target}) {    
     console.info(`toggleFrameVisibility() called by ${this.retrieveCallerFunctionName()}, mode: ${mode}`);
     switch(mode) {
       case "show":
@@ -61,7 +61,7 @@ export const classManager = {
     }
   },
 
-  toggleFrameClass(mode, className, target) {
+  toggleClass(mode, className, target) {
     console.info(`toggleFrameClass() called by ${this.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
     switch(mode) {
       case "add":
