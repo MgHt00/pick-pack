@@ -31,24 +31,33 @@ export default class Global {
     return this;
   }
 
-  toggleFrameOrderMessage(mode) {
-    console.info(`toggleFrameOrderMessage(): mode: ${mode}`);
+  // Helper Functions
+  toggleFrameVisibility(mode, target) {
+    const stack = new Error().stack;     // (For console.log) To get the stack trace and parse the caller's function name dynamically.
+    const callerName = stack.split("\n")[2]?.trim().split(" ")[1] || "Unknown";
+
+    console.info(`toggleFrameVisibility() called by ${callerName}, mode: ${mode}`);
+
     switch(mode) {
       case "show":
-        return this.removeClass(this.frameOrderMessage, "hidden"); // The preceding `return this` enables method chaining.
+        return this.removeClass(target, "hidden"); // The preceding `return this` enables method chaining.
       case "hide":
-        return this.addClass(this.frameOrderMessage, "hidden"); // The preceding `return this` enables method chaining.
+        return this.addClass(target, "hidden"); 
       default:
         console.warn("Invalid mode. Use 'show' or 'hide'.");
         return this;
     }
   }
 
-  // hide functions
-  hideFrameOrderMessage() {
-    console.info("hideFrameOrderMessage()");
-    return this.addClass(this.frameOrderMessage, "hidden"); // The preceding `return this` enables method chaining.
+  toggleFrameOrderMessage(mode) {
+    return this.toggleFrameVisibility(mode, this.frameOrderMessage);
   }
+
+  toggleFrameSKUContainer(mode) {
+    return this.toggleFrameVisibility(mode, this.frameSKUContainer);
+  }
+
+  // hide functions
 
   hideFrameSKUContainer() {
     console.info("hideFrameSKUContainer()");
@@ -66,10 +75,6 @@ export default class Global {
   }
 
   // show functions
-  showFrameOrderMessage() {
-    console.info("showFrameOrderMessage()");
-    return this.removeClass(this.frameOrderMessage, "hidden"); 
-  }
 
   showFrameSKUContainer() {
     console.info("showFrameSKUContainer()");
@@ -97,8 +102,8 @@ export default class Global {
     return this.removeClass(this.orderMessage, className);
   }
 
-  changeBarcodeBundleClass({mode, className}) {
-    console.info(`changeBarcodeBundleClass(): mode: ${mode}, className: ${className}`);
+  toggleBarcodeBundle({mode, className}) {
+    console.info(`toggleBarcodeBundle(): mode: ${mode}, className: ${className}`);
     switch (mode) {
       case "add":
         return this.addClass([

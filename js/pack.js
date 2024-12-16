@@ -408,7 +408,7 @@ function helperFunctions() {
   function disableBarcode() { //To disable barcode input and button
     console.groupCollapsed("disableBarcode()");
     globalInstance
-      .changeBarcodeBundleClass({mode: "add", className: "disabled"})
+      .toggleBarcodeBundle({mode: "add", className: "disabled"})
       .disableBarcodeInput()
       .disableCheckBarcodeBtn();
     console.groupEnd();
@@ -417,7 +417,7 @@ function helperFunctions() {
   function enableBarcode() { // To enable barcode input and button
     console.groupCollapsed("enableBarcode()");
     globalInstance
-      .changeBarcodeBundleClass({mode: "remove", className: "disabled"})
+      .toggleBarcodeBundle({mode: "remove", className: "disabled"})
       .enableBarcodeInput()
       .enableCheckBarcodeBtn();
     console.groupEnd();
