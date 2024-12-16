@@ -18,9 +18,9 @@ const helperInstance = helperFunctions();
   console.groupCollapsed("initialize()");
   globalInstance
     .toggleFrameOrderMessage("hide")
-    .hideFrameSKUContainer()
-    .hideFrameProgressContainer()
-    .hideFrameScanBarcode();
+    .toggleFrameSKUContainer("hide")
+    .toggleFrameProgressContainer("hide")
+    .toggleFrameScanBarcode("hide");
 
   listenerInstance
     .loadListeners();

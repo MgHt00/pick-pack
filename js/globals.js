@@ -49,6 +49,11 @@ export default class Global {
     }
   }
 
+  toggleClass(mode, className, target) {
+
+  }
+
+  // Visibility changes functions
   toggleFrameOrderMessage(mode) {
     return this.toggleFrameVisibility(mode, this.frameOrderMessage);
   }
@@ -57,38 +62,12 @@ export default class Global {
     return this.toggleFrameVisibility(mode, this.frameSKUContainer);
   }
 
-  // hide functions
-
-  hideFrameSKUContainer() {
-    console.info("hideFrameSKUContainer()");
-    return this.addClass(this.frameSKUContainer, "hidden");
+  toggleFrameProgressContainer(mode) {
+    return this.toggleFrameVisibility(mode, this.frameProgressContainer);
   }
 
-  hideFrameProgressContainer() {
-    console.info("hideFrameProgressContainer()");
-    return this.addClass(this.frameProgressContainer, "hidden");
-  }
-
-  hideFrameScanBarcode() {
-    console.info("hideFrameScanBarcode()");
-    return this.addClass(this.frameScanBarcode, "hidden");
-  }
-
-  // show functions
-
-  showFrameSKUContainer() {
-    console.info("showFrameSKUContainer()");
-    return this.removeClass(this.frameSKUContainer, "hidden"); 
-  }
-
-  showFrameProgressContainer() {
-    console.info("showFrameProgressContainer()");
-    return this.removeClass(this.frameProgressContainer, "hidden"); 
-  }
-
-  showFrameScanBarcode() {
-    console.info("showFrameScanBarcoder()");
-    return this.removeClass(this.frameScanBarcode, "hidden"); 
+  toggleFrameScanBarcode(mode) {
+    return this.toggleFrameVisibility(mode, this.frameScanBarcode);
   }
 
   // class changes functions
