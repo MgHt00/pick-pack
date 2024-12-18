@@ -33,29 +33,12 @@ export default class Global {
 
   // Visibility changes functions
   toggleVisibility(targetElements = [], mode) {
-    console.info(`toggleVisibility(); mode: ${mode}`);
     targetElements = this.checkAndConvertArray(targetElements);
-    targetElements = Array.isArray(targetElements)? targetElements : [targetElements];
 
     targetElements.forEach(element => {
-      return this.toggleFrameVisibility({mode, target: element});
-    })
-  }
-
-  toggleFrameOrderMessage(mode) {
-    return this.toggleFrameVisibility({mode, target: this.frameOrderMessage});
-  }
-
-  toggleFrameSKUContainer(mode) {
-    return this.toggleFrameVisibility({mode, target: this.frameSKUContainer});
-  }
-
-  toggleFrameProgressContainer(mode) {
-    return this.toggleFrameVisibility({mode, target: this.frameProgressContainer});
-  }
-
-  toggleFrameScanBarcode(mode) {
-    return this.toggleFrameVisibility({mode, target: this.frameScanBarcode});
+      this.toggleFrameVisibility({mode, target: element});
+    });
+    return this;
   }
 
   // class changes functions

@@ -17,10 +17,13 @@ const helperInstance = helperFunctions();
 (function initialize(){
   console.groupCollapsed("initialize()");
   globalInstance
-    .toggleFrameOrderMessage("hide")
-    .toggleFrameSKUContainer("hide")
-    .toggleFrameProgressContainer("hide")
-    .toggleFrameScanBarcode("hide");
+    .toggleVisibility([
+      globalInstance.frameOrderMessage,
+      globalInstance.frameSKUContainer,
+      globalInstance.frameProgressContainer,
+      globalInstance.frameScanBarcode,
+    ], "hide")
+    
 
   listenerInstance
     .loadListeners();
@@ -71,7 +74,7 @@ function listenerManager() {
 async function loadOrder() {
   console.groupCollapsed("loadOrder()");
   globalInstance
-    .toggleFrameOrderMessage("show")
+    .toggleVisibility(globalInstance.frameOrderMessage, "show")
     .removeClassFromOrderMessage("success-message");
 
   orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
@@ -86,7 +89,8 @@ async function loadOrder() {
   }
 
   resetAll(); // reset everything before loading new order
-  globalInstance.toggleFrameOrderMessage("show"); // need to show again because of `resetAll()`
+  globalInstance
+    .toggleVisibility(globalInstance.frameOrderMessage, "show");// need to show again because of `resetAll()`
 
   // Check if the order has already been checked
   // Need to ensure that the checkOrderNote function is called and 
