@@ -1,9 +1,12 @@
-export const cssClassManager = {
-  // ---------- Helper Functions ----------
+export const utilityFunctionsManager = {
+  checkAndConvertArray(value) {
+    return value = Array.isArray(value)? value : [value];
+  },
+
   removeClass(targetElements = null, className) {
     if (!targetElements) return this; // Return early if no elements are provided
   
-    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements]; // Ensure targetElements is an array
+    targetElements = this.checkAndConvertArray(targetElements);
   
     targetElements.forEach(element => {
       element.classList.remove(className);
@@ -15,7 +18,7 @@ export const cssClassManager = {
   addClass(targetElements = null, className) {
     if (!targetElements) return this; 
   
-    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
+    targetElements = this.checkAndConvertArray(targetElements);
   
     targetElements.forEach(element => {
       element.classList.add(className);
@@ -32,32 +35,37 @@ export const cssClassManager = {
       element.className = '';
     });
   },
+};
 
-  // ---------- Interface Functions ----------
+export const cssClassManager = {
   toggleFrameVisibility({mode, target}) {    
     console.info(`toggleFrameVisibility() called by ${generalFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
     switch(mode) {
       case "show":
-        return this.removeClass(target, "hidden"); // The preceding `return this` enables method chaining.
+        utilityFunctionsManager.removeClass(target, "hidden"); 
+        break;
       case "hide":
-        return this.addClass(target, "hidden"); 
+        utilityFunctionsManager.addClass(target, "hidden"); 
+        break;
       default:
         console.warn("Invalid mode. Use 'show' or 'hide'.");
-        return this;
     }
+    return this;
   },
 
   toggleClass({mode, className, target}) {
     console.info(`toggleFrameClass() called by ${this.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
     switch(mode) {
       case "add":
-        return this.addClass(target, className);
+        utilityFunctionsManager.addClass(target, className);
+        break;
       case "remove":
-        return this.removeClass(target, className);
+        utilityFunctionsManager.removeClass(target, className);
+        break;
       default:
         console.warn("Invalid mode. Use 'add' or 'remove'.");
-        return this;
     }
+    return this;
   },
 
 };
@@ -75,11 +83,7 @@ export const contentManager = {
   },
 };
 
-export const utilityFunctionsManager = {
-  checkAndConvertArray(value) {
-    return value = Array.isArray(value)? value : [value];
-  },
-};
+
 
 const generalFunctionsManager = {
   retrieveCallerFunctionName() {
