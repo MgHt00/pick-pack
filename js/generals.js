@@ -1,4 +1,4 @@
-export const classManager = {
+export const cssClassManager = {
   // ---------- Helper Functions ----------
   removeClass(targetElements = null, className) {
     if (!targetElements) return this; // Return early if no elements are provided
@@ -33,23 +33,9 @@ export const classManager = {
     });
   },
 
-  retrieveCallerFunctionName() {
-    const stack = new Error().stack; // Get the stack trace
-    const stackLines = stack.split("\n");
-  
-    // Retrieve the 3rd entry in the stack trace (index 3) to get the original caller (Check detail at cheat sheets from gitHub)
-    const callerLine = stackLines[3]?.trim();
-    let callerName = callerLine?.split(" ")[1] || "Unknown";
-  
-    // Remove the class or object prefix (e.g., "Global.toggleFrameOrderMessage" becomes "toggleFrameOrderMessage")
-    callerName = callerName.includes(".") ? callerName.split(".").pop() : callerName;
-  
-    return callerName;
-  },  
-
   // ---------- Interface Functions ----------
   toggleFrameVisibility({mode, target}) {    
-    console.info(`toggleFrameVisibility() called by ${this.retrieveCallerFunctionName()}, mode: ${mode}`);
+    console.info(`toggleFrameVisibility() called by ${generalFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
     switch(mode) {
       case "show":
         return this.removeClass(target, "hidden"); // The preceding `return this` enables method chaining.
@@ -87,4 +73,20 @@ export const contentManager = {
     targetElement.innerHTML = content;
     return this;
   },
+}
+
+const generalFunctionsManager = {
+  retrieveCallerFunctionName() {
+    const stack = new Error().stack; // Get the stack trace
+    const stackLines = stack.split("\n");
+  
+    // Retrieve the 3rd entry in the stack trace (index 3) to get the original caller (Check detail at cheat sheets from gitHub)
+    const callerLine = stackLines[3]?.trim();
+    let callerName = callerLine?.split(" ")[1] || "Unknown";
+  
+    // Remove the class or object prefix (e.g., "Global.toggleFrameOrderMessage" becomes "toggleFrameOrderMessage")
+    callerName = callerName.includes(".") ? callerName.split(".").pop() : callerName;
+  
+    return callerName;
+  },  
 }

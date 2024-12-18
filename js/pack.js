@@ -96,7 +96,6 @@ async function loadOrder() {
     globalInstance
       .setOrderMessageInnerHTML("Order already checked.<br>Enter another order.")
       .addClassToOrderMessage("success-message")
-      /*.toggleOrderMessageClass("add", "success-message")*/
       .resetOrderInput();
     soundInstance.playWrongSound();
     console.groupEnd();

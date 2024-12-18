@@ -1,4 +1,4 @@
-import { classManager, contentManager } from "./generals.js";
+import { cssClassManager, contentManager } from "./generals.js";
 
 export default class Global {
   constructor() {
@@ -121,4 +121,4 @@ export default class Global {
   }
 }
 
-Object.assign(Global.prototype, classManager, contentManager);
+Object.assign(Global.prototype, cssClassManager, contentManager);
