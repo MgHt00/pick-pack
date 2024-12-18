@@ -269,7 +269,6 @@ async function checkBarcode() {
   // Check if all SKUs are scanned
   if (orderedSKUs.length === 0) {
     helperInstance.disableBarcode();
-    //soundInstance.playCorrectSound();
     soundInstance.playCompleteSound();
 
     globalInstance.orderMessage.textContent = "Order complete!";
@@ -485,7 +484,7 @@ function soundManager() {
     // An oscillator can only be started and stopped once, and it cannot be reused. 
     // ...Keeping it outside the function causes the error when you try to restart it. 
 
-    oscillator.type = 'square';
+    /*oscillator.type = 'square';
     oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 note
     gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
   
@@ -493,12 +492,12 @@ function soundManager() {
     gainNode.connect(audioCtx.destination);
   
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.1); // Play sound for 0.1 seconds
+    oscillator.stop(audioCtx.currentTime + 0.1); // Play sound for 0.1 seconds*/
   }
   
   function playCorrectSound() {
     console.info("playCorrectSound() played");
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
+    /*const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
   
@@ -510,7 +509,7 @@ function soundManager() {
     gainNode.connect(audioCtx.destination);
   
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
+    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds*/
   }
   
   function playWrongSound() {
@@ -519,7 +518,7 @@ function soundManager() {
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
   
-    oscillator.type = 'sawtooth';
+    /*oscillator.type = 'sawtooth';
     oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
     gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
   
@@ -527,7 +526,7 @@ function soundManager() {
     gainNode.connect(audioCtx.destination);
   
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
+    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds*/
   }
   
   function playCompleteSound() {
@@ -536,7 +535,7 @@ function soundManager() {
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
   
-    oscillator.type = 'sawtooth';
+    /*oscillator.type = 'sawtooth';
     oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
     gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
   
@@ -544,7 +543,7 @@ function soundManager() {
     gainNode.connect(audioCtx.destination);
   
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.5); // Play sound for 0.5 seconds
+    oscillator.stop(audioCtx.currentTime + 0.5); // Play sound for 0.5 seconds*/
   }
 
   return {
