@@ -1,4 +1,4 @@
-import { cssClassManager, contentManager, utilityFunctionsManager } from "./generals.js";
+import { cssClassManager, contentManager} from "./generals.js";
 
 export default class Global {
   constructor() {
@@ -33,16 +33,20 @@ export default class Global {
 
   // Visibility changes functions
   toggleVisibility(targetElements = [], mode) {
-    targetElements = this.checkAndConvertArray(targetElements);
+    targetElements = this.checkArray(targetElements);
 
     targetElements.forEach(element => {
-      this.toggleFrameVisibility({mode, target: element});
+      this.toggleTargetVisibility({mode, target: element});
     });
     return this;
   }
 
+  toggleClass(targetElements = [], mode) {
+
+  }
+
   // class changes functions
-  toggleOrderMessageClass(mode, className) {
+  /*toggleOrderMessageClass(mode, className) {
     return this.toggleClass({mode, className, target: this.orderMessage})
   }
 
@@ -54,7 +58,7 @@ export default class Global {
   removeClassFromOrderMessage(className) {
     console.info("removeClassFromOrderMessage():", className);
     return this.removeClass(this.orderMessage, className);
-  }
+  }*/
 
   toggleBarcodeBundle({mode, className}) {
     console.info(`toggleBarcodeBundle(): mode: ${mode}, className: ${className}`);
@@ -119,4 +123,4 @@ export default class Global {
   }
 }
 
-Object.assign(Global.prototype, cssClassManager, contentManager, utilityFunctionsManager);
+Object.assign(Global.prototype, cssClassManager, contentManager);

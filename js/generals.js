@@ -1,4 +1,4 @@
-export const utilityFunctionsManager = {
+const utilityFunctionsManager = {
   checkAndConvertArray(value) {
     return value = Array.isArray(value)? value : [value];
   },
@@ -38,7 +38,9 @@ export const utilityFunctionsManager = {
 };
 
 export const cssClassManager = {
-  toggleFrameVisibility({mode, target}) {    
+  checkArray : utilityFunctionsManager.checkAndConvertArray, // Because `utilityFunctionsManager` shouldn't be export to Global
+
+  toggleTargetVisibility({mode, target}) {    
     console.info(`toggleFrameVisibility() called by ${generalFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
     switch(mode) {
       case "show":
@@ -53,7 +55,7 @@ export const cssClassManager = {
     return this;
   },
 
-  toggleClass({mode, className, target}) {
+  toggleTargetClass({mode, className, target}) {
     console.info(`toggleFrameClass() called by ${this.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
     switch(mode) {
       case "add":
@@ -91,7 +93,7 @@ const generalFunctionsManager = {
     const stackLines = stack.split("\n");
   
     // Retrieve the 3rd entry in the stack trace (index 3) to get the original caller (Check detail at cheat sheets from gitHub)
-    const callerLine = stackLines[3]?.trim();
+    const callerLine = stackLines[4]?.trim();
     let callerName = callerLine?.split(" ")[1] || "Unknown";
   
     // Remove the class or object prefix (e.g., "Global.toggleFrameOrderMessage" becomes "toggleFrameOrderMessage")
