@@ -31,6 +31,11 @@ export default class Global {
     return this;
   }
 
+  focusOnOrderInput() {
+    this.orderInput.value = "";
+    this.orderInput.focus();
+  }
+
   // Visibility changes functions
   toggleVisibility(targetElements = [], mode) {
     targetElements = this.checkArray(targetElements);

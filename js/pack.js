@@ -405,9 +405,8 @@ async function checkOrderNote(orderId, successMessage) {
   }
 }
 
-// MISC functions
 function helperFunctions() {
-  function resetAll() { // FUNCTION: To reset when Load Order is pressed.
+  function resetAll() { // To reset when Load Order is pressed.
     console.groupCollapsed("resetAll()");
 
     globalInstance
@@ -415,43 +414,42 @@ function helperFunctions() {
         target: globalInstance.bodyElement,
         mode: "add",
         className: "start"
-      });
+      })
 
-    globalInstance.emptyCSSClass([
-      globalInstance.headerElement,
-      globalInstance.frameLoadOrder,
-      globalInstance.frameOrderMessage,
-      globalInstance.orderMessage,
-      globalInstance.frameSKUContainer,
-      globalInstance.frameProgressContainer,
-      globalInstance.frameScanBarcode,
-    ]
-    );
+      .emptyCSSClass([
+        globalInstance.headerElement,
+        globalInstance.frameLoadOrder,
+        globalInstance.frameOrderMessage,
+        globalInstance.orderMessage,
+        globalInstance.frameSKUContainer,
+        globalInstance.frameProgressContainer,
+        globalInstance.frameScanBarcode,
+      ])
 
-    globalInstance.toggleVisibility([
-      globalInstance.headerElement,
-      globalInstance.frameLoadOrder,
-    ], "show");
+      .toggleVisibility([
+        globalInstance.headerElement,
+        globalInstance.frameLoadOrder,
+      ], "show")
 
-    globalInstance.toggleVisibility([
-      globalInstance.frameOrderMessage,
-      globalInstance.resetBtn,
-      globalInstance.frameSKUContainer,
-      globalInstance.frameProgressContainer,
-      globalInstance.frameScanBarcode
-    ], "hide");
+      .toggleVisibility([
+        globalInstance.frameOrderMessage,
+        globalInstance.resetBtn,
+        globalInstance.frameSKUContainer,
+        globalInstance.frameProgressContainer,
+        globalInstance.frameScanBarcode
+      ], "hide")
 
-    globalInstance
       .emptyInnerHTML([
         globalInstance.orderMessage,
         globalInstance.frameSKUContainer,
         globalInstance.frameProgressContainer,
       ])
 
-    globalInstance
       .insertTextContent(globalInstance.resetBtn, "Reset")
+      .focusOnOrderInput();
 
-    /*globalInstance.headerElement.className = "";
+    /*OLD CODES - NEED TO DELETE WHEN CONFIRMED
+    globalInstance.headerElement.className = "";
     globalInstance.headerElement.classList.remove("hidden");
   
     globalInstance.frameLoadOrder.className = "";
@@ -476,14 +474,15 @@ function helperFunctions() {
   
     globalInstance.frameScanBarcode.className = "";
     globalInstance.frameScanBarcode.classList.add("hidden");
-  */
+
+    globalInstance.orderInput.value = "";
+    globalInstance.orderInput.focus();
+    */
     disableBarcode();
     orderItems = [];
     orderedSKUs = [];
     totalSKUs = 0;
 
-    globalInstance.orderInput.value = "";
-    globalInstance.orderInput.focus();
     console.groupEnd();
   }
 
