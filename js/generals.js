@@ -61,7 +61,7 @@ export const classManager = {
     }
   },
 
-  toggleClass(mode, className, target) {
+  toggleClass({mode, className, target}) {
     console.info(`toggleFrameClass() called by ${this.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
     switch(mode) {
       case "add":
@@ -83,7 +83,8 @@ export const contentManager = {
   },
 
   insertInnerHTML(targetElement, content) {
-    targetElement.innerHtml = content;
+    targetElement.innerHTML = "";  
+    targetElement.innerHTML = content;
     return this;
   },
 }

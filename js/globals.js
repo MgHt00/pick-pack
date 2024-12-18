@@ -50,7 +50,7 @@ export default class Global {
 
   // class changes functions
   toggleOrderMessageClass(mode, className) {
-    return this.toggleClass(mode, )
+    return this.toggleClass({mode, className, target: this.orderMessage})
   }
 
   addClassToOrderMessage(className) {
