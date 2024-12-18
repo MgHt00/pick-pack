@@ -41,24 +41,13 @@ export default class Global {
     return this;
   }
 
-  toggleClass(targetElements = [], mode) {
+  toggleClass({targetElements = [], mode, className}) {
+    targetElements = this.checkArray(targetElements);
 
+    targetElements.forEach(element => {
+      this.toggleTargetClass({mode, className, target: element}); 
+    });
   }
-
-  // class changes functions
-  /*toggleOrderMessageClass(mode, className) {
-    return this.toggleClass({mode, className, target: this.orderMessage})
-  }
-
-  addClassToOrderMessage(className) {
-    console.info("addClassToOrderMessage():", className);
-    return this.addClass(this.orderMessage, className);
-  }
-
-  removeClassFromOrderMessage(className) {
-    console.info("removeClassFromOrderMessage():", className);
-    return this.removeClass(this.orderMessage, className);
-  }*/
 
   toggleBarcodeBundle({mode, className}) {
     console.info(`toggleBarcodeBundle(): mode: ${mode}, className: ${className}`);
@@ -84,7 +73,10 @@ export default class Global {
   // text manipulation functions
   emptyInnerHTML(targetElements = []) {
     console.info("emptyInnerHTML()");
-    targetElements = this.checkAndConvertArray(targetElements);
+    targetElements = this.checkArray(targetElements);
+    targetElements.forEach(element => {
+      this.insertInnerHTML(element, "");
+    });
   }
 
   updateOrderMessage(content) {

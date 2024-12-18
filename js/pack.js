@@ -41,7 +41,7 @@ function listenerManager() {
     // click listeners
     globalInstance.checkBarcodeBtn.addEventListener("click", checkBarcode);
     globalInstance.loadOrderBtn.addEventListener("click", loadOrder);
-    globalInstance.resetBtn.addEventListener("click", resetAll);
+    globalInstance.resetBtn.addEventListener("click", helperInstance.resetAll);
     
     // key listeners
     globalInstance.orderInput.addEventListener("keydown", handleOrderInputKey); // don't need to manually pass `event`, the browser takes care of providing the event object.
@@ -50,7 +50,7 @@ function listenerManager() {
 
   function DOMloaded() {
     globalInstance.orderInput.focus(); // focus on the input at start.
-    resetAll(); // Reset everything at the start.
+    helperInstance.resetAll(); // Reset everything at the start.
   }
 
   function handleOrderInputKey(event) {
@@ -88,7 +88,7 @@ async function loadOrder() {
     return;
   }
 
-  resetAll(); // reset everything before loading new order
+  helperInstance.resetAll(); // reset everything before loading new order
   globalInstance
     .toggleVisibility(globalInstance.frameOrderMessage, "show");// need to show again because of `resetAll()`
 
@@ -407,6 +407,86 @@ async function checkOrderNote(orderId, successMessage) {
 
 // MISC functions
 function helperFunctions() {
+  function resetAll() { // FUNCTION: To reset when Load Order is pressed.
+    console.groupCollapsed("resetAll()");
+
+    globalInstance
+      .toggleClass({
+        target: globalInstance.bodyElement,
+        mode: "add",
+        className: "start"
+      });
+
+    globalInstance.emptyCSSClass([
+      globalInstance.headerElement,
+      globalInstance.frameLoadOrder,
+      globalInstance.frameOrderMessage,
+      globalInstance.orderMessage,
+      globalInstance.frameSKUContainer,
+      globalInstance.frameProgressContainer,
+      globalInstance.frameScanBarcode,
+    ]
+    );
+
+    globalInstance.toggleVisibility([
+      globalInstance.headerElement,
+      globalInstance.frameLoadOrder,
+    ], "show");
+
+    globalInstance.toggleVisibility([
+      globalInstance.frameOrderMessage,
+      globalInstance.resetBtn,
+      globalInstance.frameSKUContainer,
+      globalInstance.frameProgressContainer,
+      globalInstance.frameScanBarcode
+    ], "hide");
+
+    globalInstance
+      .emptyInnerHTML([
+        globalInstance.orderMessage,
+        globalInstance.frameSKUContainer,
+        globalInstance.frameProgressContainer,
+      ])
+
+    globalInstance
+      .insertTextContent(globalInstance.resetBtn, "Reset")
+
+    /*globalInstance.headerElement.className = "";
+    globalInstance.headerElement.classList.remove("hidden");
+  
+    globalInstance.frameLoadOrder.className = "";
+    globalInstance.frameLoadOrder.classList.remove("hidden");
+  
+    globalInstance.frameOrderMessage.className = "";
+    globalInstance.frameOrderMessage.classList.add("hidden");
+  
+    globalInstance.orderMessage.textContent = "";
+    globalInstance.orderMessage.className = "";
+    globalInstance.resetBtn.textContent =  "Reset";
+    
+    globalInstance.resetBtn.classList.add("hidden");
+  
+    globalInstance.frameSKUContainer.className = "";
+    globalInstance.frameSKUContainer.classList.add("hidden");
+    globalInstance.frameSKUContainer.innerHTML = "";
+  
+    globalInstance.frameProgressContainer.className = "";
+    globalInstance.frameProgressContainer.classList.add("hidden");
+    globalInstance.frameProgressContainer.innerHTML = "";
+  
+    globalInstance.frameScanBarcode.className = "";
+    globalInstance.frameScanBarcode.classList.add("hidden");
+  */
+    disableBarcode();
+    orderItems = [];
+    orderedSKUs = [];
+    totalSKUs = 0;
+
+    globalInstance.orderInput.value = "";
+    globalInstance.orderInput.focus();
+    console.groupEnd();
+  }
+
 
   function disableBarcode() { //To disable barcode input and button
     console.groupCollapsed("disableBarcode()");
@@ -427,74 +507,12 @@ function helperFunctions() {
   }
 
   return {
+    resetAll,
     disableBarcode,
     enableBarcode,
   }
 }
 
-
-
-
-// FUNCTION: To reset when Load Order is pressed.
-function resetAll() {
-  console.groupCollapsed("resetAll()");
-  globalInstance.addClass(globalInstance.bodyElement, "start");
-
-  globalInstance.emptyClass([
-    globalInstance.headerElement,
-    globalInstance.frameLoadOrder,
-    globalInstance.frameOrderMessage,
-    globalInstance.orderMessage,
-    globalInstance.frameSKUContainer,
-    globalInstance.frameProgressContainer,
-    globalInstance.frameScanBarcode,
-    ]
-  );
-
-  globalInstance.toggleVisibility([
-    globalInstance.headerElement,
-    globalInstance.frameLoadOrder,
-  ], "show");
-
-  globalInstance.toggleVisibility([
-    globalInstance.frameOrderMessage,
-  ], "hide");
-
-  //globalInstance.headerElement.className = "";
-  //globalInstance.headerElement.classList.remove("hidden");
-
-  //globalInstance.frameLoadOrder.className = "";
-  //globalInstance.frameLoadOrder.classList.remove("hidden");
-
-  //globalInstance.frameOrderMessage.className = "";
-  //globalInstance.frameOrderMessage.classList.add("hidden");
-
-  globalInstance.orderMessage.textContent = "";
-  //globalInstance.orderMessage.className = "";
-  globalInstance.resetBtn.textContent =  "Reset";
-  globalInstance.resetBtn.classList.add("hidden");
-
-  //globalInstance.frameSKUContainer.className = "";
-  globalInstance.frameSKUContainer.classList.add("hidden");
-  globalInstance.frameSKUContainer.innerHTML = "";
-
-  //globalInstance.frameProgressContainer.className = "";
-  globalInstance.frameProgressContainer.classList.add("hidden");
-  globalInstance.frameProgressContainer.innerHTML = "";
-
-  //globalInstance.frameScanBarcode.className = "";
-  globalInstance.frameScanBarcode.classList.add("hidden");
-  
-  helperInstance.disableBarcode();
-  //globalInstance.orderMessage.textContent = "Ready to begin.";
-  orderItems = []; 
-  orderedSKUs = [];
-  totalSKUs = 0; 
-  
-  globalInstance.orderInput.value = "";
-  globalInstance.orderInput.focus();
-  console.groupEnd();
-}
 
 function soundManager() {
   function playBeepSound() {
