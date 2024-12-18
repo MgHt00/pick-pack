@@ -433,31 +433,52 @@ function helperFunctions() {
 
 // FUNCTION: To reset when Load Order is pressed.
 function resetAll() {
-  globalInstance.bodyElement.classList.add("start");
+  console.groupCollapsed("resetAll()");
+  globalInstance.addClass(globalInstance.bodyElement, "start");
 
-  globalInstance.headerElement.className = "";
-  globalInstance.headerElement.classList.remove("hidden");
+  globalInstance.emptyClass([
+    globalInstance.headerElement,
+    globalInstance.frameLoadOrder,
+    globalInstance.frameOrderMessage,
+    globalInstance.orderMessage,
+    globalInstance.frameSKUContainer,
+    globalInstance.frameProgressContainer,
+    globalInstance.frameScanBarcode,
+    ]
+  );
 
-  globalInstance.frameLoadOrder.className = "";
-  globalInstance.frameLoadOrder.classList.remove("hidden");
+  globalInstance.toggleVisibility([
+    globalInstance.headerElement,
+    globalInstance.frameLoadOrder,
+  ], "show");
 
-  globalInstance.frameOrderMessage.className = "";
-  globalInstance.frameOrderMessage.classList.add("hidden");
+  globalInstance.toggleVisibility([
+    globalInstance.frameOrderMessage,
+  ], "hide");
+
+  //globalInstance.headerElement.className = "";
+  //globalInstance.headerElement.classList.remove("hidden");
+
+  //globalInstance.frameLoadOrder.className = "";
+  //globalInstance.frameLoadOrder.classList.remove("hidden");
+
+  //globalInstance.frameOrderMessage.className = "";
+  //globalInstance.frameOrderMessage.classList.add("hidden");
 
   globalInstance.orderMessage.textContent = "";
-  globalInstance.orderMessage.className = "";
+  //globalInstance.orderMessage.className = "";
   globalInstance.resetBtn.textContent =  "Reset";
   globalInstance.resetBtn.classList.add("hidden");
 
-  globalInstance.frameSKUContainer.className = "";
+  //globalInstance.frameSKUContainer.className = "";
   globalInstance.frameSKUContainer.classList.add("hidden");
   globalInstance.frameSKUContainer.innerHTML = "";
 
-  globalInstance.frameProgressContainer.className = "";
+  //globalInstance.frameProgressContainer.className = "";
   globalInstance.frameProgressContainer.classList.add("hidden");
   globalInstance.frameProgressContainer.innerHTML = "";
 
-  globalInstance.frameScanBarcode.className = "";
+  //globalInstance.frameScanBarcode.className = "";
   globalInstance.frameScanBarcode.classList.add("hidden");
   
   helperInstance.disableBarcode();
@@ -468,6 +489,7 @@ function resetAll() {
   
   globalInstance.orderInput.value = "";
   globalInstance.orderInput.focus();
+  console.groupEnd();
 }
 
 function soundManager() {

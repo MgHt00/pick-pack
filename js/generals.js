@@ -24,7 +24,7 @@ export const cssClassManager = {
     return this; 
   },
 
-  emptyClass(targetElements = null, className) {
+  emptyClass(targetElements = null) {
     if (!targetElements) return this;
 
     targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
@@ -73,7 +73,13 @@ export const contentManager = {
     targetElement.innerHTML = content;
     return this;
   },
-}
+};
+
+export const utilityFunctionsManager = {
+  checkAndConvertArray(value) {
+    return value = Array.isArray(value)? value : [value];
+  },
+};
 
 const generalFunctionsManager = {
   retrieveCallerFunctionName() {
@@ -89,4 +95,4 @@ const generalFunctionsManager = {
   
     return callerName;
   },  
-}
+};

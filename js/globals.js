@@ -1,4 +1,4 @@
-import { cssClassManager, contentManager } from "./generals.js";
+import { cssClassManager, contentManager, utilityFunctionsManager } from "./generals.js";
 
 export default class Global {
   constructor() {
@@ -32,6 +32,16 @@ export default class Global {
   }
 
   // Visibility changes functions
+  toggleVisibility(targetElements = [], mode) {
+    console.info(`toggleVisibility(); mode: ${mode}`);
+    targetElements = this.checkAndConvertArray(targetElements);
+    targetElements = Array.isArray(targetElements)? targetElements : [targetElements];
+
+    targetElements.forEach(element => {
+      return this.toggleFrameVisibility({mode, target: element});
+    })
+  }
+
   toggleFrameOrderMessage(mode) {
     return this.toggleFrameVisibility({mode, target: this.frameOrderMessage});
   }
@@ -84,7 +94,12 @@ export default class Global {
     }
   }
 
-  // text insertion functions
+  // text manipulation functions
+  emptyInnerHTML(targetElements = []) {
+    console.info("emptyInnerHTML()");
+    targetElements = this.checkAndConvertArray(targetElements);
+  }
+
   updateOrderMessage(content) {
     console.info("orderMessageContent():", content);
     return this.insertTextContent(this.orderMessage, content);
@@ -121,4 +136,4 @@ export default class Global {
   }
 }
 
-Object.assign(Global.prototype, cssClassManager, contentManager);
+Object.assign(Global.prototype, cssClassManager, contentManager, utilityFunctionsManager);
