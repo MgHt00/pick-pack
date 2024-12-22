@@ -1,4 +1,4 @@
-import { utilityFunctionsManager, cssClassManager, contentManager} from "./generals.js";
+import { cssClassManager, contentManager} from "./generals.js";
 
 export default class Global {
   constructor() {
@@ -38,16 +38,16 @@ export default class Global {
 
   // Visibility changes functions
   toggleVisibility(targetElements = [], mode) {
-    targetElements = utilityFunctionsManager.checkAndConvertArray(targetElements);
+    targetElements = cssClassManager.checkArray(targetElements);
 
     targetElements.forEach(element => {
-      this.toggleTargetVisibility({mode, target: element});
+      cssClassManager.toggleTargetVisibility({mode, target: element});
     });
     return this;
   }
 
   toggleClass({targetElements = [], mode, className}) {
-    targetElements = utilityFunctionsManager.checkAndConvertArray(targetElements);
+    targetElements = cssClassManager.checkArray(targetElements);
 
     targetElements.forEach(element => {
       cssClassManager.toggleTargetClass({mode, className, target: element}).bind(Global); 
@@ -55,9 +55,9 @@ export default class Global {
     return this;
   }
 
-  emptyCSSClass(targetElements = []) {
-    targetElements = utilityFunctionsManager.checkAndConvertArray(targetElements);
-    utilityFunctionsManager.emptyClass(targetElements);
+  emptyAllClass(targetElements = []) {
+    targetElements = cssClassManager.checkArray(targetElements);
+    cssClassManager.emptyCSSClass(targetElements);
     return this;
   }  
 
@@ -85,10 +85,11 @@ export default class Global {
   // text manipulation functions
   emptyInnerHTML(targetElements = []) {
     console.info("emptyInnerHTML()");
-    targetElements = utilityFunctionsManager.checkAndConvertArray(targetElements);
+    targetElements = cssClassManager.checkArray(targetElements);
     targetElements.forEach(element => {
       this.insertInnerHTML(element, "");
     });
+    return this;
   }
 
   updateOrderMessage(content) {
@@ -127,4 +128,4 @@ export default class Global {
   }
 }
 
-Object.assign(Global.prototype, utilityFunctionsManager, cssClassManager, contentManager);
+Object.assign(Global.prototype, cssClassManager, contentManager);

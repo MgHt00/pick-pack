@@ -11,8 +11,6 @@ export const utilityFunctionsManager = {
     targetElements.forEach(element => {
       element.classList.remove(className);
     });
-  
-    return this; // Allow method chaining
   },
 
   addClass(targetElements = null, className) {
@@ -23,30 +21,39 @@ export const utilityFunctionsManager = {
     targetElements.forEach(element => {
       element.classList.add(className);
     });
-  
-    return this; 
   },
 
   emptyClass(targetElements = null) {
-    console.info("emptyClass() is called");
     if (!targetElements) return this;
 
     targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
     targetElements.forEach(element => {
       element.className = '';
     });
-
-    return this;
   },
+
+  retrieveCallerFunctionName() {
+    const stack = new Error().stack; // Get the stack trace
+    const stackLines = stack.split("\n");
+  
+    // Retrieve the 3rd entry in the stack trace (index 3) to get the original caller (Check detail at cheat sheets from gitHub)
+    const callerLine = stackLines[3]?.trim();
+    let callerName = callerLine?.split(" ")[1] || "Unknown";
+  
+    // Remove the class or object prefix (e.g., "Global.toggleFrameOrderMessage" becomes "toggleFrameOrderMessage")
+    callerName = callerName.includes(".") ? callerName.split(".").pop() : callerName;
+  
+    return callerName;
+  },  
 };
 
 export const cssClassManager = {
   // Function References: because `utilityFunctionsManager` shouldn't be exported to Global
-  //checkArray: utilityFunctionsManager.checkAndConvertArray, // No context dependency
-  //emptyCSSClass: utilityFunctionsManager.emptyClass.bind(utilityFunctionsManager), // Explicitly bind
+  checkArray: utilityFunctionsManager.checkAndConvertArray, 
+  emptyCSSClass: utilityFunctionsManager.emptyClass,
 
   toggleTargetVisibility({mode, target}) {    
-    console.info(`toggleFrameVisibility() called by ${generalFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
+    console.info(`toggleFrameVisibility() called by ${utilityFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
     switch(mode) {
       case "show":
         utilityFunctionsManager.removeClass(target, "hidden"); 
@@ -61,7 +68,7 @@ export const cssClassManager = {
   },
 
   toggleTargetClass({mode, className, target}) {
-    console.info(`toggleFrameClass() called by ${generalFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
+    console.info(`toggleFrameClass() called by ${utilityFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
     switch(mode) {
       case "add":
         utilityFunctionsManager.addClass(target, className);
@@ -88,22 +95,4 @@ export const contentManager = {
     targetElement.innerHTML = content;
     return this;
   },
-};
-
-
-
-const generalFunctionsManager = {
-  retrieveCallerFunctionName() {
-    const stack = new Error().stack; // Get the stack trace
-    const stackLines = stack.split("\n");
-  
-    // Retrieve the 3rd entry in the stack trace (index 3) to get the original caller (Check detail at cheat sheets from gitHub)
-    const callerLine = stackLines[3]?.trim();
-    let callerName = callerLine?.split(" ")[1] || "Unknown";
-  
-    // Remove the class or object prefix (e.g., "Global.toggleFrameOrderMessage" becomes "toggleFrameOrderMessage")
-    callerName = callerName.includes(".") ? callerName.split(".").pop() : callerName;
-  
-    return callerName;
-  },  
 };

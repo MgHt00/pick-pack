@@ -416,7 +416,7 @@ function helperFunctions() {
         className: "start"
       })
     
-      .emptyCSSClass([
+      .emptyAllClass([
         globalInstance.headerElement,
         globalInstance.frameLoadOrder,
         globalInstance.frameOrderMessage,
