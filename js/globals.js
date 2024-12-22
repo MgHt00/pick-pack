@@ -25,6 +25,10 @@ export default class Global {
     return document.querySelector("#order-input").value;
   }
 
+  readBarCodeInputValue() {
+    return document.querySelector("#barcode-input").value;
+  }
+
   resetOrderInput() {
     this.orderInput.value = "";
     this.orderInput.focus();
@@ -37,7 +41,7 @@ export default class Global {
   }
 
   // Visibility changes functions
-  toggleVisibility(targetElements = [], mode) {
+  toggleVisibility(targetElements = [], mode) { // expected mode -> "show", "hide"
     targetElements = cssClassManager.checkArray(targetElements);
 
     targetElements.forEach(element => {
@@ -46,11 +50,11 @@ export default class Global {
     return this;
   }
 
-  toggleClass({targetElements = [], mode, className}) {
+  toggleClass({targetElements = [], mode, className}) { // expecte mode -> "add", "remove"
     targetElements = cssClassManager.checkArray(targetElements);
 
     targetElements.forEach(element => {
-      cssClassManager.toggleTargetClass({mode, className, target: element}).bind(Global); 
+      cssClassManager.toggleTargetClass({mode, className, target: element}); 
     });
     return this;
   }
