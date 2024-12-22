@@ -65,27 +65,6 @@ export default class Global {
     return this;
   }  
 
-  toggleBarcodeBundle({mode, className}) {
-    console.info(`toggleBarcodeBundle(): mode: ${mode}, className: ${className}`);
-    switch (mode) {
-      case "add":
-        return this.addClass([
-          this.barcodeInputTop, 
-          this.barcodeLabel
-        ], className);
-
-      case "remove":
-        return this.removeClass([
-          this.barcodeInputTop, 
-          this.barcodeLabel
-        ], className);
-
-      default:
-        console.warn("Invalid mode. Use 'add' or 'remove'.");
-        return this;
-    }
-  }
-
   // text manipulation functions
   emptyInnerHTML(targetElements = []) {
     console.info("emptyInnerHTML()");

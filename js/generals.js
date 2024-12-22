@@ -64,7 +64,6 @@ export const cssClassManager = {
       default:
         console.warn("Invalid mode. Use 'show' or 'hide'.");
     }
-    return this;
   },
 
   toggleTargetClass({mode, className, target}) {
@@ -95,4 +94,9 @@ export const contentManager = {
     targetElement.innerHTML = content;
     return this;
   },
+
+  appendContent(targetElement, content) {
+    targetElement.append(content);
+    return this;
+  }
 };
