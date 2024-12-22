@@ -1,4 +1,4 @@
-import { cssClassManager, contentManager} from "./generals.js";
+import { utilityFunctionsManager, cssClassManager, contentManager} from "./generals.js";
 
 export default class Global {
   constructor() {
@@ -38,7 +38,7 @@ export default class Global {
 
   // Visibility changes functions
   toggleVisibility(targetElements = [], mode) {
-    targetElements = this.checkArray(targetElements);
+    targetElements = utilityFunctionsManager.checkAndConvertArray(targetElements);
 
     targetElements.forEach(element => {
       this.toggleTargetVisibility({mode, target: element});
@@ -47,12 +47,19 @@ export default class Global {
   }
 
   toggleClass({targetElements = [], mode, className}) {
-    targetElements = this.checkArray(targetElements);
+    targetElements = utilityFunctionsManager.checkAndConvertArray(targetElements);
 
     targetElements.forEach(element => {
-      this.toggleTargetClass({mode, className, target: element}); 
+      cssClassManager.toggleTargetClass({mode, className, target: element}).bind(Global); 
     });
+    return this;
   }
+
+  emptyCSSClass(targetElements = []) {
+    targetElements = utilityFunctionsManager.checkAndConvertArray(targetElements);
+    utilityFunctionsManager.emptyClass(targetElements);
+    return this;
+  }  
 
   toggleBarcodeBundle({mode, className}) {
     console.info(`toggleBarcodeBundle(): mode: ${mode}, className: ${className}`);
@@ -78,7 +85,7 @@ export default class Global {
   // text manipulation functions
   emptyInnerHTML(targetElements = []) {
     console.info("emptyInnerHTML()");
-    targetElements = this.checkArray(targetElements);
+    targetElements = utilityFunctionsManager.checkAndConvertArray(targetElements);
     targetElements.forEach(element => {
       this.insertInnerHTML(element, "");
     });
@@ -120,4 +127,4 @@ export default class Global {
   }
 }
 
-Object.assign(Global.prototype, cssClassManager, contentManager);
+Object.assign(Global.prototype, utilityFunctionsManager, cssClassManager, contentManager);

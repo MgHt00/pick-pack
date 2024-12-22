@@ -415,7 +415,7 @@ function helperFunctions() {
         mode: "add",
         className: "start"
       })
-
+    
       .emptyCSSClass([
         globalInstance.headerElement,
         globalInstance.frameLoadOrder,
@@ -425,7 +425,7 @@ function helperFunctions() {
         globalInstance.frameProgressContainer,
         globalInstance.frameScanBarcode,
       ])
-
+    
       .toggleVisibility([
         globalInstance.headerElement,
         globalInstance.frameLoadOrder,
@@ -485,7 +485,6 @@ function helperFunctions() {
 
     console.groupEnd();
   }
-
 
   function disableBarcode() { //To disable barcode input and button
     console.groupCollapsed("disableBarcode()");

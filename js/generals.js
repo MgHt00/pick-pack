@@ -1,4 +1,4 @@
-const utilityFunctionsManager = {
+export const utilityFunctionsManager = {
   checkAndConvertArray(value) {
     return value = Array.isArray(value)? value : [value];
   },
@@ -28,19 +28,22 @@ const utilityFunctionsManager = {
   },
 
   emptyClass(targetElements = null) {
+    console.info("emptyClass() is called");
     if (!targetElements) return this;
 
     targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
     targetElements.forEach(element => {
       element.className = '';
     });
+
+    return this;
   },
 };
 
 export const cssClassManager = {
-  // Function Reference: because `utilityFunctionsManager` shouldn't be exported to Global
-  checkArray : utilityFunctionsManager.checkAndConvertArray, 
-  emptyCSSClass : utilityFunctionsManager.emptyClass,
+  // Function References: because `utilityFunctionsManager` shouldn't be exported to Global
+  //checkArray: utilityFunctionsManager.checkAndConvertArray, // No context dependency
+  //emptyCSSClass: utilityFunctionsManager.emptyClass.bind(utilityFunctionsManager), // Explicitly bind
 
   toggleTargetVisibility({mode, target}) {    
     console.info(`toggleFrameVisibility() called by ${generalFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
