@@ -72,38 +72,39 @@ function listenerManager() {
 
 async function loadOrder() { // To load an order with a user input
   console.groupCollapsed("loadOrder()");
-  globalInstance
+  prepareFrameOrderMessage();
+
+  orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
+  if (!orderID) {
+    invalidOrder(); return;
+  }
+
+  const isOrderChecked = await checkOrderNote(orderID, globalInstance.successMessage); // awaited properly within the loadOrder function.
+  if (isOrderChecked) {
+    orderIsChecked(); return;
+  } else {
+    helperInstance
+      .resetAll(); // reset everything before loading new order
+    globalInstance
+      .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
+      .insertTextContent(globalInstance.orderMessage, "Order loading...");
+
+    await fetchOrderItems(orderID); 
+  }
+  console.groupEnd();
+
+  // Helper sub-functions
+  function prepareFrameOrderMessage() {
+    globalInstance
     .toggleVisibility(globalInstance.frameOrderMessage, "show")
     .toggleClass({
       targetElements: globalInstance.frameOrderMessage,
       mode: "remove",
       className: "success-message",
-    })
-
-  orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
-
-  if (!orderID) {
-    invalidOrder(); return;
+    });
   }
 
-  helperInstance
-    .resetAll(); // reset everything before loading new order
-  globalInstance
-    .toggleVisibility(globalInstance.frameOrderMessage, "show");// need to show again because of `resetAll()`
-
-  // Check if the order has already been checked
-  // Need to ensure that the checkOrderNote function is called and 
-  // awaited properly within the loadOrder function.
-  const isOrderChecked = await checkOrderNote(orderID, globalInstance.successMessage);
-  if (isOrderChecked) {
-    orderIsChecked(); return;
-  }
-
-  globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading...")
-  await fetchOrderItems(orderID); 
-  console.groupEnd();
-
-  function invalidOrder() {
+  function invalidOrder() { 
     console.warn(`invalidOrder()`);
     soundInstance
       .playWrongSound();
