@@ -83,15 +83,7 @@ async function loadOrder() { // To load an order with a user input
   orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
 
   if (!orderID) {
-    soundInstance
-      .playWrongSound();
-    globalInstance
-      .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
-    helperInstance
-      .resetOrderInput();
-    
-    console.groupEnd();
-    return;
+    invalidOrder(); return;
   }
 
   helperInstance
@@ -104,6 +96,26 @@ async function loadOrder() { // To load an order with a user input
   // awaited properly within the loadOrder function.
   const isOrderChecked = await checkOrderNote(orderID, globalInstance.successMessage);
   if (isOrderChecked) {
+    orderIsChecked(); return;
+  }
+
+  globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading...")
+  await fetchOrderItems(orderID); 
+  console.groupEnd();
+
+  function invalidOrder() {
+    console.warn(`invalidOrder()`);
+    soundInstance
+      .playWrongSound();
+    globalInstance
+      .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
+    helperInstance
+      .resetOrderInput();
+    console.groupEnd();
+  }
+
+  function orderIsChecked() {
+    console.warn(`orderIsChecked()`);
     globalInstance
       .insertInnerHTML(
         globalInstance.orderMessage, 
@@ -118,13 +130,7 @@ async function loadOrder() { // To load an order with a user input
       .playWrongSound();
 
     console.groupEnd();
-    return;
   }
-
-  //globalInstance.updateOrderMessage("Order loading...");
-  globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading...")
-  await fetchOrderItems(orderID); 
-  console.groupEnd();
 }
 
 // FUNCTION: Fetch SKUs from the user-input order number
