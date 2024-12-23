@@ -74,41 +74,9 @@ export default class Global {
     });
     return this;
   }
-
-  updateOrderMessage(content) {
-    console.info("orderMessageContent():", content);
-    return this.insertTextContent(this.orderMessage, content);
-  }
   
-  setOrderMessageInnerHTML(content) {
-    console.info("updateOrderMessageInnerHTML():", content);
-    return this.insertInnerHTML(this.orderMessage, content);
-  }
-
   // enable / disable functions
-  enableBarcodeInput() {
-    console.info("enableBarcodeInput()");
-    this.barcodeInput.disabled = false;
-    return this;
-  }
-
-  disableBarcodeInput() {
-    console.info("disableBarcodeInput()");
-    this.barcodeInput.disabled = true;
-    return this;
-  }
-
-  enableCheckBarcodeBtn() {
-    console.info("enableCheckBarcodeBtn()");
-    this.checkBarcodeBtn.disabled = false;
-    return this;
-  }
-
-  disableCheckBarcodeBtn() {
-    console.info("disableCheckBarcodeBtn()");
-    this.checkBarcodeBtn.disabled = true;
-    return this;
-  }
+  
 }
 
 Object.assign(Global.prototype, cssClassManager, contentManager);
