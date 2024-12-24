@@ -225,38 +225,6 @@ async function fetchOrderItems(orderId) {
 } 
 
 // FUNCTION: 
-async function appendOrderNote(orderId, successMessage) {
-  const auth = btoa(`${consumerKey}:${consumerSecret}`);
-  const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
-
-  try {
-    // Get current date in ISO 8601 format (UTC timezone)
-    const currentDate = new Date().toISOString();
-
-    // Prepare the new note data
-    const newNote = {
-      note: successMessage,
-      customer_note: false, // Set to false for a private note
-      date_created: currentDate,
-    };
-    
-
-    // Add new note to the order using POST
-    const response = await axios.post(noteURL, newNote, {
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    // Log the full response object to inspect where updated notes are located
-    console.info('Order note added successfully:', response.data);
-  } catch (error) {
-    console.error('Error appending order note:', error);
-  }
-}
-
-// FUNCTION: 
 async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
   const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
@@ -595,11 +563,10 @@ function utilityFunctions() {
   function disableBarcode() { //To disable barcode input and button
     console.groupCollapsed("disableBarcode()");
     globalInstance
-      .toggleClass({
-        targetElements: [globalInstance.barcodeInputTop, globalInstance.barcodeLabel],
-        mode: "add",
-        className: "disabled",
-      })
+      .toggleDisability([
+          globalInstance.barcodeInputTop, 
+          globalInstance.barcodeLabel
+      ],"disabled")
       disableBarcodeInput()
       disableCheckBarcodeBtn();
     console.groupEnd();
@@ -607,7 +574,6 @@ function utilityFunctions() {
 
   function enableBarcode() { // To enable barcode input and button
     console.groupCollapsed("enableBarcode()");
-
     globalInstance
       .toggleDisability([
           globalInstance.barcodeInputTop, 
