@@ -14,7 +14,7 @@ const globalInstance = new Global();
 const localInstance = new Local();
 const listenerInstance = listenerManager();
 const soundInstance = soundManager();
-const helperInstance = helperFunctions();
+const utilityInstance = utilityFunctions();
 
 (function initialize(){
   console.groupCollapsed("initialize()");
@@ -41,9 +41,9 @@ function listenerManager() {
     document.addEventListener("DOMContentLoaded", handleDOMloaded);
 
     // click listeners
-    globalInstance.checkBarcodeBtn.addEventListener("click", helperInstance.checkBarcode);
+    globalInstance.checkBarcodeBtn.addEventListener("click", utilityInstance.checkBarcode);
     globalInstance.loadOrderBtn.addEventListener("click", loadOrder);
-    globalInstance.resetBtn.addEventListener("click", helperInstance.resetAll);
+    globalInstance.resetBtn.addEventListener("click", utilityInstance.resetAll);
     
     // key listeners
     globalInstance.orderInput.addEventListener("keydown", handleOrderInputKey); // don't need to manually pass `event`, the browser takes care of providing the event object.
@@ -52,7 +52,7 @@ function listenerManager() {
 
   function handleDOMloaded() {
     globalInstance.orderInput.focus(); // focus on the input at start.
-    helperInstance.resetAll(); // Reset everything at the start.
+    utilityInstance.resetAll(); // Reset everything at the start.
   }
 
   function handleOrderInputKey(event) {
@@ -63,7 +63,7 @@ function listenerManager() {
 
   function handleBarcodeInputKey(event) {
     if (event.key === "Enter") {
-      helperInstance.checkBarcode();
+      utilityInstance.checkBarcode();
     }
   }
 
@@ -85,7 +85,7 @@ async function loadOrder() { // To load an order with a user input
   if (isOrderChecked) {
     orderIsChecked(); return;
   } else {
-    helperInstance
+    utilityInstance
       .resetAll(); // reset everything before loading new order
     globalInstance
       .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
@@ -112,7 +112,7 @@ async function loadOrder() { // To load an order with a user input
       .playWrongSound();
     globalInstance
       .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
-    helperInstance
+    utilityInstance
       .resetOrderInput();
     console.groupEnd();
   }
@@ -127,7 +127,7 @@ async function loadOrder() { // To load an order with a user input
         targetElements: globalInstance.orderMessage,
         mode: "add",
         className: "success-message",});
-    helperInstance
+    utilityInstance
       .resetOrderInput();
     soundInstance
       .playWrongSound();
@@ -202,7 +202,7 @@ async function fetchOrderItems(orderId) {
 
   globalInstance.frameScanBarcode.classList.add("transition");
 
-  helperInstance.enableBarcode();
+  utilityInstance.enableBarcode();
   globalInstance.barcodeInput.focus();
   
 } catch (error) {
@@ -339,7 +339,7 @@ async function checkOrderNote(orderId, successMessage) {
   }
 }
 
-function helperFunctions() {
+function utilityFunctions() {
   function resetAll() { // To reset when Load Order is pressed.
     console.groupCollapsed("resetAll()");
 
