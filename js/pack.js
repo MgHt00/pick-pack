@@ -4,12 +4,22 @@ import Global from './globals.js';
 /*const consumerKey = '%%CONSUMER_KEY%%';
 const consumerSecret = '%%CONSUMER_SECRET%%';*/
 
-let orderItems = []; // to fetch all info of an order
+/*let orderItems = []; // to fetch all info of an order
 let orderedSKUs = []; // to keep the ordered SKUs
 let orderID = 0;
-let totalSKUs = 0;
+let totalSKUs = 0;*/
+
+class Local {
+  constructor() {
+    this.orderItems = []; // to fetch all info of an order
+    this.orderedSKUs = []; // to keep the ordered SKUs
+    this.orderID = 0;
+    this.totalSKUs = 0;
+  }
+}
 
 const globalInstance = new Global();
+const localInstance = new Local();
 const listenerInstance = listenerManager();
 const soundInstance = soundManager();
 const helperInstance = helperFunctions();
@@ -74,12 +84,12 @@ async function loadOrder() { // To load an order with a user input
   console.groupCollapsed("loadOrder()");
   prepareFrameOrderMessage();
 
-  orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
-  if (!orderID) {
+  localInstance.orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
+  if (!localInstance.orderID) {
     invalidOrder(); return;
   }
 
-  const isOrderChecked = await checkOrderNote(orderID, globalInstance.successMessage); // awaited properly within the loadOrder function.
+  const isOrderChecked = await checkOrderNote(localInstance.orderID, globalInstance.successMessage); // awaited properly within the loadOrder function.
   if (isOrderChecked) {
     orderIsChecked(); return;
   } else {
@@ -89,7 +99,7 @@ async function loadOrder() { // To load an order with a user input
       .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
       .insertTextContent(globalInstance.orderMessage, "Order loading...");
 
-    await fetchOrderItems(orderID); 
+    await fetchOrderItems(localInstance.orderID); 
   }
   console.groupEnd();
 
@@ -105,7 +115,7 @@ async function loadOrder() { // To load an order with a user input
   }
 
   function invalidOrder() { 
-    console.warn(`invalidOrder()`);
+    console.groupCollapsed(`invalidOrder()`);
     soundInstance
       .playWrongSound();
     globalInstance
@@ -156,25 +166,25 @@ async function fetchOrderItems(orderId) {
       timeoutPromise
     ]);
 
-    // Assign WooCommerce order into `orderItems`
+    // Assign WooCommerce order into `localInstance.orderItems`
     if (response.data && response.data.line_items) {
-      orderItems = response.data.line_items;
-      console.info(orderItems);
+      localInstance.orderItems = response.data.line_items;
+      console.info(localInstance.orderItems);
     } else {
       throw new Error("Order not found");
     }
 
   // To fetch ordered SKUs
-  for (let orderItem of orderItems) {
+  for (let orderItem of localInstance.orderItems) {
     // Get `quantity` property from and `orderItem` object
     const quantity = Number(orderItem["quantity"]);
     /*console.info(`Order quantity ${quantity}`);*/
 
     globalInstance.frameSKUContainer.classList.remove("hidden");
 
-    // Add ordered SKU to the `orderedSKUs` array, and increment the counter.
+    // Add ordered SKU to the `localInstance.orderedSKUs` array, and increment the counter.
     for (let i = 0; i < quantity; i++) {
-      orderedSKUs[totalSKUs++] = orderItem["sku"];
+      localInstance.orderedSKUs[localInstance.totalSKUs++] = orderItem["sku"];
       // Create new element with the ID same as the SKU.
       const sku = document.createElement("p");
       sku.setAttribute("id", `${orderItem["sku"]}`);
@@ -411,9 +421,9 @@ function helperFunctions() {
     globalInstance.orderInput.focus();
     */
     disableBarcode();
-    orderItems = [];
-    orderedSKUs = [];
-    totalSKUs = 0;
+    localInstance.orderItems = [];
+    localInstance.orderedSKUs = [];
+    localInstance.totalSKUs = 0;
 
     console.groupEnd();
   }
@@ -441,8 +451,8 @@ function helperFunctions() {
       return;
     }
 
-    for (let i = 0; i < orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
-      if (barcode === orderedSKUs[i]) {
+    for (let i = 0; i < localInstance.orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
+      if (barcode === localInstance.orderedSKUs[i]) {
         decorateFrameProgressContainer("found", i);
         spliceCheckedItem(i);
         soundInstance.playBeepSound();
@@ -458,7 +468,7 @@ function helperFunctions() {
     }
 
     // Check if all SKUs are scanned
-    if (orderedSKUs.length === 0) {
+    if (localInstance.orderedSKUs.length === 0) {
       disableBarcode();
       soundInstance.playCompleteSound();
 
@@ -494,7 +504,7 @@ function helperFunctions() {
           "Check a new order"
         );
       
-      const orderId = orderID;
+      const orderId = localInstance.orderID;
 
       /* TEMP COMMENT */
       await appendOrderNoteAndChangeStatus(orderId, globalInstance.successMessage);
@@ -536,13 +546,13 @@ function helperFunctions() {
           //////
 
           // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
-          // and put it in the progress-container; loop until the end of orderedSKUs array.
+          // and put it in the progress-container; loop until the end of localInstance.orderedSKUs array.
 
           /* OLD CODES; delete this when stable
           globalInstance.frameProgressContainer.classList.remove("error-message");
           globalInstance.frameProgressContainer.innerHTML = "Correct!! Scan another.";
           globalInstance.frameProgressContainer.classList.add("success-message");          
-          document.querySelector(`#${orderedSKUs[i]}`).classList.add("checked-sku");
+          document.querySelector(`#${localInstance.orderedSKUs[i]}`).classList.add("checked-sku");
           */
           globalInstance
             .toggleClass({
@@ -560,7 +570,7 @@ function helperFunctions() {
               className: "success-message",
             })
             .toggleClass({
-              targetElements: document.querySelector(`#${orderedSKUs[i]}`),
+              targetElements: document.querySelector(`#${localInstance.orderedSKUs[i]}`),
               mode: "add",
               className: "checked-sku",
             })
@@ -590,11 +600,11 @@ function helperFunctions() {
       }
     }
 
-    function spliceCheckedItem(i) {// Remove scanned SKU from orderedSKUs array.
+    function spliceCheckedItem(i) {// Remove scanned SKU from localInstance.orderedSKUs array.
       console.groupCollapsed("spliceCheckedItem()");
-      console.info(`Before splice: ${orderedSKUs}`);
-      orderedSKUs.splice(i, 1);
-      console.info(`After splice: ${orderedSKUs}`);
+      console.info(`Before splice: ${localInstance.orderedSKUs}`);
+      localInstance.orderedSKUs.splice(i, 1);
+      console.info(`After splice: ${localInstance.orderedSKUs}`);
 
       skuFound = true;
       console.groupEnd();
