@@ -80,7 +80,7 @@ async function loadOrder() { // To load an order with a user input
     invalidOrder(); return;
   }
 
-  const isOrderChecked = await checkOrderNote(localInstance.orderID, globalInstance.successMessage); // awaited properly within the loadOrder function.
+  const isOrderChecked = await utilityInstance.checkOrderNote(localInstance.orderID, globalInstance.successMessage); // awaited properly within the loadOrder function.
   if (isOrderChecked) {
     orderIsChecked(); return;
   } else {
@@ -112,7 +112,7 @@ async function loadOrder() { // To load an order with a user input
   }
 
   function orderIsChecked() {
-    console.warn(`orderIsChecked()`);
+    console.groupCollapsed(`orderIsChecked()`);
     globalInstance
       .insertInnerHTML(
         globalInstance.orderMessage, 
@@ -274,40 +274,6 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
 }
 
 // FUNCTION:
-async function checkOrderNote(orderId, successMessage) {
-  globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
-
-  const auth = btoa(`${consumerKey}:${consumerSecret}`);
-  const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
-
-  try {
-    // Fetch existing order details to get notes
-    const response = await axios.get(noteURL, {
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    // Extract existing notes array from the response
-    const existingNotes = response.data || [];
-
-    for(let i = 0; i<existingNotes.length; i++) {
-      /*console.info(existingNotes[i].note);*/
-      if (existingNotes[i].note === successMessage){
-        console.info("Retrun true");
-        return true;
-      }
-    }
-
-    // If no matching note is found
-    return false;
-
-  } catch (error) {
-    console.error('Error appending order note:', error);
-    return false; // In case of error, consider the order as not checked
-  }
-}
 
 function utilityFunctions() {
   function resetAll() { // To reset when Load Order is pressed.
@@ -388,6 +354,38 @@ function utilityFunctions() {
     localInstance.totalSKUs = 0;
 
     console.groupEnd();
+  }
+
+  async function checkOrderNote(orderId, successMessage) {
+    globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
+  
+    const auth = btoa(`${consumerKey}:${consumerSecret}`);
+    const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
+  
+    try { // Fetch existing order details to get notes
+      const response = await axios.get(noteURL, {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      // Extract existing notes array from the response
+      const existingNotes = response.data || [];
+  
+      for(let i = 0; i<existingNotes.length; i++) {
+        if (existingNotes[i].note === successMessage){
+          console.info("checkOrderNote(): Success message found in the order.");
+          return true;
+        }
+      }
+      // If no matching note is found
+      return false;
+  
+    } catch (error) {
+      console.error('checkOrderNote(): Error appending order note:', error);
+      return false; // In case of error, consider the order as not checked
+    }
   }
 
   async function checkBarcode() { // To match scanned-SKUs with ordered-SKUs
@@ -623,6 +621,7 @@ function utilityFunctions() {
 
   return {
     resetAll,
+    checkOrderNote,
     checkBarcode,
     disableBarcode,
     enableBarcode,
