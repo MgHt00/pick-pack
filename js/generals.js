@@ -53,7 +53,7 @@ export const cssClassManager = {
   emptyCSSClass: utilityFunctionsManager.emptyClass,
 
   toggleTargetVisibility({mode, target}) {    
-    console.info(`toggleFrameVisibility() called by ${utilityFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
+    //console.info(`toggleFrameVisibility() called by ${utilityFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
     switch(mode) {
       case "show":
         utilityFunctionsManager.removeClass(target, "hidden"); 
@@ -66,8 +66,22 @@ export const cssClassManager = {
     }
   },
 
+  toggleTargetDisability({mode, target}) {    
+    //console.info(`toggleFrameVisibility() called by ${utilityFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}`);
+    switch(mode) {
+      case "enabled":
+        utilityFunctionsManager.removeClass(target, "disabled"); 
+        break;
+      case "disabled":
+        utilityFunctionsManager.addClass(target, "disabled"); 
+        break;
+      default:
+        console.warn("Invalid mode. Use 'enabled' or 'disabled'.");
+    }
+  },
+
   toggleTargetClass({mode, className, target}) {
-    console.info(`toggleFrameClass() called by ${utilityFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
+    //console.info(`toggleFrameClass() called by ${utilityFunctionsManager.retrieveCallerFunctionName()}, mode: ${mode}, className: ${className}`);
     switch(mode) {
       case "add":
         utilityFunctionsManager.addClass(target, className);

@@ -24,9 +24,8 @@ const utilityInstance = utilityFunctions();
       globalInstance.frameSKUContainer,
       globalInstance.frameProgressContainer,
       globalInstance.frameScanBarcode,
-    ], "hide")
+    ], "hide");
     
-
   listenerInstance
     .loadListeners();
 
@@ -608,12 +607,12 @@ function utilityFunctions() {
 
   function enableBarcode() { // To enable barcode input and button
     console.groupCollapsed("enableBarcode()");
+
     globalInstance
-      .toggleClass({
-        targetElements: [globalInstance.barcodeInputTop, globalInstance.barcodeLabel],
-        mode: "remove",
-        className: "disabled",
-      })
+      .toggleDisability([
+          globalInstance.barcodeInputTop, 
+          globalInstance.barcodeLabel
+      ],"enabled")
     enableBarcodeInput()
     enableCheckBarcodeBtn();
     console.groupEnd();

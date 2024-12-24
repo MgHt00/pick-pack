@@ -39,6 +39,15 @@ export default class Global {
     return this;
   }
 
+  toggleDisability(targetElements = [], mode) { // expected mode -> "disabled", "enabled"
+    targetElements = cssClassManager.checkArray(targetElements);
+
+    targetElements.forEach(element => {
+      cssClassManager.toggleTargetDisability({mode, target: element});
+    });
+    return this;
+  }
+
   toggleClass({targetElements = [], mode, className}) { // expecte mode -> "add", "remove"
     targetElements = cssClassManager.checkArray(targetElements);
 
