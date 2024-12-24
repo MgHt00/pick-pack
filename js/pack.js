@@ -379,9 +379,9 @@ function utilityFunctions() {
         globalInstance.frameProgressContainer,
       ])
 
-      .insertTextContent(globalInstance.resetBtn, "Reset")
-      .focusOnOrderInput();
-
+      .insertTextContent(globalInstance.resetBtn, "Reset");
+      
+    resetOrderInput();
     /*OLD CODES - NEED TO DELETE WHEN CONFIRMED
     globalInstance.headerElement.className = "";
     globalInstance.headerElement.classList.remove("hidden");
@@ -423,7 +423,7 @@ function utilityFunctions() {
   async function checkBarcode() { // To match scanned-SKUs with ordered-SKUs
     console.groupCollapsed("checkBarcode()");
 
-    const barcode = globalInstance.readBarCodeInputValue();
+    const barcode = globalInstance.readBarcodeInputValue();
     const existingError = document.querySelector("#barcodeError");
     let skuFound = false;
     

@@ -25,19 +25,8 @@ export default class Global {
     return document.querySelector("#order-input").value;
   }
 
-  readBarCodeInputValue() {
+  readBarcodeInputValue() {
     return document.querySelector("#barcode-input").value;
-  }
-
-  resetOrderInput() {
-    this.orderInput.value = "";
-    this.orderInput.focus();
-    return this;
-  }
-
-  focusOnOrderInput() {
-    this.orderInput.value = "";
-    this.orderInput.focus();
   }
 
   // Visibility changes functions
