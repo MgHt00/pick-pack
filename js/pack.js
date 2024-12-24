@@ -84,12 +84,7 @@ async function loadOrder() { // To load an order with a user input
   if (isOrderChecked) {
     orderIsChecked(); return;
   } else {
-    utilityInstance
-      .resetAll(); // reset everything before loading new order
-    globalInstance
-      .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
-      .insertTextContent(globalInstance.orderMessage, "Order loading...");
-
+    prepareToLoadOrderItems();
     await fetchOrderItems(localInstance.orderID); 
   }
   console.groupEnd();
@@ -132,6 +127,14 @@ async function loadOrder() { // To load an order with a user input
       .playWrongSound();
 
     console.groupEnd();
+  }
+
+  function prepareToLoadOrderItems() {
+    utilityInstance
+      .resetAll(); // reset everything before loading new order
+    globalInstance
+      .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
+      .insertTextContent(globalInstance.orderMessage, "Order loading..."); // need to show again because of `resetAll()`
   }
 }
 
@@ -272,7 +275,7 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
 
 // FUNCTION:
 async function checkOrderNote(orderId, successMessage) {
-  globalInstance.orderMessage.textContent = "Order loading...";
+  globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
 
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
   const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
