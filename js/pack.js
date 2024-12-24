@@ -423,8 +423,8 @@ function helperFunctions() {
     console.groupCollapsed("checkBarcode()");
 
     const barcode = globalInstance.readBarCodeInputValue();
-    let skuFound = false;
     const existingError = document.querySelector("#barcodeError");
+    let skuFound = false;
     
     globalInstance
       .toggleVisibility(
@@ -437,7 +437,74 @@ function helperFunctions() {
     }
 
     if (!barcode) { // Display error if barcode input is empty
-      console.warn("Barcode input in empty.");
+      barcodeInputIsEmpty();
+      return;
+    }
+
+    for (let i = 0; i < orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
+      if (barcode === orderedSKUs[i]) {
+        decorateFrameProgressContainer("found", i);
+        spliceCheckedItem(i);
+        soundInstance.playBeepSound();
+        resetBarcodeInput();
+        break; // To exit the loop immediately after processing the matched SKU.
+      }
+    }
+
+    if (!skuFound) { // If no matching SKU is found
+      decorateFrameProgressContainer("not-found");
+      soundInstance.playWrongSound();
+      resetBarcodeInput();
+    }
+
+    // Check if all SKUs are scanned
+    if (orderedSKUs.length === 0) {
+      disableBarcode();
+      soundInstance.playCompleteSound();
+
+      /*DELETE it when stable
+      globalInstance.orderMessage.textContent = "Order complete!";
+      globalInstance.orderMessage.classList.add("order-complete");
+      globalInstance.frameSKUContainer.classList.add("hidden");
+      globalInstance.frameProgressContainer.classList.add("hidden");
+      globalInstance.frameScanBarcode.classList.add("hidden");
+      globalInstance.resetBtn.textContent = "Check a new order";
+      */
+      globalInstance
+        .insertTextContent(
+          globalInstance.orderMessage,
+          "Order complete!"
+        )
+        .toggleClass({
+          targetElements: globalInstance.orderMessage,
+          mode: "add",
+          className: "order-complete"
+        })
+        .toggleClass({
+          targetElements: [
+            globalInstance.frameSKUContainer,
+            globalInstance.frameProgressContainer,
+            globalInstance.frameScanBarcode,
+          ],
+          mode: "add",
+          className: "hidden",
+        })
+        .insertTextContent(
+          globalInstance.resetBtn,
+          "Check a new order"
+        );
+      
+      const orderId = orderID;
+
+      /* TEMP COMMENT */
+      await appendOrderNoteAndChangeStatus(orderId, globalInstance.successMessage);
+
+      console.info("appendOrderNoteAndChangeStatus() is called");
+    }
+
+    // helper sub-functions
+    function barcodeInputIsEmpty() {
+      console.info("Barcode input is empty.");
 
       const errorParagraph = document.createElement("p");
       globalInstance
@@ -459,91 +526,78 @@ function helperFunctions() {
       errorParagraph.setAttribute("id", "barcodeError");
       soundInstance.playWrongSound();
       console.groupEnd();
-      return;
     }
 
-    // Iterate through the ordered SKUs to find a match
-    for (let i = 0; i < orderedSKUs.length; i++) {
-      if (barcode === orderedSKUs[i]) {
-        // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
-        // and put it in the progress-container; loop until the end of orderedSKUs array.
+    function decorateFrameProgressContainer(status, i = 0) {
+      switch (status) { 
+        case "found":
+          //////
+          // We have bug here. (if multiple items with same sku, only the first is striked)
+          //////
 
+          // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
+          // and put it in the progress-container; loop until the end of orderedSKUs array.
 
-        //////
-        // We have bug here. (if multiple items with same sku, only the first is striked)
-        //////
+          /* OLD CODES; delete this when stable
+          globalInstance.frameProgressContainer.classList.remove("error-message");
+          globalInstance.frameProgressContainer.innerHTML = "Correct!! Scan another.";
+          globalInstance.frameProgressContainer.classList.add("success-message");          
+          document.querySelector(`#${orderedSKUs[i]}`).classList.add("checked-sku");
+          */
+          globalInstance
+            .toggleClass({
+              targetElements: globalInstance.frameProgressContainer,
+              mode: "remove",
+              className: "error-message",
+            })
+            .insertInnerHTML(
+              globalInstance.frameProgressContainer,
+              "Correct!! Scan another."
+            )
+            .toggleClass({
+              targetElements: globalInstance.frameProgressContainer,
+              mode: "add",
+              className: "success-message",
+            })
+            .toggleClass({
+              targetElements: document.querySelector(`#${orderedSKUs[i]}`),
+              mode: "add",
+              className: "checked-sku",
+            })
+          break;
+        case "not-found":
+          /*DELETE when stable
+          globalInstance.frameProgressContainer.classList.remove("success-message");
+          globalInstance.frameProgressContainer.innerHTML = "Wrong Product";
+          globalInstance.frameProgressContainer.classList.add("error-message");*/
 
-        /* OLD CODES; delete this when stable
-        globalInstance.frameProgressContainer.classList.remove("error-message");
-        globalInstance.frameProgressContainer.innerHTML = "Correct!! Scan another.";
-        globalInstance.frameProgressContainer.classList.add("success-message");          
-        document.querySelector(`#${orderedSKUs[i]}`).classList.add("checked-sku");
-        */
-        globalInstance
-          .toggleClass({
-            targetElements: globalInstance.frameProgressContainer,
-            mode: "remove",
-            className: "error-message",
-          })
-          .insertInnerHTML(
-            globalInstance.frameProgressContainer, 
-            "Correct!! Scan another."
-          )
-          .toggleClass({
-            targetElements: globalInstance.frameProgressContainer,
-            mode: "add",
-            className: "success-message",
-          })
-          .toggleClass({
-            targetElements: document.querySelector(`#${orderedSKUs[i]}`),
-            mode: "add",
-            className: "checked-sku",
-          })
-
-        // Remove scanned SKU from orderedSKUs array.
-        console.info(`Before splice: ${orderedSKUs}`);
-        orderedSKUs.splice(i, 1);
-        console.info(`After splice: ${orderedSKUs}`);
-
-        skuFound = true;
-        soundInstance.playBeepSound();
-        globalInstance.barcodeInput.value = "";
-        globalInstance.barcodeInput.focus();
-        break; // To exit the loop immediately after processing the matched SKU.
+          globalInstance
+            .toggleClass({
+              targetElements: globalInstance.frameProgressContainer,
+              mode: "remove",
+              className: "success-message",
+            })
+            .insertInnerHTML(
+              globalInstance.frameProgressContainer,
+              "Wrong Product"
+            )
+            .toggleClass({
+              targetElements: globalInstance.frameProgressContainer,
+              mode: "add",
+              className: "error-message",
+            });
+            break
       }
     }
 
-    // If no matching SKU is found
-    if (!skuFound) {
-      //globalInstance.orderMessage.textContent = "Wrong Product";
+    function spliceCheckedItem(i) {// Remove scanned SKU from orderedSKUs array.
+      console.groupCollapsed("spliceCheckedItem()");
+      console.info(`Before splice: ${orderedSKUs}`);
+      orderedSKUs.splice(i, 1);
+      console.info(`After splice: ${orderedSKUs}`);
 
-      globalInstance.frameProgressContainer.classList.remove("success-message");
-      globalInstance.frameProgressContainer.innerHTML = "Wrong Product";
-      globalInstance.frameProgressContainer.classList.add("error-message");
-
-      soundInstance.playWrongSound();
-      resetBarcodeInput();
-    }
-
-    // Check if all SKUs are scanned
-    if (orderedSKUs.length === 0) {
-      disableBarcode();
-      soundInstance.playCompleteSound();
-
-      globalInstance.orderMessage.textContent = "Order complete!";
-      globalInstance.orderMessage.classList.add("order-complete");
-
-      globalInstance.frameSKUContainer.classList.add("hidden");
-      globalInstance.frameProgressContainer.classList.add("hidden");
-      globalInstance.frameScanBarcode.classList.add("hidden");
-
-      globalInstance.resetBtn.textContent = "Check a new order";
-      const orderId = orderID;
-
-      /* TEMP COMMENT */
-      await appendOrderNoteAndChangeStatus(orderId, globalInstance.successMessage);
-
-      console.info("appendOrderNoteAndChangeStatus() is called");
+      skuFound = true;
+      console.groupEnd();
     }
   }
 
