@@ -1,14 +1,6 @@
 import { consumerKey, consumerSecret } from './config.js';
 import Global from './globals.js';
 
-/*const consumerKey = '%%CONSUMER_KEY%%';
-const consumerSecret = '%%CONSUMER_SECRET%%';*/
-
-/*let orderItems = []; // to fetch all info of an order
-let orderedSKUs = []; // to keep the ordered SKUs
-let orderID = 0;
-let totalSKUs = 0;*/
-
 class Local {
   constructor() {
     this.orderItems = []; // to fetch all info of an order
@@ -428,8 +420,7 @@ function helperFunctions() {
     console.groupEnd();
   }
 
-  // FUNCTION: To match scanned-SKUs with ordered-SKUs
-  async function checkBarcode() {
+  async function checkBarcode() { // To match scanned-SKUs with ordered-SKUs
     console.groupCollapsed("checkBarcode()");
 
     const barcode = globalInstance.readBarCodeInputValue();
@@ -439,8 +430,7 @@ function helperFunctions() {
     globalInstance
       .toggleVisibility(
         globalInstance.frameProgressContainer, 
-        "show"
-      );
+        "show");
 
     if (existingError) { // Remove existing error message if any
       existingError.remove();
@@ -457,6 +447,7 @@ function helperFunctions() {
         spliceCheckedItem(i);
         soundInstance.playBeepSound();
         resetBarcodeInput();
+        skuFound = true;
         break; // To exit the loop immediately after processing the matched SKU.
       }
     }
@@ -467,53 +458,16 @@ function helperFunctions() {
       resetBarcodeInput();
     }
 
-    // Check if all SKUs are scanned
-    if (localInstance.orderedSKUs.length === 0) {
+    if (localInstance.orderedSKUs.length === 0) { // Check if all SKUs are scanned
       disableBarcode();
       soundInstance.playCompleteSound();
-
-      /*DELETE it when stable
-      globalInstance.orderMessage.textContent = "Order complete!";
-      globalInstance.orderMessage.classList.add("order-complete");
-      globalInstance.frameSKUContainer.classList.add("hidden");
-      globalInstance.frameProgressContainer.classList.add("hidden");
-      globalInstance.frameScanBarcode.classList.add("hidden");
-      globalInstance.resetBtn.textContent = "Check a new order";
-      */
-      globalInstance
-        .insertTextContent(
-          globalInstance.orderMessage,
-          "Order complete!"
-        )
-        .toggleClass({
-          targetElements: globalInstance.orderMessage,
-          mode: "add",
-          className: "order-complete"
-        })
-        .toggleClass({
-          targetElements: [
-            globalInstance.frameSKUContainer,
-            globalInstance.frameProgressContainer,
-            globalInstance.frameScanBarcode,
-          ],
-          mode: "add",
-          className: "hidden",
-        })
-        .insertTextContent(
-          globalInstance.resetBtn,
-          "Check a new order"
-        );
-      
-      const orderId = localInstance.orderID;
-
-      /* TEMP COMMENT */
-      await appendOrderNoteAndChangeStatus(orderId, globalInstance.successMessage);
-
-      console.info("appendOrderNoteAndChangeStatus() is called");
+      wrapUpWhenComplete();
+      /*DELETE when stable const orderId = localInstance.orderID;*/
+      await appendOrderNoteAndChangeStatus(localInstance.orderID, globalInstance.successMessage);
     }
 
     // helper sub-functions
-    function barcodeInputIsEmpty() {
+    function barcodeInputIsEmpty() { // when barcode input is empty
       console.info("Barcode input is empty.");
 
       const errorParagraph = document.createElement("p");
@@ -538,7 +492,7 @@ function helperFunctions() {
       console.groupEnd();
     }
 
-    function decorateFrameProgressContainer(status, i = 0) {
+    function decorateFrameProgressContainer(status, i = 0) { // show or hide frames; strike-through SKU etc.
       switch (status) { 
         case "found":
           //////
@@ -596,7 +550,7 @@ function helperFunctions() {
               mode: "add",
               className: "error-message",
             });
-            break
+            break;
       }
     }
 
@@ -605,12 +559,39 @@ function helperFunctions() {
       console.info(`Before splice: ${localInstance.orderedSKUs}`);
       localInstance.orderedSKUs.splice(i, 1);
       console.info(`After splice: ${localInstance.orderedSKUs}`);
-
-      skuFound = true;
       console.groupEnd();
     }
-  }
 
+    function wrapUpWhenComplete() { // Decorate and insert text when no more SKU to check
+      /*DELETE it when stable
+      globalInstance.orderMessage.textContent = "Order complete!";
+      globalInstance.orderMessage.classList.add("order-complete");
+      globalInstance.frameSKUContainer.classList.add("hidden");
+      globalInstance.frameProgressContainer.classList.add("hidden");
+      globalInstance.frameScanBarcode.classList.add("hidden");
+      globalInstance.resetBtn.textContent = "Check a new order";
+      */
+      globalInstance
+        .insertTextContent(
+          globalInstance.orderMessage,
+          "Order complete!"
+        )
+        .toggleClass({
+          targetElements: globalInstance.orderMessage,
+          mode: "add",
+          className: "order-complete"
+        })
+        .toggleVisibility([
+          globalInstance.frameSKUContainer,
+          globalInstance.frameProgressContainer,
+          globalInstance.frameScanBarcode,
+        ], "hide")
+        .insertTextContent(
+          globalInstance.resetBtn,
+          "Check a new order"
+        );
+    }
+  }
 
   function disableBarcode() { //To disable barcode input and button
     console.groupCollapsed("disableBarcode()");
