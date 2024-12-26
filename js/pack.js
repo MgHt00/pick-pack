@@ -8,6 +8,8 @@ class Local {
     this.orderID = 0;
     this.totalSKUs = 0;
     this.successMessage = successMessage;
+    this.orderURL= "https://mmls.biz/wp-json/wc/v3/orders/"
+    this.noteURLpostfix = "/notes";
   }
 }
 
@@ -142,8 +144,10 @@ async function loadOrder() { // To load an order with a user input
 
 // FUNCTION: Fetch SKUs from the user-input order number
 async function fetchOrderItems(orderId) {
+  console.info("fetchOrderItems()");
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
-  const url = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
+  //const url = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
+  const url = `${localInstance.orderURL}${orderId}`; // construct URL by string interpolation
   const timeout = 10000; // Set a timeout limit in milliseconds
 
   try {
@@ -237,7 +241,7 @@ function orderManager() {
     globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
   
     const auth = btoa(`${consumerKey}:${consumerSecret}`);
-    const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
+    const noteURL = `${localInstance.orderURL}${orderId}${localInstance.noteURLpostfix}`; // construct URL by string interpolation
   
     try { // Fetch existing order details to get notes
       const response = await axios.get(noteURL, {
@@ -267,8 +271,10 @@ function orderManager() {
 
   async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
     const auth = btoa(`${consumerKey}:${consumerSecret}`);
-    const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
-    const orderURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
+    //const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
+    const noteURL = `${localInstance.orderURL}${orderId}${localInstance.noteURLpostfix}`; // construct URL by string interpolation
+    //const orderURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
+    const orderURL = `${localInstance.orderURL}${orderId}`;
   
     try {
       // Get current date in ISO 8601 format (UTC timezone)
