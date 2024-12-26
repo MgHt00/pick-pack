@@ -77,15 +77,13 @@ function listenerManager() {
 
 // FUNCTION: Fetch SKUs from the user-input order number
 async function fetchOrderItems(orderId) {
-  console.info("fetchOrderItems()");
+  console.groupCollapsed("fetchOrderItems()");
   const auth = btoa(`${consumerKey}:${consumerSecret}`);
-  //const url = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
   const url = `${localInstance.orderURL}${orderId}`; // construct URL by string interpolation
   const timeout = 10000; // Set a timeout limit in milliseconds
 
   try {
-    // Create a timeout promise
-    const timeoutPromise = new Promise((_, reject) =>
+    const timeoutPromise = new Promise((_, reject) => // Create a timeout promise
       setTimeout(() => reject(new Error("Request timed out")), timeout)
     );
 
@@ -107,46 +105,80 @@ async function fetchOrderItems(orderId) {
       throw new Error("Order not found");
     }
 
-  // To fetch ordered SKUs
-  for (let orderItem of localInstance.orderItems) {
-    // Get `quantity` property from and `orderItem` object
-    const quantity = Number(orderItem["quantity"]);
-    /*console.info(`Order quantity ${quantity}`);*/
+    // To fetch ordered SKUs
+    for (let orderItem of localInstance.orderItems) {
+      // Get `quantity` property from and `orderItem` object
+      const quantity = Number(orderItem["quantity"]);
+      /*console.info(`Order quantity ${quantity}`);*/
 
-    globalInstance.frameSKUContainer.classList.remove("hidden");
+      globalInstance.frameSKUContainer.classList.remove("hidden");
 
-    // Add ordered SKU to the `localInstance.orderedSKUs` array, and increment the counter.
-    for (let i = 0; i < quantity; i++) {
-      localInstance.orderedSKUs[localInstance.totalSKUs++] = orderItem["sku"];
-      // Create new element with the ID same as the SKU.
-      const sku = document.createElement("p");
-      sku.setAttribute("id", `${orderItem["sku"]}`);
-      sku.textContent = orderItem["sku"];
-      globalInstance.frameSKUContainer.append(sku);
-    }   
-  }
+      // Add ordered SKU to the `localInstance.orderedSKUs` array, and increment the counter.
+      for (let i = 0; i < quantity; i++) {
+        localInstance.orderedSKUs[localInstance.totalSKUs++] = orderItem["sku"];
+        // Create new element with the ID same as the SKU.
+        const sku = document.createElement("p");
+        sku.setAttribute("id", `${orderItem["sku"]}`);
+        sku.textContent = orderItem["sku"];
+        globalInstance.frameSKUContainer.append(sku);
+      }
+    }
 
-  globalInstance.bodyElement.classList.remove("start");
-  globalInstance.bodyElement.classList.add("transition");
+    //globalInstance.bodyElement.classList.remove("start");
+    globalInstance
+      .toggleClass({
+        targetElements: globalInstance.bodyElement,
+        mode: "add",
+        className: "start",
+      });
 
-  globalInstance.headerElement.classList.add("hidden");
+    /*globalInstance.bodyElement.classList.add("transition");
+    globalInstance.orderMessage.classList.add("transition");
+    globalInstance.frameScanBarcode.classList.add("transition");*/
+    globalInstance
+      .toggleClass({
+        targetElements: [globalInstance.bodyElement, globalInstance.orderMessage, globalInstance.frameScanBarcode],
+        mode: "add",
+        className: "transition",
+      });
 
-  globalInstance.orderMessage.textContent = `${orderId} Loaded.`;
-  globalInstance.orderMessage.classList.add("loaded");
-  soundInstance.playBeepSound();
 
-  globalInstance.frameLoadOrder.classList.add("hidden");
-  globalInstance.frameScanBarcode.classList.remove("hidden");
+    /*globalInstance.headerElement.classList.add("hidden");
+    globalInstance.frameLoadOrder.classList.add("hidden");*/
+    globalInstance
+      .toggleVisibility(
+        [globalInstance.headerElement, globalInstance.frameLoadOrder]
+        , "hide");
 
-  globalInstance.orderMessage.classList.add("transition");
-  globalInstance.resetBtn.classList.remove("hidden");
+    /*globalInstance.orderMessage.textContent = `${orderId} Loaded.`;*/
+    globalInstance
+      .insertTextContent(
+        globalInstance.orderMessage,
+        `${orderId} Loaded.`
+      );
 
-  globalInstance.frameScanBarcode.classList.add("transition");
+    /*globalInstance.orderMessage.classList.add("loaded");*/
+    globalInstance
+      .toggleClass({
+        targetElements: globalInstance.orderMessage,
+        mode: "add",
+        className: "loaded",
+      });
 
-  utilityInstance.enableBarcode();
-  globalInstance.barcodeInput.focus();
-  
-} catch (error) {
+    /*globalInstance.frameScanBarcode.classList.remove("hidden");  
+    globalInstance.resetBtn.classList.remove("hidden");*/
+    globalInstance
+      .toggleVisibility([
+        globalInstance.frameScanBarcode, globalInstance.resetBtn
+      ], "show");
+
+    soundInstance
+      .playBeepSound();
+    utilityInstance
+      .enableBarcode()
+      .resetBarcodeInput();
+
+  } catch (error) {
     console.error('Error fetching order data:', error);
 
     // Handle specific error messages
@@ -164,6 +196,8 @@ async function fetchOrderItems(orderId) {
     globalInstance.orderInput.focus();
     return; // Exit the function if there is an error
   }
+
+  console.groupEnd();
 } 
 
 function orderManager() {
@@ -600,43 +634,38 @@ function utilityManager() {
           globalInstance.barcodeInputTop, 
           globalInstance.barcodeLabel
       ],"enabled")
-    enableBarcodeInput()
+    enableBarcodeInput();
     enableCheckBarcodeBtn();
     console.groupEnd();
+    return this;
   }
 
   function enableBarcodeInput() {
-    //console.info("enableBarcodeInput()");
     globalInstance.barcodeInput.disabled = false;
-    //return this;
   }
 
   function disableBarcodeInput() {
-    //console.info("disableBarcodeInput()");
     globalInstance.barcodeInput.disabled = true;
-    //return this;
   }
 
   function enableCheckBarcodeBtn() {
-    //console.info("enableCheckBarcodeBtn()");
     globalInstance.checkBarcodeBtn.disabled = false;
-    //return this;
   }
 
   function disableCheckBarcodeBtn() {
-    //console.info("disableCheckBarcodeBtn()");
     globalInstance.checkBarcodeBtn.disabled = true;
-    //return this;
   }
 
   function resetOrderInput() {
     globalInstance.orderInput.value = "";
     globalInstance.orderInput.focus();
+    return this;
   }
   
   function resetBarcodeInput() {
     globalInstance.barcodeInput.value = "";
     globalInstance.barcodeInput.focus();
+    return this;
   }
 
   return {
