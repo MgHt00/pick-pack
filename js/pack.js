@@ -13,6 +13,7 @@ class Local {
 const globalInstance = new Global();
 const localInstance = new Local();
 const listenerInstance = listenerManager();
+const orderInstance = orderManager();
 const soundInstance = soundManager();
 const utilityInstance = utilityManager();
 
@@ -80,7 +81,7 @@ async function loadOrder() { // To load an order with a user input
     invalidOrder(); return;
   }
 
-  const isOrderChecked = await utilityInstance.checkOrderNote(localInstance.orderID, globalInstance.successMessage); // awaited properly within the loadOrder function.
+  const isOrderChecked = await orderInstance.checkOrderNote(localInstance.orderID, globalInstance.successMessage); // awaited properly within the loadOrder function.
   if (isOrderChecked) {
     orderIsChecked(); return;
   } else {
@@ -228,53 +229,90 @@ async function fetchOrderItems(orderId) {
 } 
 
 // FUNCTION: 
-async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
-  const auth = btoa(`${consumerKey}:${consumerSecret}`);
-  const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
-  const orderURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
 
-  try {
-    // Get current date in ISO 8601 format (UTC timezone)
-    const currentDate = new Date().toISOString();
-
-    // Prepare the new note data
-    const newNote = {
-      note: successMessage,
-      customer_note: false, // Set to false for a private note
-      date_created: currentDate,
-    };
-
-    // Add new note to the order using POST
-    const noteResponse = await axios.post(noteURL, newNote, {
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    console.info('Order note added successfully:', noteResponse.data);
-
-    // If the note is added successfully, change the order status to 'packed'
-    const orderUpdate = {
-      status: 'packed'
-    };
-
-    const orderResponse = await axios.put(orderURL, orderUpdate, {
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    console.info('Order status updated successfully:', orderResponse.data);
-
-  } catch (error) {
-    console.error('Error appending order note or updating order status:', error);
-  }
-}
 
 function orderManager() {
+  async function checkOrderNote(orderId, successMessage) {
+    globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
+  
+    const auth = btoa(`${consumerKey}:${consumerSecret}`);
+    const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
+  
+    try { // Fetch existing order details to get notes
+      const response = await axios.get(noteURL, {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      // Extract existing notes array from the response
+      const existingNotes = response.data || [];
+  
+      for(let i = 0; i<existingNotes.length; i++) {
+        if (existingNotes[i].note === successMessage){
+          console.info("checkOrderNote(): Success message found in the order.");
+          return true;
+        }
+      }
+      // If no matching note is found
+      return false;
+  
+    } catch (error) {
+      console.error('checkOrderNote(): Error appending order note:', error);
+      return false; // In case of error, consider the order as not checked
+    }
+  }
 
+  async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
+    const auth = btoa(`${consumerKey}:${consumerSecret}`);
+    const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
+    const orderURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
+  
+    try {
+      // Get current date in ISO 8601 format (UTC timezone)
+      const currentDate = new Date().toISOString();
+  
+      // Prepare the new note data
+      const newNote = {
+        note: successMessage,
+        customer_note: false, // Set to false for a private note
+        date_created: currentDate,
+      };
+  
+      // Add new note to the order using POST
+      const noteResponse = await axios.post(noteURL, newNote, {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      console.info('Order note added successfully:', noteResponse.data);
+  
+      // If the note is added successfully, change the order status to 'packed'
+      const orderUpdate = {
+        status: 'packed'
+      };
+  
+      const orderResponse = await axios.put(orderURL, orderUpdate, {
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      console.info('Order status updated successfully:', orderResponse.data);
+  
+    } catch (error) {
+      console.error('Error appending order note or updating order status:', error);
+    }
+  }
+
+  return{
+    checkOrderNote,
+    appendOrderNoteAndChangeStatus
+  }
 }
 
 function utilityManager() {
@@ -358,38 +396,6 @@ function utilityManager() {
     console.groupEnd();
   }
 
-  async function checkOrderNote(orderId, successMessage) {
-    globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
-  
-    const auth = btoa(`${consumerKey}:${consumerSecret}`);
-    const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
-  
-    try { // Fetch existing order details to get notes
-      const response = await axios.get(noteURL, {
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      // Extract existing notes array from the response
-      const existingNotes = response.data || [];
-  
-      for(let i = 0; i<existingNotes.length; i++) {
-        if (existingNotes[i].note === successMessage){
-          console.info("checkOrderNote(): Success message found in the order.");
-          return true;
-        }
-      }
-      // If no matching note is found
-      return false;
-  
-    } catch (error) {
-      console.error('checkOrderNote(): Error appending order note:', error);
-      return false; // In case of error, consider the order as not checked
-    }
-  }
-
   async function checkBarcode() { // To match scanned-SKUs with ordered-SKUs
     console.groupCollapsed("checkBarcode()");
 
@@ -433,7 +439,7 @@ function utilityManager() {
       soundInstance.playCompleteSound();
       wrapUpWhenComplete();
       /*DELETE when stable const orderId = localInstance.orderID;*/
-      await appendOrderNoteAndChangeStatus(localInstance.orderID, globalInstance.successMessage);
+      await orderInstance.appendOrderNoteAndChangeStatus(localInstance.orderID, globalInstance.successMessage);
     }
 
     // helper sub-functions
@@ -623,7 +629,6 @@ function utilityManager() {
 
   return {
     resetAll,
-    checkOrderNote,
     checkBarcode,
     disableBarcode,
     enableBarcode,
