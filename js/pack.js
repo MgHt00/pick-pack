@@ -2,16 +2,17 @@ import { consumerKey, consumerSecret } from './config.js';
 import Global from './globals.js';
 
 class Local {
-  constructor() {
+  constructor(successMessage) {
     this.orderItems = []; // to fetch all info of an order
     this.orderedSKUs = []; // to keep the ordered SKUs
     this.orderID = 0;
     this.totalSKUs = 0;
+    this.successMessage = successMessage;
   }
 }
 
 const globalInstance = new Global();
-const localInstance = new Local();
+const localInstance = new Local("All SKUs matched with barcodes successfully.");
 const listenerInstance = listenerManager();
 const orderInstance = orderManager();
 const soundInstance = soundManager();
@@ -81,7 +82,7 @@ async function loadOrder() { // To load an order with a user input
     invalidOrder(); return;
   }
 
-  const isOrderChecked = await orderInstance.checkOrderNote(localInstance.orderID, globalInstance.successMessage); // awaited properly within the loadOrder function.
+  const isOrderChecked = await orderInstance.checkOrderNote(localInstance.orderID, localInstance.successMessage); // awaited properly within the loadOrder function.
   if (isOrderChecked) {
     orderIsChecked(); return;
   } else {
@@ -439,7 +440,7 @@ function utilityManager() {
       soundInstance.playCompleteSound();
       wrapUpWhenComplete();
       /*DELETE when stable const orderId = localInstance.orderID;*/
-      await orderInstance.appendOrderNoteAndChangeStatus(localInstance.orderID, globalInstance.successMessage);
+      await orderInstance.appendOrderNoteAndChangeStatus(localInstance.orderID, localInstance.successMessage);
     }
 
     // helper sub-functions

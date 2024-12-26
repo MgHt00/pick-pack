@@ -17,7 +17,6 @@ export default class Global {
     this.frameOrderMessage = document.querySelector("#frame-order-message");
     this.orderMessage = document.querySelector("#order-message");
     this.frameProgressContainer = document.querySelector("#frame-progress-container");
-    this.successMessage = "All SKUs matched with barcodes successfully.";
   }
 
   readOrderInputValue() {
