@@ -14,7 +14,7 @@ const globalInstance = new Global();
 const localInstance = new Local();
 const listenerInstance = listenerManager();
 const soundInstance = soundManager();
-const utilityInstance = utilityFunctions();
+const utilityInstance = utilityManager();
 
 (function initialize(){
   console.groupCollapsed("initialize()");
@@ -73,7 +73,7 @@ function listenerManager() {
 
 async function loadOrder() { // To load an order with a user input
   console.groupCollapsed("loadOrder()");
-  prepareFrameOrderMessage();
+  prepareFrameOrderMessage(); // calling a sub-function
 
   localInstance.orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
   if (!localInstance.orderID) {
@@ -273,7 +273,11 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
   }
 }
 
-function utilityFunctions() {
+function orderManager() {
+
+}
+
+function utilityManager() {
   function resetAll() { // To reset when Load Order is pressed.
     console.groupCollapsed("resetAll()");
 
@@ -626,7 +630,6 @@ function utilityFunctions() {
     resetOrderInput,
   }
 }
-
 
 function soundManager() {
   function playBeepSound() {
