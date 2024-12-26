@@ -45,7 +45,7 @@ function listenerManager() {
 
     // click listeners
     globalInstance.checkBarcodeBtn.addEventListener("click", utilityInstance.checkBarcode);
-    globalInstance.loadOrderBtn.addEventListener("click", loadOrder);
+    globalInstance.loadOrderBtn.addEventListener("click", orderInstance.loadOrder);
     globalInstance.resetBtn.addEventListener("click", utilityInstance.resetAll);
     
     // key listeners
@@ -60,7 +60,7 @@ function listenerManager() {
 
   function handleOrderInputKey(event) {
     if (event.key === "Enter") {
-      loadOrder();
+      orderInstance.loadOrder();
     }
   }
 
@@ -72,73 +72,6 @@ function listenerManager() {
 
   return {
     loadListeners,
-  }
-}
-
-async function loadOrder() { // To load an order with a user input
-  console.groupCollapsed("loadOrder()");
-  prepareFrameOrderMessage(); // calling a sub-function
-
-  localInstance.orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
-  if (!localInstance.orderID) {
-    invalidOrder(); return;
-  }
-
-  const isOrderChecked = await orderInstance.checkOrderNote(localInstance.orderID, localInstance.successMessage); // awaited properly within the loadOrder function.
-  if (isOrderChecked) {
-    orderIsChecked(); return;
-  } else {
-    prepareToLoadOrderItems();
-    await fetchOrderItems(localInstance.orderID); 
-  }
-  console.groupEnd();
-
-  // Helper sub-functions
-  function prepareFrameOrderMessage() {
-    globalInstance
-    .toggleVisibility(globalInstance.frameOrderMessage, "show")
-    .toggleClass({
-      targetElements: globalInstance.frameOrderMessage,
-      mode: "remove",
-      className: "success-message",
-    });
-  }
-
-  function invalidOrder() { 
-    console.groupCollapsed(`invalidOrder()`);
-    soundInstance
-      .playWrongSound();
-    globalInstance
-      .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
-    utilityInstance
-      .resetOrderInput();
-    console.groupEnd();
-  }
-
-  function orderIsChecked() {
-    console.groupCollapsed(`orderIsChecked()`);
-    globalInstance
-      .insertInnerHTML(
-        globalInstance.orderMessage, 
-        "Order already checked.<br>Enter another order.")
-      .toggleClass({
-        targetElements: globalInstance.orderMessage,
-        mode: "add",
-        className: "success-message",});
-    utilityInstance
-      .resetOrderInput();
-    soundInstance
-      .playWrongSound();
-
-    console.groupEnd();
-  }
-
-  function prepareToLoadOrderItems() {
-    utilityInstance
-      .resetAll(); // reset everything before loading new order
-    globalInstance
-      .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
-      .insertTextContent(globalInstance.orderMessage, "Order loading..."); // need to show again because of `resetAll()`
   }
 }
 
@@ -233,10 +166,75 @@ async function fetchOrderItems(orderId) {
   }
 } 
 
-// FUNCTION: 
-
-
 function orderManager() {
+  async function loadOrder() { // To load an order with a user input
+    console.groupCollapsed("loadOrder()");
+    prepareFrameOrderMessage(); // calling a sub-function
+  
+    localInstance.orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
+    if (!localInstance.orderID) {
+      invalidOrder(); return;
+    }
+  
+    const isOrderChecked = await checkOrderNote(localInstance.orderID, localInstance.successMessage); // awaited properly within the loadOrder function.
+    if (isOrderChecked) {
+      orderIsChecked(); return;
+    } else {
+      prepareToLoadOrderItems();
+      await fetchOrderItems(localInstance.orderID); 
+    }
+    console.groupEnd();
+  
+    // Helper sub-functions
+    function prepareFrameOrderMessage() {
+      globalInstance
+      .toggleVisibility(globalInstance.frameOrderMessage, "show")
+      .toggleClass({
+        targetElements: globalInstance.frameOrderMessage,
+        mode: "remove",
+        className: "success-message",
+      });
+    }
+  
+    function invalidOrder() { 
+      console.groupCollapsed(`invalidOrder()`);
+      soundInstance
+        .playWrongSound();
+      globalInstance
+        .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
+      utilityInstance
+        .resetOrderInput();
+      console.groupEnd();
+    }
+  
+    function orderIsChecked() {
+      console.groupCollapsed(`orderIsChecked()`);
+      globalInstance
+        .insertInnerHTML(
+          globalInstance.orderMessage, 
+          "Order already checked.<br>Enter another order.")
+        .toggleClass({
+          targetElements: globalInstance.orderMessage,
+          mode: "add",
+          className: "success-message",});
+      utilityInstance
+        .resetOrderInput();
+      soundInstance
+        .playWrongSound();
+  
+      console.groupEnd();
+    }
+  
+    function prepareToLoadOrderItems() {
+      utilityInstance
+        .resetAll(); // reset everything before loading new order
+      globalInstance
+        .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
+        .insertTextContent(globalInstance.orderMessage, "Order loading..."); // need to show again because of `resetAll()`
+    }
+    // Helper sub-functions ENDS
+  }
+
   async function checkOrderNote(orderId, successMessage) {
     globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
   
@@ -283,7 +281,9 @@ function orderManager() {
       console.error('Error appending order note or updating order status:', error);
     }
 
-    // helper SUB-functions
+    console.groupEnd();
+
+    // Helper SUB-functions
     async function prepareAndAddNewNote(auth, noteURL, successMessage) {
       const currentDate = new Date().toISOString(); // Get current date in ISO 8601 format (UTC timezone)
       
@@ -318,12 +318,12 @@ function orderManager() {
   
       console.info('Order status updated successfully:', orderResponse.data);
     }
-    console.groupEnd();
+    // Helper SUB-functions ENDS
   }
 
   return{
-    checkOrderNote,
-    appendOrderNoteAndChangeStatus
+    loadOrder,
+    appendOrderNoteAndChangeStatus,
   }
 }
 
