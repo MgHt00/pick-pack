@@ -24,7 +24,7 @@ const utilityInstance = utilityFunctions();
       globalInstance.frameSKUContainer,
       globalInstance.frameProgressContainer,
       globalInstance.frameScanBarcode,
-    ], "hide");
+    ], "hide"); 
     
   listenerInstance
     .loadListeners();
@@ -272,8 +272,6 @@ async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
     console.error('Error appending order note or updating order status:', error);
   }
 }
-
-// FUNCTION:
 
 function utilityFunctions() {
   function resetAll() { // To reset when Load Order is pressed.
