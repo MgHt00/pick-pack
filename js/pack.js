@@ -270,25 +270,31 @@ function orderManager() {
   }
 
   async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
+    console.groupCollapsed("appendOrderNoteAndChangeStatus()");
     const auth = btoa(`${consumerKey}:${consumerSecret}`);
-    //const noteURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}/notes`;
     const noteURL = `${localInstance.orderURL}${orderId}${localInstance.noteURLpostfix}`; // construct URL by string interpolation
-    //const orderURL = `https://mmls.biz/wp-json/wc/v3/orders/${orderId}`;
     const orderURL = `${localInstance.orderURL}${orderId}`;
   
     try {
-      // Get current date in ISO 8601 format (UTC timezone)
-      const currentDate = new Date().toISOString();
+      await prepareAndAddNewNote(auth, noteURL, successMessage);
+      await changeStatusToPacked(auth, orderURL);
   
-      // Prepare the new note data
-      const newNote = {
+    } catch (error) {
+      console.error('Error appending order note or updating order status:', error);
+    }
+
+    // helper SUB-functions
+    async function prepareAndAddNewNote(auth, noteURL, successMessage) {
+      const currentDate = new Date().toISOString(); // Get current date in ISO 8601 format (UTC timezone)
+      
+      const newNote = { // Prepare the new note data
         note: successMessage,
         customer_note: false, // Set to false for a private note
         date_created: currentDate,
       };
-  
+      
       // Add new note to the order using POST
-      const noteResponse = await axios.post(noteURL, newNote, {
+      const noteResponse = await axios.post(noteURL, newNote, { 
         headers: {
           'Authorization': `Basic ${auth}`,
           'Content-Type': 'application/json',
@@ -296,8 +302,9 @@ function orderManager() {
       });
   
       console.info('Order note added successfully:', noteResponse.data);
-  
-      // If the note is added successfully, change the order status to 'packed'
+    }
+
+    async function changeStatusToPacked(auth, orderURL) { // change the order status to 'packed'
       const orderUpdate = {
         status: 'packed'
       };
@@ -310,10 +317,8 @@ function orderManager() {
       });
   
       console.info('Order status updated successfully:', orderResponse.data);
-  
-    } catch (error) {
-      console.error('Error appending order note or updating order status:', error);
     }
+    console.groupEnd();
   }
 
   return{
