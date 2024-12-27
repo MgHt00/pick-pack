@@ -425,10 +425,10 @@ function utilityManager() {
       barcodeInputIsEmpty();
       return;
     }
-
+    
     for (let i = 0; i < localInstance.orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
-      if (`${barcode}-${i}` === `${localInstance.orderedSKUs[i]}-${i}`) {
-        decorateFrameProgressContainer("found", i);
+      if (`${barcode}` === `${localInstance.orderedSKUs[i]}`) {
+        decorateFrameProgressContainer("found", `${localInstance.orderedSKUs[i]}`);
         spliceCheckedItem(i);
         soundInstance.playBeepSound();
         resetBarcodeInput();
@@ -477,16 +477,11 @@ function utilityManager() {
       console.groupEnd();
     }
 
-    function decorateFrameProgressContainer(status, i = 0) { // show or hide frames; strike-through SKU etc.
+    function decorateFrameProgressContainer(status, sku) { // show or hide frames; strike-through SKU etc.
       switch (status) { 
         case "found":
-          //////
-          // We have bug here. (if multiple items with same sku, only the first is striked)
-          //////
-
           // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
           // and put it in the progress-container; loop until the end of localInstance.orderedSKUs array.
-
           globalInstance
             .toggleClass({
               targetElements: globalInstance.frameProgressContainer,
@@ -503,7 +498,9 @@ function utilityManager() {
               className: "success-message",
             })
             .toggleClass({
-              targetElements: document.querySelector(`#${localInstance.orderedSKUs[i]}-${i}`),
+              // Matches elements whose id starts with the value of sku.
+              // Excludes elements that already have the `checked-sku` class.
+              targetElements: document.querySelector(`[id^=${sku}]:not(.checked-sku)`),
               mode: "add",
               className: "checked-sku",
             })
