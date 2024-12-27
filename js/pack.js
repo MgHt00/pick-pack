@@ -480,8 +480,8 @@ function utilityManager() {
     function decorateFrameProgressContainer(status, sku) { // show or hide frames; strike-through SKU etc.
       switch (status) { 
         case "found":
-          // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
-          // and put it in the progress-container; loop until the end of localInstance.orderedSKUs array.
+          // If scanned barcode is same as orderedSKU, matched SKU is striked-through,...
+          // ... and loop until the end of localInstance.orderedSKUs array.
           globalInstance
             .toggleClass({
               targetElements: globalInstance.frameProgressContainer,
