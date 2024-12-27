@@ -75,131 +75,6 @@ function listenerManager() {
   }
 }
 
-// FUNCTION: Fetch SKUs from the user-input order number
-async function fetchOrderItems(orderId) {
-  console.groupCollapsed("fetchOrderItems()");
-  const auth = btoa(`${consumerKey}:${consumerSecret}`);
-  const url = `${localInstance.orderURL}${orderId}`; // construct URL by string interpolation
-  const timeout = 10000; // Set a timeout limit in milliseconds
-
-  try {
-    const timeoutPromise = new Promise((_, reject) => // Create a timeout promise
-      setTimeout(() => reject(new Error("Request timed out")), timeout)
-    );
-
-    // Fetch the order data with a race between the request and the timeout
-    const response = await Promise.race([
-      axios.get(url, {
-        headers: {
-          'Authorization': `Basic ${auth}`
-        }
-      }),
-      timeoutPromise
-    ]);
-
-    // Assign WooCommerce order into `localInstance.orderItems`
-    if (response.data && response.data.line_items) {
-      localInstance.orderItems = response.data.line_items;
-      console.info(localInstance.orderItems);
-    } else {
-      throw new Error("Order not found");
-    }
-
-    // To fetch ordered SKUs
-    for (let orderItem of localInstance.orderItems) {
-      // Get `quantity` property from and `orderItem` object
-      const quantity = Number(orderItem["quantity"]);
-      /*console.info(`Order quantity ${quantity}`);*/
-
-      globalInstance.frameSKUContainer.classList.remove("hidden");
-
-      // Add ordered SKU to the `localInstance.orderedSKUs` array, and increment the counter.
-      for (let i = 0; i < quantity; i++) {
-        localInstance.orderedSKUs[localInstance.totalSKUs++] = orderItem["sku"];
-        // Create new element with the ID same as the SKU.
-        const sku = document.createElement("p");
-        sku.setAttribute("id", `${orderItem["sku"]}`);
-        sku.textContent = orderItem["sku"];
-        globalInstance.frameSKUContainer.append(sku);
-      }
-    }
-
-    //globalInstance.bodyElement.classList.remove("start");
-    globalInstance
-      .toggleClass({
-        targetElements: globalInstance.bodyElement,
-        mode: "add",
-        className: "start",
-      });
-
-    /*globalInstance.bodyElement.classList.add("transition");
-    globalInstance.orderMessage.classList.add("transition");
-    globalInstance.frameScanBarcode.classList.add("transition");*/
-    globalInstance
-      .toggleClass({
-        targetElements: [globalInstance.bodyElement, globalInstance.orderMessage, globalInstance.frameScanBarcode],
-        mode: "add",
-        className: "transition",
-      });
-
-
-    /*globalInstance.headerElement.classList.add("hidden");
-    globalInstance.frameLoadOrder.classList.add("hidden");*/
-    globalInstance
-      .toggleVisibility(
-        [globalInstance.headerElement, globalInstance.frameLoadOrder]
-        , "hide");
-
-    /*globalInstance.orderMessage.textContent = `${orderId} Loaded.`;*/
-    globalInstance
-      .insertTextContent(
-        globalInstance.orderMessage,
-        `${orderId} Loaded.`
-      );
-
-    /*globalInstance.orderMessage.classList.add("loaded");*/
-    globalInstance
-      .toggleClass({
-        targetElements: globalInstance.orderMessage,
-        mode: "add",
-        className: "loaded",
-      });
-
-    /*globalInstance.frameScanBarcode.classList.remove("hidden");  
-    globalInstance.resetBtn.classList.remove("hidden");*/
-    globalInstance
-      .toggleVisibility([
-        globalInstance.frameScanBarcode, globalInstance.resetBtn
-      ], "show");
-
-    soundInstance
-      .playBeepSound();
-    utilityInstance
-      .enableBarcode()
-      .resetBarcodeInput();
-
-  } catch (error) {
-    console.error('Error fetching order data:', error);
-
-    // Handle specific error messages
-    if (error.message === "Request timed out") {
-      globalInstance.orderMessage.innerHTML = "Order loading timed out. Please try again.";
-    } else if (error.response && error.response.status === 404) {
-      globalInstance.orderMessage.innerHTML = "Order not found!";
-    } else {
-      globalInstance.orderMessage.innerHTML = "Error loading order.<br>Please try again.";
-    }
-
-    globalInstance.orderMessage.classList.add("error-message");
-    soundInstance.playWrongSound();
-    globalInstance.orderInput.value = "";
-    globalInstance.orderInput.focus();
-    return; // Exit the function if there is an error
-  }
-
-  console.groupEnd();
-} 
-
 function orderManager() {
   async function loadOrder() { // To load an order with a user input
     console.groupCollapsed("loadOrder()");
@@ -269,6 +144,149 @@ function orderManager() {
     // Helper sub-functions ENDS
   }
 
+  async function fetchOrderItems(orderId) { // To fetch SKUs from the user-input order number
+    console.groupCollapsed("fetchOrderItems()");
+    const auth = btoa(`${consumerKey}:${consumerSecret}`);
+    const url = `${localInstance.orderURL}${orderId}`; // construct URL by string interpolation
+    const timeout = 10000; // Set a timeout limit in milliseconds
+  
+    try {
+      const timeoutPromise = new Promise((_, reject) => // Create a timeout promise
+        setTimeout(() => reject(new Error("Request timed out")), timeout)
+      );
+  
+      // Fetch the order data with a race between the request and the timeout
+      const response = await Promise.race([
+        axios.get(url, {
+          headers: {
+            'Authorization': `Basic ${auth}`
+          }
+        }),
+        timeoutPromise
+      ]);
+  
+      // Assign WooCommerce order into `localInstance.orderItems`
+      if (response.data && response.data.line_items) {
+        localInstance.orderItems = response.data.line_items;
+        console.info(localInstance.orderItems);
+      } else {
+        throw new Error("Order not found");
+      }
+  
+      // To fetch ordered SKUs
+      for (let orderItem of localInstance.orderItems) {
+        const quantity = Number(orderItem["quantity"]); // Get `quantity` property from an `orderItem` object
+  
+        globalInstance
+          .toggleVisibility(
+            globalInstance.frameSKUContainer
+            , "show");
+  
+        // Add ordered SKU to the `localInstance.orderedSKUs` array, and increment the counter.
+        for (let i = 0; i < quantity; i++) {
+          localInstance.orderedSKUs[localInstance.totalSKUs++] = orderItem["sku"];
+          // Create new element with the ID same as the SKU.
+          const sku = document.createElement("p");
+          /*DELETE when stable
+          sku.setAttribute("id", `${orderItem["sku"]}`);
+          sku.textContent = orderItem["sku"];
+          globalInstance.frameSKUContainer.append(sku);*/
+          globalInstance
+            .setAttribute(sku, "id", `${orderItem["sku"]}`)
+            .insertTextContent(sku, orderItem["sku"])
+            .appendContent(globalInstance.frameSKUContainer, sku)
+        }
+      }
+      manipulateCSS(); // calling a helper sub-function
+      soundInstance
+        .playBeepSound();
+      utilityInstance
+        .enableBarcode()
+        .resetBarcodeInput();
+    } catch (error) {
+      showSpecificErrorMsg(error); // Handle specific error messages by calling a helper sub-function
+      soundInstance
+        .playWrongSound();
+      utilityInstance
+        .resetOrderInput();
+      return; // Exit the function if there is an error
+    }
+    console.groupEnd();
+  
+    // Helper sub-functions
+    function manipulateCSS() {
+      /*DELETE when stable 
+      globalInstance.bodyElement.classList.remove("start");
+      globalInstance.bodyElement.classList.add("transition");
+      globalInstance.orderMessage.classList.add("transition");
+      globalInstance.frameScanBarcode.classList.add("transition");
+      globalInstance.headerElement.classList.add("hidden");
+      globalInstance.frameLoadOrder.classList.add("hidden");
+      globalInstance.orderMessage.textContent = `${orderId} Loaded.`;
+      globalInstance.orderMessage.classList.add("loaded");
+      globalInstance.frameScanBarcode.classList.remove("hidden");  
+      globalInstance.resetBtn.classList.remove("hidden");
+      */
+      globalInstance
+        .toggleClass({
+          targetElements: globalInstance.bodyElement,
+          mode: "add",
+          className: "start",
+        })
+        .toggleClass({
+          targetElements: [globalInstance.bodyElement, globalInstance.orderMessage, globalInstance.frameScanBarcode],
+          mode: "add",
+          className: "transition",
+        })
+        .toggleVisibility(
+          [globalInstance.headerElement, globalInstance.frameLoadOrder]
+          , "hide")
+        .insertTextContent(
+          globalInstance.orderMessage,
+          `${orderId} Loaded.`
+        )
+        .toggleClass({
+          targetElements: globalInstance.orderMessage,
+          mode: "add",
+          className: "loaded",
+        })
+        .toggleVisibility([
+          globalInstance.frameScanBarcode, globalInstance.resetBtn
+        ], "show");
+    }
+  
+    function showSpecificErrorMsg(error) {
+      console.error('Error fetching order data:', error);
+      /*DELETE when stable 
+        globalInstance.orderMessage.innerHTML = "Order loading timed out. Please try again.";
+        globalInstance.orderMessage.innerHTML = "Order not found!";
+        globalInstance.orderMessage.innerHTML = "Error loading order.<br>Please try again.";*/
+      if (error.message === "Request timed out") {
+        globalInstance
+          .insertInnerHTML(globalInstance.orderMessage, "Order loading timed out. Please try again.")
+      } else if (error.response && error.response.status === 404) {
+        globalInstance
+          .insertInnerHTML(globalInstance.orderMessage, "Order not found!");
+      } else {
+        globalInstance
+          .insertInnerHTML(globalInstance.orderMessage, "Error loading order.<br>Please try again.");
+      }
+  
+      /* DELETE when stable 
+      globalInstance.orderMessage.classList.add("error-message");
+      soundInstance.playWrongSound();
+      globalInstance.orderInput.value = "";
+      globalInstance.orderInput.focus();*/
+      globalInstance
+        .toggleClass({
+          targetElements: globalInstance.orderMessage,
+          mode: "add",
+          className: "error-message",
+        });
+    }
+    // Helper sub-function ENDS
+  } 
+  
   async function checkOrderNote(orderId, successMessage) {
     globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
   

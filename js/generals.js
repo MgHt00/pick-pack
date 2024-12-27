@@ -98,6 +98,11 @@ export const cssClassManager = {
 };
 
 export const contentManager = {
+  setAttribute(targetElement, attribute, content){
+    targetElement.setAttribute(attribute, content);
+    return this;
+  },
+
   insertTextContent(targetElement, content) {
     targetElement.textContent = content;
     return this;
