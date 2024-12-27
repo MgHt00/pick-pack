@@ -187,12 +187,8 @@ function orderManager() {
           localInstance.orderedSKUs[localInstance.totalSKUs++] = orderItem["sku"];
           // Create new element with the ID same as the SKU.
           const sku = document.createElement("p");
-          /*DELETE when stable
-          sku.setAttribute("id", `${orderItem["sku"]}`);
-          sku.textContent = orderItem["sku"];
-          globalInstance.frameSKUContainer.append(sku);*/
           globalInstance
-            .setAttribute(sku, "id", `${orderItem["sku"]}`)
+            .setAttribute(sku, "id", `${orderItem["sku"]}-${i}`)
             .insertTextContent(sku, orderItem["sku"])
             .appendContent(globalInstance.frameSKUContainer, sku)
         }
@@ -215,18 +211,6 @@ function orderManager() {
   
     // Helper sub-functions
     function manipulateCSS() {
-      /*DELETE when stable 
-      globalInstance.bodyElement.classList.remove("start");
-      globalInstance.bodyElement.classList.add("transition");
-      globalInstance.orderMessage.classList.add("transition");
-      globalInstance.frameScanBarcode.classList.add("transition");
-      globalInstance.headerElement.classList.add("hidden");
-      globalInstance.frameLoadOrder.classList.add("hidden");
-      globalInstance.orderMessage.textContent = `${orderId} Loaded.`;
-      globalInstance.orderMessage.classList.add("loaded");
-      globalInstance.frameScanBarcode.classList.remove("hidden");  
-      globalInstance.resetBtn.classList.remove("hidden");
-      */
       globalInstance
         .toggleClass({
           targetElements: globalInstance.bodyElement,
@@ -257,10 +241,6 @@ function orderManager() {
   
     function showSpecificErrorMsg(error) {
       console.error('Error fetching order data:', error);
-      /*DELETE when stable 
-        globalInstance.orderMessage.innerHTML = "Order loading timed out. Please try again.";
-        globalInstance.orderMessage.innerHTML = "Order not found!";
-        globalInstance.orderMessage.innerHTML = "Error loading order.<br>Please try again.";*/
       if (error.message === "Request timed out") {
         globalInstance
           .insertInnerHTML(globalInstance.orderMessage, "Order loading timed out. Please try again.")
@@ -272,11 +252,6 @@ function orderManager() {
           .insertInnerHTML(globalInstance.orderMessage, "Error loading order.<br>Please try again.");
       }
   
-      /* DELETE when stable 
-      globalInstance.orderMessage.classList.add("error-message");
-      soundInstance.playWrongSound();
-      globalInstance.orderInput.value = "";
-      globalInstance.orderInput.focus();*/
       globalInstance
         .toggleClass({
           targetElements: globalInstance.orderMessage,
@@ -422,36 +397,6 @@ function utilityManager() {
       .insertTextContent(globalInstance.resetBtn, "Reset");
       
     resetOrderInput();
-    /*OLD CODES - NEED TO DELETE WHEN CONFIRMED
-    globalInstance.headerElement.className = "";
-    globalInstance.headerElement.classList.remove("hidden");
-  
-    globalInstance.frameLoadOrder.className = "";
-    globalInstance.frameLoadOrder.classList.remove("hidden");
-  
-    globalInstance.frameOrderMessage.className = "";
-    globalInstance.frameOrderMessage.classList.add("hidden");
-  
-    globalInstance.orderMessage.textContent = "";
-    globalInstance.orderMessage.className = "";
-    globalInstance.resetBtn.textContent =  "Reset";
-    
-    globalInstance.resetBtn.classList.add("hidden");
-  
-    globalInstance.frameSKUContainer.className = "";
-    globalInstance.frameSKUContainer.classList.add("hidden");
-    globalInstance.frameSKUContainer.innerHTML = "";
-  
-    globalInstance.frameProgressContainer.className = "";
-    globalInstance.frameProgressContainer.classList.add("hidden");
-    globalInstance.frameProgressContainer.innerHTML = "";
-  
-    globalInstance.frameScanBarcode.className = "";
-    globalInstance.frameScanBarcode.classList.add("hidden");
-
-    globalInstance.orderInput.value = "";
-    globalInstance.orderInput.focus();
-    */
     disableBarcode();
     localInstance.orderItems = [];
     localInstance.orderedSKUs = [];
@@ -482,7 +427,7 @@ function utilityManager() {
     }
 
     for (let i = 0; i < localInstance.orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
-      if (barcode === localInstance.orderedSKUs[i]) {
+      if (`${barcode}-${i}` === `${localInstance.orderedSKUs[i]}-${i}`) {
         decorateFrameProgressContainer("found", i);
         spliceCheckedItem(i);
         soundInstance.playBeepSound();
@@ -542,12 +487,6 @@ function utilityManager() {
           // If scanned barcode is same as orderedSKU, matched SKU is removed from the frame-SKU-container
           // and put it in the progress-container; loop until the end of localInstance.orderedSKUs array.
 
-          /* OLD CODES; delete this when stable
-          globalInstance.frameProgressContainer.classList.remove("error-message");
-          globalInstance.frameProgressContainer.innerHTML = "Correct!! Scan another.";
-          globalInstance.frameProgressContainer.classList.add("success-message");          
-          document.querySelector(`#${localInstance.orderedSKUs[i]}`).classList.add("checked-sku");
-          */
           globalInstance
             .toggleClass({
               targetElements: globalInstance.frameProgressContainer,
@@ -564,17 +503,12 @@ function utilityManager() {
               className: "success-message",
             })
             .toggleClass({
-              targetElements: document.querySelector(`#${localInstance.orderedSKUs[i]}`),
+              targetElements: document.querySelector(`#${localInstance.orderedSKUs[i]}-${i}`),
               mode: "add",
               className: "checked-sku",
             })
           break;
         case "not-found":
-          /*DELETE when stable
-          globalInstance.frameProgressContainer.classList.remove("success-message");
-          globalInstance.frameProgressContainer.innerHTML = "Wrong Product";
-          globalInstance.frameProgressContainer.classList.add("error-message");*/
-
           globalInstance
             .toggleClass({
               targetElements: globalInstance.frameProgressContainer,
@@ -603,14 +537,6 @@ function utilityManager() {
     }
 
     function wrapUpWhenComplete() { // Decorate and insert text when no more SKU to check
-      /*DELETE it when stable
-      globalInstance.orderMessage.textContent = "Order complete!";
-      globalInstance.orderMessage.classList.add("order-complete");
-      globalInstance.frameSKUContainer.classList.add("hidden");
-      globalInstance.frameProgressContainer.classList.add("hidden");
-      globalInstance.frameScanBarcode.classList.add("hidden");
-      globalInstance.resetBtn.textContent = "Check a new order";
-      */
       globalInstance
         .insertTextContent(
           globalInstance.orderMessage,
