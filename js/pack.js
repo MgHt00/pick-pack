@@ -674,6 +674,7 @@ function utilityManager() {
     disableBarcode,
     enableBarcode,
     resetOrderInput,
+    resetBarcodeInput,
   }
 }
 
