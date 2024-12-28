@@ -477,51 +477,41 @@ function utilityManager() {
       console.groupEnd();
     }
 
-    function decorateFrameProgressContainer(status, sku) { // show or hide frames; strike-through SKU etc.
+    function decorateFrameProgressContainer(status, sku) { // show or hide frames; strike-through SKU etc.      
+      // helper function: Update the progress container based on status
+      function updateProgressContainer(message, addClass, removeClass) { 
+        const container = globalInstance.frameProgressContainer;
+        globalInstance
+          .toggleClass({
+            targetElements: container,
+            mode: "remove",
+            className: removeClass,
+          })
+          .insertInnerHTML(container, message)
+          .toggleClass({
+            targetElements: container,
+            mode: "add",
+            className: addClass,
+          });
+      }
+
       switch (status) { 
         case "found":
-          // If scanned barcode is same as orderedSKU, matched SKU is striked-through,...
-          // ... and loop until the end of localInstance.orderedSKUs array.
-          globalInstance
+          // Update progress container for a successful scan
+          updateProgressContainer("Correct!! Scan another.", "success-message", "error-message");
+          
+          // Mark the SKU element as checked if it matches the scanned SKU
+          globalInstance 
             .toggleClass({
-              targetElements: globalInstance.frameProgressContainer,
-              mode: "remove",
-              className: "error-message",
-            })
-            .insertInnerHTML(
-              globalInstance.frameProgressContainer,
-              "Correct!! Scan another."
-            )
-            .toggleClass({
-              targetElements: globalInstance.frameProgressContainer,
-              mode: "add",
-              className: "success-message",
-            })
-            .toggleClass({
-              // Matches elements whose id starts with the value of sku.
-              // Excludes elements that already have the `checked-sku` class.
               targetElements: document.querySelector(`[id^=${sku}]:not(.checked-sku)`),
               mode: "add",
               className: "checked-sku",
-            })
+            });
           break;
         case "not-found":
-          globalInstance
-            .toggleClass({
-              targetElements: globalInstance.frameProgressContainer,
-              mode: "remove",
-              className: "success-message",
-            })
-            .insertInnerHTML(
-              globalInstance.frameProgressContainer,
-              "Wrong Product"
-            )
-            .toggleClass({
-              targetElements: globalInstance.frameProgressContainer,
-              mode: "add",
-              className: "error-message",
-            });
-            break;
+          // Update progress container for an incorrect scan
+          updateProgressContainer("Wrong Product", "error-message", "success-message");
+          break;
       }
     }
 
