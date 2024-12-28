@@ -76,6 +76,7 @@ function listenerManager() {
 }
 
 function orderManager() {
+
   async function loadOrder() { // To load an order with a user input
     console.groupCollapsed("loadOrder()");
     
@@ -158,7 +159,7 @@ function orderManager() {
       console.groupEnd();
     }
   
-    // Helper sub-functions 
+    // Helper functions 
     function processOrderItems(orderItems) { // To fetch ordered SKUs
       for (const orderItem of orderItems) {
         const { sku, quantity } = orderItem;
@@ -247,10 +248,23 @@ function orderManager() {
       // Fetch the order data with a race between the request and the timeout
       return Promise.race([axios.get(url, config), timeoutPromise]);
     }
-    // Helper sub-function ENDS
+    // Helper function ENDS
   } 
   
+  /**
+   * Checks if a specific note exists in the order's notes.
+   * @param {string} orderId - The ID of the order to check.
+   * @param {string} successMessage - The note to search for in the order's notes.
+   * @returns {Promise<boolean>} - Resolves to true if the note exists, otherwise false.
+   */
   async function checkOrderNote(orderId, successMessage) {
+    console.info(`checkOrderNote(): Checking notes for order ID: ${orderId}`);
+
+    if (!orderId || !successMessage) {
+      console.error("checkOrderNote(): Invalid parameters - orderId or successMessage missing.");
+      return false;
+    }
+
     globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
   
     const auth = btoa(`${consumerKey}:${consumerSecret}`);
@@ -264,20 +278,24 @@ function orderManager() {
         },
       });
   
-      // Extract existing notes array from the response
-      const existingNotes = response.data || [];
-  
-      for(let i = 0; i<existingNotes.length; i++) {
-        if (existingNotes[i].note === successMessage){
-          console.info("checkOrderNote(): Success message found in the order.");
-          return true;
-        }
+      const existingNotes = response.data || []; // Extract existing notes array from the response
+      console.info('checkOrderNote(): Existing notes:', existingNotes);
+      const isNoteFound = existingNotes.some(orderNote => orderNote.note === successMessage);
+
+      if (isNoteFound) {
+        console.info("checkOrderNote(): Success message found in the order.");
       }
-      // If no matching note is found
-      return false;
-  
+
+      return isNoteFound; // Return true if the note is found, otherwise false.
+
     } catch (error) {
-      console.error('checkOrderNote(): Error appending order note:', error);
+      if (error.response) {
+        console.error('checkOrderNote(): Server responded with an error:', error.response.status);
+      } else if (error.request) {
+        console.error('checkOrderNote(): No response received from the server.');
+      } else {
+        console.error('checkOrderNote(): Error setting up the request:', error.message);
+      }
       return false; // In case of error, consider the order as not checked
     }
   }
