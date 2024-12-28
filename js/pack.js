@@ -78,70 +78,58 @@ function listenerManager() {
 function orderManager() {
   async function loadOrder() { // To load an order with a user input
     console.groupCollapsed("loadOrder()");
-    prepareFrameOrderMessage(); // calling a sub-function
-  
+    
+    const { frameOrderMessage, orderMessage } = globalInstance;
     localInstance.orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
+
+    setupFrameMessage(); // Prepare the frame message initially
     if (!localInstance.orderID) {
-      invalidOrder(); return;
+      handleInvalidOrder(); 
+      return;
     }
   
     const isOrderChecked = await checkOrderNote(localInstance.orderID, localInstance.successMessage); // awaited properly within the loadOrder function.
     if (isOrderChecked) {
-      orderIsChecked(); return;
-    } else {
-      prepareToLoadOrderItems();
-      await fetchOrderItems(localInstance.orderID); 
-    }
+      handleCheckedOrder(); 
+      return;
+    } 
+
+    prepareToLoadOrderItems();
+    await fetchOrderItems(localInstance.orderID); 
+    
     console.groupEnd();
   
-    // Helper sub-functions
-    function prepareFrameOrderMessage() {
-      globalInstance
-      .toggleVisibility(globalInstance.frameOrderMessage, "show")
-      .toggleClass({
-        targetElements: globalInstance.frameOrderMessage,
-        mode: "remove",
-        className: "success-message",
-      });
+    // Helper functions
+    function setupFrameMessage() {
+      utilityInstance.resetAll();
+      globalInstance.toggleVisibilityWithClass(frameOrderMessage, "show", "success-message", "remove");
     }
   
-    function invalidOrder() { 
-      console.groupCollapsed(`invalidOrder()`);
-      soundInstance
-        .playWrongSound();
+    function handleInvalidOrder() { 
+      console.groupCollapsed(`handleInvalidOrder()`);
       globalInstance
-        .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
-      utilityInstance
-        .resetOrderInput();
+        .displayMessageWithClass(orderMessage, "Enter an order ID to load.", "error-message")
+      soundInstance.playWrongSound();
+      utilityInstance.resetOrderInput();
       console.groupEnd();
     }
   
-    function orderIsChecked() {
-      console.groupCollapsed(`orderIsChecked()`);
+    function handleCheckedOrder() {
+      console.groupCollapsed(`handleCheckedOrder()`);
       globalInstance
-        .insertInnerHTML(
-          globalInstance.orderMessage, 
-          "Order already checked.<br>Enter another order.")
-        .toggleClass({
-          targetElements: globalInstance.orderMessage,
-          mode: "add",
-          className: "success-message",});
-      utilityInstance
-        .resetOrderInput();
-      soundInstance
-        .playWrongSound();
+        .displayMessageWithClass(orderMessage, "Order already checked.<br>Enter another order.", "success-message")
+      utilityInstance.resetOrderInput();
+      soundInstance.playWrongSound();
   
       console.groupEnd();
     }
   
     function prepareToLoadOrderItems() {
-      utilityInstance
-        .resetAll(); // reset everything before loading new order
       globalInstance
-        .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
-        .insertTextContent(globalInstance.orderMessage, "Order loading..."); // need to show again because of `resetAll()`
+        .toggleVisibility(frameOrderMessage, "show") // need to show again because of `resetAll()`
+        .insertTextContent(orderMessage, "Order loading..."); // need to show again because of `resetAll()`
     }
-    // Helper sub-functions ENDS
+    // Helper functions ENDS
   }
 
   async function fetchOrderItems(orderId) { // To fetch SKUs from the user-input order number

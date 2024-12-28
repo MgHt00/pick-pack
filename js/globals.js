@@ -38,6 +38,17 @@ export default class Global {
     return this;
   }
 
+  toggleVisibilityWithClass(element, visibility, className = "", mode = "add") {
+    this.toggleVisibility(element, visibility);
+    if (className) {
+      this.toggleClass({
+        targetElements: element,
+        mode: mode,
+        className: className,
+      });
+    }
+  }
+
   toggleDisability(targetElements = [], mode) { // expected mode -> "disabled", "enabled"
     targetElements = cssClassManager.checkArray(targetElements);
 
@@ -72,6 +83,17 @@ export default class Global {
     return this;
   }
   
+  displayMessageWithClass(element, message, className) {
+    this
+      .insertInnerHTML(element, message)
+      .toggleClass({
+        targetElements: element,
+        mode: "add",
+        //className: `${type}-message`,
+        className: className,
+      });
+  }
+
   // enable / disable functions
   
 }
