@@ -151,65 +151,52 @@ function orderManager() {
     const timeout = 10000; // Set a timeout limit in milliseconds
   
     try {
-      const timeoutPromise = new Promise((_, reject) => // Create a timeout promise
-        setTimeout(() => reject(new Error("Request timed out")), timeout)
-      );
+      const response = await fetchWithTimeout(url, timeout, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      });
   
-      // Fetch the order data with a race between the request and the timeout
-      const response = await Promise.race([
-        axios.get(url, {
-          headers: {
-            'Authorization': `Basic ${auth}`
-          }
-        }),
-        timeoutPromise
-      ]);
-  
-      // Assign WooCommerce order into `localInstance.orderItems`
       if (response.data && response.data.line_items) {
-        localInstance.orderItems = response.data.line_items;
+        localInstance.orderItems = response.data.line_items; // Assign WooCommerce order into `localInstance.orderItems`
         console.info(localInstance.orderItems);
+
+        processOrderItems(localInstance.orderItems);
+        setupUIAfterSuccess(orderId);
       } else {
         throw new Error("Order not found");
       }
+    } catch (error) {
+      handleFetchError(error); // Handle specific error messages by calling a helper sub-function
+    } finally {
+      console.groupEnd();
+    }
   
-      // To fetch ordered SKUs
-      for (let orderItem of localInstance.orderItems) {
-        const quantity = Number(orderItem["quantity"]); // Get `quantity` property from an `orderItem` object
-  
-        globalInstance
-          .toggleVisibility(
-            globalInstance.frameSKUContainer
-            , "show");
-  
-        // Add ordered SKU to the `localInstance.orderedSKUs` array, and increment the counter.
-        for (let i = 0; i < quantity; i++) {
-          localInstance.orderedSKUs[localInstance.totalSKUs++] = orderItem["sku"];
-          // Create new element with the ID same as the SKU.
-          const sku = document.createElement("p");
-          globalInstance
-            .setAttribute(sku, "id", `${orderItem["sku"]}-${i}`)
-            .insertTextContent(sku, orderItem["sku"])
-            .appendContent(globalInstance.frameSKUContainer, sku)
+    // Helper sub-functions 
+    function processOrderItems(orderItems) { // To fetch ordered SKUs
+      for (const orderItem of orderItems) {
+        const { sku, quantity } = orderItem;
+        for (let i = 0; i < Number(quantity); i++) {
+          addSKUToDOM(sku, i);
+          localInstance.orderedSKUs[localInstance.totalSKUs++] = sku;
         }
       }
-      manipulateCSS(); // calling a helper sub-function
-      soundInstance
-        .playBeepSound();
-      utilityInstance
-        .enableBarcode()
-        .resetBarcodeInput();
-    } catch (error) {
-      showSpecificErrorMsg(error); // Handle specific error messages by calling a helper sub-function
-      soundInstance
-        .playWrongSound();
-      utilityInstance
-        .resetOrderInput();
-      return; // Exit the function if there is an error
     }
-    console.groupEnd();
-  
-    // Helper sub-functions
+
+    function addSKUToDOM(sku, index) { // To add SKU to the DOM
+      const container = globalInstance.frameSKUContainer;
+      const skuElement = document.createElement("p");
+      globalInstance
+        .toggleVisibility(container, "show")
+        .setAttribute(skuElement, "id", `${sku}-${index}`)
+        .insertTextContent(skuElement, sku)
+        .appendContent(container, skuElement);
+    }
+
+    function setupUIAfterSuccess(orderId) {
+      manipulateCSS(orderId);
+      soundInstance.playBeepSound();
+      utilityInstance.enableBarcode().resetBarcodeInput();
+    }
+
     function manipulateCSS() {
       globalInstance
         .toggleClass({
@@ -239,25 +226,38 @@ function orderManager() {
         ], "show");
     }
   
-    function showSpecificErrorMsg(error) {
+    function handleFetchError(error) {
       console.error('Error fetching order data:', error);
-      if (error.message === "Request timed out") {
-        globalInstance
-          .insertInnerHTML(globalInstance.orderMessage, "Order loading timed out. Please try again.")
-      } else if (error.response && error.response.status === 404) {
-        globalInstance
-          .insertInnerHTML(globalInstance.orderMessage, "Order not found!");
-      } else {
-        globalInstance
-          .insertInnerHTML(globalInstance.orderMessage, "Error loading order.<br>Please try again.");
-      }
-  
+
+      const errorMessage = getErrorMessage(error);
       globalInstance
+        .insertInnerHTML(globalInstance.orderMessage, errorMessage)
         .toggleClass({
           targetElements: globalInstance.orderMessage,
           mode: "add",
           className: "error-message",
         });
+
+      soundInstance.playWrongSound();
+      utilityInstance.resetOrderInput();
+    }
+
+    function getErrorMessage(error) {
+      if (error.message === "Request timed out") {
+        return "Order loading timed out. Please try again.";
+      } else if (error.response?.status === 404) {
+        return "Order not found!";
+      }
+      return "Error loading order.<br>Please try again.";
+    }
+
+    async function fetchWithTimeout(url, timeout, config) {
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), timeout)
+      );
+
+      // Fetch the order data with a race between the request and the timeout
+      return Promise.race([axios.get(url, config), timeoutPromise]);
     }
     // Helper sub-function ENDS
   } 
