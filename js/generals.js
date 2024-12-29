@@ -3,33 +3,36 @@ export const utilityFunctionsManager = {
     return value = Array.isArray(value)? value : [value];
   },
 
-  removeClass(targetElements = null, className) {
-    if (!targetElements) return this; // Return early if no elements are provided
-  
-    targetElements = this.checkAndConvertArray(targetElements);
-  
-    targetElements.forEach(element => {
-      element.classList.remove(className);
-    });
+  isValidClassName(value) {
+    return typeof value === 'string' && value.trim() !== '';
   },
 
-  addClass(targetElements = null, className) {
-    if (!targetElements) return this; 
-  
+  removeClass(targetElements = [], className) {  
     targetElements = this.checkAndConvertArray(targetElements);
-  
+    if (!this.isValidClassName(className)) return this; // Validate className
+
     targetElements.forEach(element => {
-      element.classList.add(className);
+      if (element) element.classList.remove(className);
     });
+    return this;
   },
 
-  emptyClass(targetElements = null) {
-    if (!targetElements) return this;
-
-    targetElements = Array.isArray(targetElements) ? targetElements : [targetElements];
+  addClass(targetElements = [], className) {  
+    targetElements = this.checkAndConvertArray(targetElements);
+    if (!this.isValidClassName(className)) return this;
+    
     targetElements.forEach(element => {
-      element.className = '';
+      if (element) element.classList.add(className);
     });
+    return this;
+  },
+
+  emptyClass(targetElements = []) {
+    targetElements = this.checkAndConvertArray(targetElements);
+    targetElements.forEach(element => {
+      if (element) element.className = '';
+    });
+    return this;
   },
 
   retrieveCallerFunctionName() {
