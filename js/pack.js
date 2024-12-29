@@ -76,7 +76,22 @@ function listenerManager() {
 }
 
 function orderManager() {
-
+  /**
+   * Asynchronously loads an order based on user input.
+   * 
+   * This function performs the following steps:
+   * 1. Reads the order ID from user input.
+   * 2. Sets up the initial frame message.
+   * 3. Checks if the order ID is valid.
+   * 4. If the order ID is invalid, handles the invalid order scenario.
+   * 5. If the order is already checked, handles the checked order scenario.
+   * 6. Prepares to load order items.
+   * 7. Fetches the order items.
+   * 
+   * @async
+   * @function loadOrder
+   * @returns {Promise<void>} A promise that resolves when the order is loaded.
+   */
   async function loadOrder() { // To load an order with a user input
     console.groupCollapsed("loadOrder()");
     
@@ -133,6 +148,23 @@ function orderManager() {
     // Helper functions ENDS
   }
 
+  /**
+   * Fetches order items from the given order ID and processes them.
+   * 
+   * @param {string} orderId - The ID of the order to fetch.
+   * @returns {Promise<void>} - A promise that resolves when the order items have been fetched and processed.
+   * 
+   * @throws {Error} - Throws an error if the order is not found or if there is an issue with the fetch request.
+   * 
+   * @example
+   * fetchOrderItems('12345')
+   *   .then(() => {
+   *     console.log('Order items fetched and processed successfully.');
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error fetching order items:', error);
+   *   });
+   */
   async function fetchOrderItems(orderId) { // To fetch SKUs from the user-input order number
     console.groupCollapsed("fetchOrderItems()");
     const auth = btoa(`${consumerKey}:${consumerSecret}`);
@@ -300,24 +332,49 @@ function orderManager() {
     }
   }
 
+  /**
+   * Appends a note to an order and changes its status to "packed".
+   * @param {string} orderId - The ID of the order.
+   * @param {string} successMessage - The note to append to the order.
+   * @returns {Promise<void>} - Resolves when the operation is successful.
+   */
   async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
     console.groupCollapsed("appendOrderNoteAndChangeStatus()");
-    const auth = btoa(`${consumerKey}:${consumerSecret}`);
+    const auth = btoa(`${consumerKey}:${consumerSecret}`);  
     const noteURL = `${localInstance.orderURL}${orderId}${localInstance.noteURLpostfix}`; // construct URL by string interpolation
     const orderURL = `${localInstance.orderURL}${orderId}`;
+    const headers = {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/json',
+    };
+
+    if (!orderId || !successMessage) {
+      console.error('Invalid inputs: orderId and successMessage are required.');
+      return;
+    }
   
     try {
-      await prepareAndAddNewNote(auth, noteURL, successMessage);
-      await changeStatusToPacked(auth, orderURL);
-  
+      await prepareAndAddNewNote();
     } catch (error) {
-      console.error('Error appending order note or updating order status:', error);
+      console.error('Error adding order note:', error);
+      throw error; // Re-throw to prevent subsequent operations
+    }
+
+    try {
+      await changeStatusToPacked();
+    } catch (error) {
+      console.error('Error update order status to packed:, error');
     }
 
     console.groupEnd();
 
-    // Helper SUB-functions
-    async function prepareAndAddNewNote(auth, noteURL, successMessage) {
+    // Helper functions
+    /**
+     * Prepares and adds a new note to the order.
+     * @returns {Promise<void>} - Resolves when the note is successfully added.
+     * @throws {Error} - If the note addition fails.
+     */
+    async function prepareAndAddNewNote() { // Prepare and add a new note to the order.
       const currentDate = new Date().toISOString(); // Get current date in ISO 8601 format (UTC timezone)
       
       const newNote = { // Prepare the new note data
@@ -325,33 +382,39 @@ function orderManager() {
         customer_note: false, // Set to false for a private note
         date_created: currentDate,
       };
-      
-      // Add new note to the order using POST
-      const noteResponse = await axios.post(noteURL, newNote, { 
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      console.info('Order note added successfully:', noteResponse.data);
+
+      try {
+        const noteResponse = await axios.post(noteURL, newNote, { headers }); // Add new note to the order using POST request
+        if (noteResponse.status !== 201) {
+          throw new Error(`Failed to add note: ${noteResponse.status}`);
+        }
+        console.info('Order note added successfully:', noteResponse.data);
+      } catch (error) {
+        console.error('Error in prepareAndAddNewNote:', error);
+        throw error; // Propagate error to the parent function
+      }
     }
 
-    async function changeStatusToPacked(auth, orderURL) { // change the order status to 'packed'
-      const orderUpdate = {
-        status: 'packed'
-      };
-  
-      const orderResponse = await axios.put(orderURL, orderUpdate, {
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      console.info('Order status updated successfully:', orderResponse.data);
+    /**
+     * Change the order status to "packed".
+     * @returns {Promise<void>} - Resolves when the note is successfully added.
+     * @throws {Error} - If the note addition fails.
+     */
+    async function changeStatusToPacked() { // change the order status to 'packed'
+      const orderUpdate = { status: 'packed' };
+
+      try {
+        const orderResponse = await axios.put(orderURL, orderUpdate, { headers });
+        if (orderResponse.status !== 200) {
+          throw new Error(`Failed to update status: ${orderResponse.status}`);
+        }
+        console.info('Order status updated successfully:', orderResponse.data);
+      } catch (error) {
+        console.error('Error in changeStatusToPacked:', error);
+        throw error; // Propagate error to the parent function
+      }
     }
-    // Helper SUB-functions ENDS
+    // Helper functions ENDS
   }
 
   return{
