@@ -482,7 +482,7 @@ function utilityManager() {
     console.groupEnd();
   }
 
-  function resetState() {
+  function resetState() { // To reset orderinput, barcodeinput, and localInstance variables
     resetOrderInput();
     disableBarcode();
     localInstance.orderItems = [];
@@ -492,52 +492,30 @@ function utilityManager() {
   
   async function checkBarcode() { // To match scanned-SKUs with ordered-SKUs
     console.groupCollapsed("checkBarcode()");
+    globalInstance.toggleVisibility(globalInstance.frameProgressContainer, "show");
 
     const barcode = globalInstance.readBarcodeInputValue();
-    const existingError = document.querySelector("#barcodeError");
-    let skuFound = false;
-    
-    globalInstance
-      .toggleVisibility(
-        globalInstance.frameProgressContainer, 
-        "show");
+    if (!validateBarcode(barcode)) return;
 
-    if (existingError) { // Remove existing error message if any
-      existingError.remove();
-    }
+    const skuFound = processBarcode(barcode);
+    if (!skuFound) handleNotFound();
 
-    if (!barcode) { // Display error if barcode input is empty
-      barcodeInputIsEmpty();
-      return;
-    }
-    
-    for (let i = 0; i < localInstance.orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
-      if (`${barcode}` === `${localInstance.orderedSKUs[i]}`) {
-        decorateFrameProgressContainer("found", `${localInstance.orderedSKUs[i]}`);
-        spliceCheckedItem(i);
-        soundInstance.playBeepSound();
-        resetBarcodeInput();
-        skuFound = true;
-        break; // To exit the loop immediately after processing the matched SKU.
+    if (localInstance.orderedSKUs.length === 0) await completeOrder();  // Check if all SKUs are scanned
+    console.groupEnd();
+
+    // helper functions
+    function validateBarcode(barcode) { // Validate barcode input
+      const existingError = document.querySelector("#barcodeError");
+      if (existingError) existingError.remove(); // Remove existing error message if any
+
+      if (!barcode) { // Display error if barcode input is empty
+        showBarcodeInputError();
+        return false;
       }
+      return true;
     }
 
-    if (!skuFound) { // If no matching SKU is found
-      decorateFrameProgressContainer("not-found");
-      soundInstance.playWrongSound();
-      resetBarcodeInput();
-    }
-
-    if (localInstance.orderedSKUs.length === 0) { // Check if all SKUs are scanned
-      disableBarcode();
-      soundInstance.playCompleteSound();
-      wrapUpWhenComplete();
-      /*DELETE when stable const orderId = localInstance.orderID;*/
-      await orderInstance.appendOrderNoteAndChangeStatus(localInstance.orderID, localInstance.successMessage);
-    }
-
-    // helper sub-functions
-    function barcodeInputIsEmpty() { // when barcode input is empty
+    function showBarcodeInputError() { // when barcode input is empty
       console.info("Barcode input is empty.");
 
       const errorParagraph = document.createElement("p");
@@ -559,9 +537,27 @@ function utilityManager() {
       
       errorParagraph.setAttribute("id", "barcodeError");
       soundInstance.playWrongSound();
-      console.groupEnd();
     }
 
+    function processBarcode(barcode) { // Process the scanned barcode
+      for (let i = 0; i < localInstance.orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
+        if (`${barcode}` === `${localInstance.orderedSKUs[i]}`) {
+          decorateFrameProgressContainer("found", `${localInstance.orderedSKUs[i]}`);
+          spliceCheckedItem(i);
+          soundInstance.playBeepSound();
+          resetBarcodeInput();
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function handleNotFound() {
+      decorateFrameProgressContainer("not-found");
+      soundInstance.playWrongSound();
+      resetBarcodeInput();
+    }
+    
     function decorateFrameProgressContainer(status, sku) { // show or hide frames; strike-through SKU etc.      
       // helper function: Update the progress container based on status
       function updateProgressContainer(message, addClass, removeClass) { 
@@ -608,6 +604,13 @@ function utilityManager() {
       console.groupEnd();
     }
 
+    async function completeOrder() {
+      disableBarcode();
+      soundInstance.playCompleteSound();
+      wrapUpWhenComplete();
+      await orderInstance.appendOrderNoteAndChangeStatus(localInstance.orderID, localInstance.successMessage);
+    }
+
     function wrapUpWhenComplete() { // Decorate and insert text when no more SKU to check
       globalInstance
         .insertTextContent(
@@ -629,6 +632,7 @@ function utilityManager() {
           "Check a new order"
         );
     }
+    // helper functions ENDS
   }
 
   function disableBarcode() { //To disable barcode input and button
