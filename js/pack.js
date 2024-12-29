@@ -424,56 +424,72 @@ function orderManager() {
 }
 
 function utilityManager() {
+  /**
+   * Resets the application state when "Load Order" is pressed.
+   * - Resets visibility, text, and content of specific elements.
+   * - Empties local instance variables and disables barcode scanning.
+   */
   function resetAll() { // To reset when Load Order is pressed.
     console.groupCollapsed("resetAll()");
+    if (!globalInstance.bodyElement) {
+      console.error('Error: `bodyElement` is missing in globalInstance.');
+      return;
+    }
+    try {
+      globalInstance // Add the "start" class
+        .toggleClass({
+          targetElements: globalInstance.bodyElement,
+          mode: "add",
+          className: "start"
+        })
 
-    globalInstance
-      .toggleClass({
-        targetElements: globalInstance.bodyElement,
-        mode: "add",
-        className: "start"
-      })
+        .emptyAllClass([ // Empty all classes
+          globalInstance.headerElement,
+          globalInstance.frameLoadOrder,
+          globalInstance.frameOrderMessage,
+          globalInstance.orderMessage,
+          globalInstance.frameSKUContainer,
+          globalInstance.frameProgressContainer,
+          globalInstance.frameScanBarcode,
+        ])
 
-      .emptyAllClass([
-        globalInstance.headerElement,
-        globalInstance.frameLoadOrder,
-        globalInstance.frameOrderMessage,
-        globalInstance.orderMessage,
-        globalInstance.frameSKUContainer,
-        globalInstance.frameProgressContainer,
-        globalInstance.frameScanBarcode,
-      ])
+        .toggleVisibility([ // Show and hide specific elements
+          globalInstance.headerElement,
+          globalInstance.frameLoadOrder,
+        ], "show")
 
-      .toggleVisibility([
-        globalInstance.headerElement,
-        globalInstance.frameLoadOrder,
-      ], "show")
+        .toggleVisibility([
+          globalInstance.frameOrderMessage,
+          globalInstance.resetBtn,
+          globalInstance.frameSKUContainer,
+          globalInstance.frameProgressContainer,
+          globalInstance.frameScanBarcode
+        ], "hide")
 
-      .toggleVisibility([
-        globalInstance.frameOrderMessage,
-        globalInstance.resetBtn,
-        globalInstance.frameSKUContainer,
-        globalInstance.frameProgressContainer,
-        globalInstance.frameScanBarcode
-      ], "hide")
+        .emptyInnerHTML([ // Reset text and HTML content
+          globalInstance.orderMessage,
+          globalInstance.frameSKUContainer,
+          globalInstance.frameProgressContainer,
+        ])
 
-      .emptyInnerHTML([
-        globalInstance.orderMessage,
-        globalInstance.frameSKUContainer,
-        globalInstance.frameProgressContainer,
-      ])
+        .insertTextContent(globalInstance.resetBtn, "Reset");
 
-      .insertTextContent(globalInstance.resetBtn, "Reset");
-      
+      resetState();
+
+    } catch (error) {
+      console.error("Error in resetAll():", error);
+    }
+    console.groupEnd();
+  }
+
+  function resetState() {
     resetOrderInput();
     disableBarcode();
     localInstance.orderItems = [];
     localInstance.orderedSKUs = [];
     localInstance.totalSKUs = 0;
-
-    console.groupEnd();
   }
-
+  
   async function checkBarcode() { // To match scanned-SKUs with ordered-SKUs
     console.groupCollapsed("checkBarcode()");
 
