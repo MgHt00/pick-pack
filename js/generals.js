@@ -20,7 +20,7 @@ export const utilityFunctionsManager = {
   addClass(targetElements = [], className) {  
     targetElements = this.checkAndConvertArray(targetElements);
     if (!this.isValidClassName(className)) return this;
-    
+
     targetElements.forEach(element => {
       if (element) element.classList.add(className);
     });
@@ -28,7 +28,6 @@ export const utilityFunctionsManager = {
   },
 
   emptyClass(targetElements = []) {
-    targetElements = this.checkAndConvertArray(targetElements);
     targetElements.forEach(element => {
       if (element) element.className = '';
     });
