@@ -3,20 +3,28 @@ import { cssClassManager, contentManager} from "./generals.js";
 export default class Global {
   constructor() {
     this.bodyElement = document.body;
-    this.headerElement = document.querySelector("#frame-header");
-    this.frameLoadOrder = document.querySelector("#frame-load-order");
-    this.orderInput = document.querySelector("#order-input");
-    this.loadOrderBtn = document.querySelector("#load-order-btn");
-    this.resetBtn = document.querySelector("#reset-btn");
-    this.frameSKUContainer = document.querySelector("#frame-SKU-container");
-    this.frameScanBarcode = document.querySelector("#frame-scan-barcode");
-    this.barcodeInputTop = document.querySelector("#barcode-input-top");
-    this.barcodeLabel = document.querySelector("#barcode-label");
-    this.barcodeInput = document.querySelector("#barcode-input");
-    this.checkBarcodeBtn = document.querySelector("#check-barcode-btn");
-    this.frameOrderMessage = document.querySelector("#frame-order-message");
-    this.orderMessage = document.querySelector("#order-message");
-    this.frameProgressContainer = document.querySelector("#frame-progress-container");
+    this.headerElement = this.safeQuerySelector("#frame-header");
+    this.frameLoadOrder = this.safeQuerySelector("#frame-load-order");
+    this.orderInput = this.safeQuerySelector("#order-input");
+    this.loadOrderBtn = this.safeQuerySelector("#load-order-btn");
+    this.resetBtn = this.safeQuerySelector("#reset-btn");
+    this.frameSKUContainer = this.safeQuerySelector("#frame-SKU-container");
+    this.frameScanBarcode = this.safeQuerySelector("#frame-scan-barcode");
+    this.barcodeInputTop = this.safeQuerySelector("#barcode-input-top");
+    this.barcodeLabel = this.safeQuerySelector("#barcode-label");
+    this.barcodeInput = this.safeQuerySelector("#barcode-input");
+    this.checkBarcodeBtn = this.safeQuerySelector("#check-barcode-btn");
+    this.frameOrderMessage = this.safeQuerySelector("#frame-order-message");
+    this.orderMessage = this.safeQuerySelector("#order-message");
+    this.frameProgressContainer = this.safeQuerySelector("#frame-progress-container");
+  }
+
+  safeQuerySelector(selector) {
+    const element = document.querySelector(selector);
+    if (!element) {
+      console.warn(`Element with selector '${selector}' not found.`);
+    }
+    return element;
   }
 
   readOrderInputValue() {
@@ -36,6 +44,17 @@ export default class Global {
       cssClassManager.toggleTargetVisibility({mode, target: element});
     });
     return this;
+  }
+
+  toggleVisibilityWithClass(element, visibility, className = "", mode = "add") {
+    this.toggleVisibility(element, visibility);
+    if (className) {
+      this.toggleClass({
+        targetElements: element,
+        mode: mode,
+        className: className,
+      });
+    }
   }
 
   toggleDisability(targetElements = [], mode) { // expected mode -> "disabled", "enabled"
@@ -72,6 +91,17 @@ export default class Global {
     return this;
   }
   
+  displayMessageWithClass(element, message, className) {
+    this
+      .insertInnerHTML(element, message)
+      .toggleClass({
+        targetElements: element,
+        mode: "add",
+        //className: `${type}-message`,
+        className: className,
+      });
+  }
+
   // enable / disable functions
   
 }

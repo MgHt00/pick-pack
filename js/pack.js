@@ -76,74 +76,95 @@ function listenerManager() {
 }
 
 function orderManager() {
+  /**
+   * Asynchronously loads an order based on user input.
+   * 
+   * This function performs the following steps:
+   * 1. Reads the order ID from user input.
+   * 2. Sets up the initial frame message.
+   * 3. Checks if the order ID is valid.
+   * 4. If the order ID is invalid, handles the invalid order scenario.
+   * 5. If the order is already checked, handles the checked order scenario.
+   * 6. Prepares to load order items.
+   * 7. Fetches the order items.
+   * 
+   * @async
+   * @function loadOrder
+   * @returns {Promise<void>} A promise that resolves when the order is loaded.
+   */
   async function loadOrder() { // To load an order with a user input
     console.groupCollapsed("loadOrder()");
-    prepareFrameOrderMessage(); // calling a sub-function
-  
+    
+    const { frameOrderMessage, orderMessage } = globalInstance;
     localInstance.orderID = globalInstance.readOrderInputValue(); // Read the order ID before resetting
+
+    setupFrameMessage(); // Prepare the frame message initially
     if (!localInstance.orderID) {
-      invalidOrder(); return;
+      handleInvalidOrder(); 
+      return;
     }
   
     const isOrderChecked = await checkOrderNote(localInstance.orderID, localInstance.successMessage); // awaited properly within the loadOrder function.
     if (isOrderChecked) {
-      orderIsChecked(); return;
-    } else {
-      prepareToLoadOrderItems();
-      await fetchOrderItems(localInstance.orderID); 
-    }
+      handleCheckedOrder(); 
+      return;
+    } 
+
+    prepareToLoadOrderItems();
+    await fetchOrderItems(localInstance.orderID); 
+    
     console.groupEnd();
   
-    // Helper sub-functions
-    function prepareFrameOrderMessage() {
-      globalInstance
-      .toggleVisibility(globalInstance.frameOrderMessage, "show")
-      .toggleClass({
-        targetElements: globalInstance.frameOrderMessage,
-        mode: "remove",
-        className: "success-message",
-      });
+    // Helper functions
+    function setupFrameMessage() {
+      utilityInstance.resetAll();
+      globalInstance.toggleVisibilityWithClass(frameOrderMessage, "show", "success-message", "remove");
     }
   
-    function invalidOrder() { 
-      console.groupCollapsed(`invalidOrder()`);
-      soundInstance
-        .playWrongSound();
+    function handleInvalidOrder() { 
+      console.groupCollapsed(`handleInvalidOrder()`);
       globalInstance
-        .insertTextContent(globalInstance.orderMessage, "Enter an order ID to load.")
-      utilityInstance
-        .resetOrderInput();
+        .displayMessageWithClass(orderMessage, "Enter an order ID to load.", "error-message")
+      soundInstance.playWrongSound();
+      utilityInstance.resetOrderInput();
       console.groupEnd();
     }
   
-    function orderIsChecked() {
-      console.groupCollapsed(`orderIsChecked()`);
+    function handleCheckedOrder() {
+      console.groupCollapsed(`handleCheckedOrder()`);
       globalInstance
-        .insertInnerHTML(
-          globalInstance.orderMessage, 
-          "Order already checked.<br>Enter another order.")
-        .toggleClass({
-          targetElements: globalInstance.orderMessage,
-          mode: "add",
-          className: "success-message",});
-      utilityInstance
-        .resetOrderInput();
-      soundInstance
-        .playWrongSound();
+        .displayMessageWithClass(orderMessage, "Order already checked.<br>Enter another order.", "success-message")
+      utilityInstance.resetOrderInput();
+      soundInstance.playWrongSound();
   
       console.groupEnd();
     }
   
     function prepareToLoadOrderItems() {
-      utilityInstance
-        .resetAll(); // reset everything before loading new order
       globalInstance
-        .toggleVisibility(globalInstance.frameOrderMessage, "show") // need to show again because of `resetAll()`
-        .insertTextContent(globalInstance.orderMessage, "Order loading..."); // need to show again because of `resetAll()`
+        .toggleVisibility(frameOrderMessage, "show") // need to show again because of `resetAll()`
+        .insertTextContent(orderMessage, "Order loading..."); // need to show again because of `resetAll()`
     }
-    // Helper sub-functions ENDS
+    // Helper functions ENDS
   }
 
+  /**
+   * Fetches order items from the given order ID and processes them.
+   * 
+   * @param {string} orderId - The ID of the order to fetch.
+   * @returns {Promise<void>} - A promise that resolves when the order items have been fetched and processed.
+   * 
+   * @throws {Error} - Throws an error if the order is not found or if there is an issue with the fetch request.
+   * 
+   * @example
+   * fetchOrderItems('12345')
+   *   .then(() => {
+   *     console.log('Order items fetched and processed successfully.');
+   *   })
+   *   .catch((error) => {
+   *     console.error('Error fetching order items:', error);
+   *   });
+   */
   async function fetchOrderItems(orderId) { // To fetch SKUs from the user-input order number
     console.groupCollapsed("fetchOrderItems()");
     const auth = btoa(`${consumerKey}:${consumerSecret}`);
@@ -151,65 +172,52 @@ function orderManager() {
     const timeout = 10000; // Set a timeout limit in milliseconds
   
     try {
-      const timeoutPromise = new Promise((_, reject) => // Create a timeout promise
-        setTimeout(() => reject(new Error("Request timed out")), timeout)
-      );
+      const response = await fetchWithTimeout(url, timeout, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      });
   
-      // Fetch the order data with a race between the request and the timeout
-      const response = await Promise.race([
-        axios.get(url, {
-          headers: {
-            'Authorization': `Basic ${auth}`
-          }
-        }),
-        timeoutPromise
-      ]);
-  
-      // Assign WooCommerce order into `localInstance.orderItems`
       if (response.data && response.data.line_items) {
-        localInstance.orderItems = response.data.line_items;
+        localInstance.orderItems = response.data.line_items; // Assign WooCommerce order into `localInstance.orderItems`
         console.info(localInstance.orderItems);
+
+        processOrderItems(localInstance.orderItems);
+        setupUIAfterSuccess(orderId);
       } else {
         throw new Error("Order not found");
       }
+    } catch (error) {
+      handleFetchError(error); // Handle specific error messages by calling a helper sub-function
+    } finally {
+      console.groupEnd();
+    }
   
-      // To fetch ordered SKUs
-      for (let orderItem of localInstance.orderItems) {
-        const quantity = Number(orderItem["quantity"]); // Get `quantity` property from an `orderItem` object
-  
-        globalInstance
-          .toggleVisibility(
-            globalInstance.frameSKUContainer
-            , "show");
-  
-        // Add ordered SKU to the `localInstance.orderedSKUs` array, and increment the counter.
-        for (let i = 0; i < quantity; i++) {
-          localInstance.orderedSKUs[localInstance.totalSKUs++] = orderItem["sku"];
-          // Create new element with the ID same as the SKU.
-          const sku = document.createElement("p");
-          globalInstance
-            .setAttribute(sku, "id", `${orderItem["sku"]}-${i}`)
-            .insertTextContent(sku, orderItem["sku"])
-            .appendContent(globalInstance.frameSKUContainer, sku)
+    // Helper functions 
+    function processOrderItems(orderItems) { // To fetch ordered SKUs
+      for (const orderItem of orderItems) {
+        const { sku, quantity } = orderItem;
+        for (let i = 0; i < Number(quantity); i++) {
+          addSKUToDOM(sku, i);
+          localInstance.orderedSKUs[localInstance.totalSKUs++] = sku;
         }
       }
-      manipulateCSS(); // calling a helper sub-function
-      soundInstance
-        .playBeepSound();
-      utilityInstance
-        .enableBarcode()
-        .resetBarcodeInput();
-    } catch (error) {
-      showSpecificErrorMsg(error); // Handle specific error messages by calling a helper sub-function
-      soundInstance
-        .playWrongSound();
-      utilityInstance
-        .resetOrderInput();
-      return; // Exit the function if there is an error
     }
-    console.groupEnd();
-  
-    // Helper sub-functions
+
+    function addSKUToDOM(sku, index) { // To add SKU to the DOM
+      const container = globalInstance.frameSKUContainer;
+      const skuElement = document.createElement("p");
+      globalInstance
+        .toggleVisibility(container, "show")
+        .setAttribute(skuElement, "id", `${sku}-${index}`)
+        .insertTextContent(skuElement, sku)
+        .appendContent(container, skuElement);
+    }
+
+    function setupUIAfterSuccess(orderId) {
+      manipulateCSS(orderId);
+      soundInstance.playBeepSound();
+      utilityInstance.enableBarcode().resetBarcodeInput();
+    }
+
     function manipulateCSS() {
       globalInstance
         .toggleClass({
@@ -239,30 +247,56 @@ function orderManager() {
         ], "show");
     }
   
-    function showSpecificErrorMsg(error) {
+    function handleFetchError(error) {
       console.error('Error fetching order data:', error);
-      if (error.message === "Request timed out") {
-        globalInstance
-          .insertInnerHTML(globalInstance.orderMessage, "Order loading timed out. Please try again.")
-      } else if (error.response && error.response.status === 404) {
-        globalInstance
-          .insertInnerHTML(globalInstance.orderMessage, "Order not found!");
-      } else {
-        globalInstance
-          .insertInnerHTML(globalInstance.orderMessage, "Error loading order.<br>Please try again.");
-      }
-  
+
+      const errorMessage = getErrorMessage(error);
       globalInstance
+        .insertInnerHTML(globalInstance.orderMessage, errorMessage)
         .toggleClass({
           targetElements: globalInstance.orderMessage,
           mode: "add",
           className: "error-message",
         });
+
+      soundInstance.playWrongSound();
+      utilityInstance.resetOrderInput();
     }
-    // Helper sub-function ENDS
+
+    function getErrorMessage(error) {
+      if (error.message === "Request timed out") {
+        return "Order loading timed out. Please try again.";
+      } else if (error.response?.status === 404) {
+        return "Order not found!";
+      }
+      return "Error loading order.<br>Please try again.";
+    }
+
+    async function fetchWithTimeout(url, timeout, config) {
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), timeout)
+      );
+
+      // Fetch the order data with a race between the request and the timeout
+      return Promise.race([axios.get(url, config), timeoutPromise]);
+    }
+    // Helper function ENDS
   } 
   
+  /**
+   * Checks if a specific note exists in the order's notes.
+   * @param {string} orderId - The ID of the order to check.
+   * @param {string} successMessage - The note to search for in the order's notes.
+   * @returns {Promise<boolean>} - Resolves to true if the note exists, otherwise false.
+   */
   async function checkOrderNote(orderId, successMessage) {
+    console.info(`checkOrderNote(): Checking notes for order ID: ${orderId}`);
+
+    if (!orderId || !successMessage) {
+      console.error("checkOrderNote(): Invalid parameters - orderId or successMessage missing.");
+      return false;
+    }
+
     globalInstance.insertTextContent(globalInstance.orderMessage, "Order loading..."); // Dummy message for the user while checking the order status.
   
     const auth = btoa(`${consumerKey}:${consumerSecret}`);
@@ -276,42 +310,71 @@ function orderManager() {
         },
       });
   
-      // Extract existing notes array from the response
-      const existingNotes = response.data || [];
-  
-      for(let i = 0; i<existingNotes.length; i++) {
-        if (existingNotes[i].note === successMessage){
-          console.info("checkOrderNote(): Success message found in the order.");
-          return true;
-        }
+      const existingNotes = response.data || []; // Extract existing notes array from the response
+      console.info('checkOrderNote(): Existing notes:', existingNotes);
+      const isNoteFound = existingNotes.some(orderNote => orderNote.note === successMessage);
+
+      if (isNoteFound) {
+        console.info("checkOrderNote(): Success message found in the order.");
       }
-      // If no matching note is found
-      return false;
-  
+
+      return isNoteFound; // Return true if the note is found, otherwise false.
+
     } catch (error) {
-      console.error('checkOrderNote(): Error appending order note:', error);
+      if (error.response) {
+        console.error('checkOrderNote(): Server responded with an error:', error.response.status);
+      } else if (error.request) {
+        console.error('checkOrderNote(): No response received from the server.');
+      } else {
+        console.error('checkOrderNote(): Error setting up the request:', error.message);
+      }
       return false; // In case of error, consider the order as not checked
     }
   }
 
+  /**
+   * Appends a note to an order and changes its status to "packed".
+   * @param {string} orderId - The ID of the order.
+   * @param {string} successMessage - The note to append to the order.
+   * @returns {Promise<void>} - Resolves when the operation is successful.
+   */
   async function appendOrderNoteAndChangeStatus(orderId, successMessage) {
     console.groupCollapsed("appendOrderNoteAndChangeStatus()");
-    const auth = btoa(`${consumerKey}:${consumerSecret}`);
+    const auth = btoa(`${consumerKey}:${consumerSecret}`);  
     const noteURL = `${localInstance.orderURL}${orderId}${localInstance.noteURLpostfix}`; // construct URL by string interpolation
     const orderURL = `${localInstance.orderURL}${orderId}`;
+    const headers = {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/json',
+    };
+
+    if (!orderId || !successMessage) {
+      console.error('Invalid inputs: orderId and successMessage are required.');
+      return;
+    }
   
     try {
-      await prepareAndAddNewNote(auth, noteURL, successMessage);
-      await changeStatusToPacked(auth, orderURL);
-  
+      await prepareAndAddNewNote();
     } catch (error) {
-      console.error('Error appending order note or updating order status:', error);
+      console.error('Error adding order note:', error);
+      throw error; // Re-throw to prevent subsequent operations
+    }
+
+    try {
+      await changeStatusToPacked();
+    } catch (error) {
+      console.error('Error update order status to packed:, error');
     }
 
     console.groupEnd();
 
-    // Helper SUB-functions
-    async function prepareAndAddNewNote(auth, noteURL, successMessage) {
+    // Helper functions
+    /**
+     * Prepares and adds a new note to the order.
+     * @returns {Promise<void>} - Resolves when the note is successfully added.
+     * @throws {Error} - If the note addition fails.
+     */
+    async function prepareAndAddNewNote() { // Prepare and add a new note to the order.
       const currentDate = new Date().toISOString(); // Get current date in ISO 8601 format (UTC timezone)
       
       const newNote = { // Prepare the new note data
@@ -319,33 +382,39 @@ function orderManager() {
         customer_note: false, // Set to false for a private note
         date_created: currentDate,
       };
-      
-      // Add new note to the order using POST
-      const noteResponse = await axios.post(noteURL, newNote, { 
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      console.info('Order note added successfully:', noteResponse.data);
+
+      try {
+        const noteResponse = await axios.post(noteURL, newNote, { headers }); // Add new note to the order using POST request
+        if (noteResponse.status !== 201) {
+          throw new Error(`Failed to add note: ${noteResponse.status}`);
+        }
+        console.info('Order note added successfully:', noteResponse.data);
+      } catch (error) {
+        console.error('Error in prepareAndAddNewNote:', error);
+        throw error; // Propagate error to the parent function
+      }
     }
 
-    async function changeStatusToPacked(auth, orderURL) { // change the order status to 'packed'
-      const orderUpdate = {
-        status: 'packed'
-      };
-  
-      const orderResponse = await axios.put(orderURL, orderUpdate, {
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Content-Type': 'application/json',
-        },
-      });
-  
-      console.info('Order status updated successfully:', orderResponse.data);
+    /**
+     * Change the order status to "packed".
+     * @returns {Promise<void>} - Resolves when the note is successfully added.
+     * @throws {Error} - If the note addition fails.
+     */
+    async function changeStatusToPacked() { // change the order status to 'packed'
+      const orderUpdate = { status: 'packed' };
+
+      try {
+        const orderResponse = await axios.put(orderURL, orderUpdate, { headers });
+        if (orderResponse.status !== 200) {
+          throw new Error(`Failed to update status: ${orderResponse.status}`);
+        }
+        console.info('Order status updated successfully:', orderResponse.data);
+      } catch (error) {
+        console.error('Error in changeStatusToPacked:', error);
+        throw error; // Propagate error to the parent function
+      }
     }
-    // Helper SUB-functions ENDS
+    // Helper functions ENDS
   }
 
   return{
@@ -355,104 +424,98 @@ function orderManager() {
 }
 
 function utilityManager() {
+  /**
+   * Resets the application state when "Load Order" is pressed.
+   * - Resets visibility, text, and content of specific elements.
+   * - Empties local instance variables and disables barcode scanning.
+   */
   function resetAll() { // To reset when Load Order is pressed.
     console.groupCollapsed("resetAll()");
+    if (!globalInstance.bodyElement) {
+      console.error('Error: `bodyElement` is missing in globalInstance.');
+      return;
+    }
+    try {
+      globalInstance // Add the "start" class
+        .toggleClass({
+          targetElements: globalInstance.bodyElement,
+          mode: "add",
+          className: "start"
+        })
 
-    globalInstance
-      .toggleClass({
-        targetElements: globalInstance.bodyElement,
-        mode: "add",
-        className: "start"
-      })
+        .emptyAllClass([ // Empty all classes
+          globalInstance.headerElement,
+          globalInstance.frameLoadOrder,
+          globalInstance.frameOrderMessage,
+          globalInstance.orderMessage,
+          globalInstance.frameSKUContainer,
+          globalInstance.frameProgressContainer,
+          globalInstance.frameScanBarcode,
+        ])
 
-      .emptyAllClass([
-        globalInstance.headerElement,
-        globalInstance.frameLoadOrder,
-        globalInstance.frameOrderMessage,
-        globalInstance.orderMessage,
-        globalInstance.frameSKUContainer,
-        globalInstance.frameProgressContainer,
-        globalInstance.frameScanBarcode,
-      ])
+        .toggleVisibility([ // Show and hide specific elements
+          globalInstance.headerElement,
+          globalInstance.frameLoadOrder,
+        ], "show")
 
-      .toggleVisibility([
-        globalInstance.headerElement,
-        globalInstance.frameLoadOrder,
-      ], "show")
+        .toggleVisibility([
+          globalInstance.frameOrderMessage,
+          globalInstance.resetBtn,
+          globalInstance.frameSKUContainer,
+          globalInstance.frameProgressContainer,
+          globalInstance.frameScanBarcode
+        ], "hide")
 
-      .toggleVisibility([
-        globalInstance.frameOrderMessage,
-        globalInstance.resetBtn,
-        globalInstance.frameSKUContainer,
-        globalInstance.frameProgressContainer,
-        globalInstance.frameScanBarcode
-      ], "hide")
+        .emptyInnerHTML([ // Reset text and HTML content
+          globalInstance.orderMessage,
+          globalInstance.frameSKUContainer,
+          globalInstance.frameProgressContainer,
+        ])
 
-      .emptyInnerHTML([
-        globalInstance.orderMessage,
-        globalInstance.frameSKUContainer,
-        globalInstance.frameProgressContainer,
-      ])
+        .insertTextContent(globalInstance.resetBtn, "Reset");
 
-      .insertTextContent(globalInstance.resetBtn, "Reset");
-      
+      resetState();
+
+    } catch (error) {
+      console.error("Error in resetAll():", error);
+    }
+    console.groupEnd();
+  }
+
+  function resetState() { // To reset orderinput, barcodeinput, and localInstance variables
     resetOrderInput();
     disableBarcode();
     localInstance.orderItems = [];
     localInstance.orderedSKUs = [];
     localInstance.totalSKUs = 0;
-
-    console.groupEnd();
   }
-
+  
   async function checkBarcode() { // To match scanned-SKUs with ordered-SKUs
     console.groupCollapsed("checkBarcode()");
+    globalInstance.toggleVisibility(globalInstance.frameProgressContainer, "show");
 
     const barcode = globalInstance.readBarcodeInputValue();
-    const existingError = document.querySelector("#barcodeError");
-    let skuFound = false;
-    
-    globalInstance
-      .toggleVisibility(
-        globalInstance.frameProgressContainer, 
-        "show");
+    if (!validateBarcode(barcode)) return;
 
-    if (existingError) { // Remove existing error message if any
-      existingError.remove();
-    }
+    const skuFound = processBarcode(barcode);
+    if (!skuFound) handleNotFound();
 
-    if (!barcode) { // Display error if barcode input is empty
-      barcodeInputIsEmpty();
-      return;
-    }
-    
-    for (let i = 0; i < localInstance.orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
-      if (`${barcode}` === `${localInstance.orderedSKUs[i]}`) {
-        decorateFrameProgressContainer("found", `${localInstance.orderedSKUs[i]}`);
-        spliceCheckedItem(i);
-        soundInstance.playBeepSound();
-        resetBarcodeInput();
-        skuFound = true;
-        break; // To exit the loop immediately after processing the matched SKU.
+    if (localInstance.orderedSKUs.length === 0) await completeOrder();  // Check if all SKUs are scanned
+    console.groupEnd();
+
+    // helper functions
+    function validateBarcode(barcode) { // Validate barcode input
+      const existingError = document.querySelector("#barcodeError");
+      if (existingError) existingError.remove(); // Remove existing error message if any
+
+      if (!barcode) { // Display error if barcode input is empty
+        showBarcodeInputError();
+        return false;
       }
+      return true;
     }
 
-    if (!skuFound) { // If no matching SKU is found
-      decorateFrameProgressContainer("not-found");
-      soundInstance.playWrongSound();
-      resetBarcodeInput();
-    }
-
-    if (localInstance.orderedSKUs.length === 0) { // Check if all SKUs are scanned
-      disableBarcode();
-      soundInstance.playCompleteSound();
-      wrapUpWhenComplete();
-      /*DELETE when stable const orderId = localInstance.orderID;*/
-      await orderInstance.appendOrderNoteAndChangeStatus(localInstance.orderID, localInstance.successMessage);
-    }
-
-    // helper sub-functions
-    function barcodeInputIsEmpty() { // when barcode input is empty
+    function showBarcodeInputError() { // when barcode input is empty
       console.info("Barcode input is empty.");
 
       const errorParagraph = document.createElement("p");
@@ -474,54 +537,62 @@ function utilityManager() {
       
       errorParagraph.setAttribute("id", "barcodeError");
       soundInstance.playWrongSound();
-      console.groupEnd();
     }
 
-    function decorateFrameProgressContainer(status, sku) { // show or hide frames; strike-through SKU etc.
+    function processBarcode(barcode) { // Process the scanned barcode
+      for (let i = 0; i < localInstance.orderedSKUs.length; i++) { // Iterate through the ordered SKUs to find a match
+        if (`${barcode}` === `${localInstance.orderedSKUs[i]}`) {
+          decorateFrameProgressContainer("found", `${localInstance.orderedSKUs[i]}`);
+          spliceCheckedItem(i);
+          soundInstance.playBeepSound();
+          resetBarcodeInput();
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function handleNotFound() {
+      decorateFrameProgressContainer("not-found");
+      soundInstance.playWrongSound();
+      resetBarcodeInput();
+    }
+    
+    function decorateFrameProgressContainer(status, sku) { // show or hide frames; strike-through SKU etc.      
+      // helper function: Update the progress container based on status
+      function updateProgressContainer(message, addClass, removeClass) { 
+        const container = globalInstance.frameProgressContainer;
+        globalInstance
+          .toggleClass({
+            targetElements: container,
+            mode: "remove",
+            className: removeClass,
+          })
+          .insertInnerHTML(container, message)
+          .toggleClass({
+            targetElements: container,
+            mode: "add",
+            className: addClass,
+          });
+      }
+
       switch (status) { 
         case "found":
-          // If scanned barcode is same as orderedSKU, matched SKU is striked-through,...
-          // ... and loop until the end of localInstance.orderedSKUs array.
-          globalInstance
+          // Update progress container for a successful scan
+          updateProgressContainer("Correct!! Scan another.", "success-message", "error-message");
+          
+          // Mark the SKU element as checked if it matches the scanned SKU
+          globalInstance 
             .toggleClass({
-              targetElements: globalInstance.frameProgressContainer,
-              mode: "remove",
-              className: "error-message",
-            })
-            .insertInnerHTML(
-              globalInstance.frameProgressContainer,
-              "Correct!! Scan another."
-            )
-            .toggleClass({
-              targetElements: globalInstance.frameProgressContainer,
-              mode: "add",
-              className: "success-message",
-            })
-            .toggleClass({
-              // Matches elements whose id starts with the value of sku.
-              // Excludes elements that already have the `checked-sku` class.
               targetElements: document.querySelector(`[id^=${sku}]:not(.checked-sku)`),
               mode: "add",
               className: "checked-sku",
-            })
+            });
           break;
         case "not-found":
-          globalInstance
-            .toggleClass({
-              targetElements: globalInstance.frameProgressContainer,
-              mode: "remove",
-              className: "success-message",
-            })
-            .insertInnerHTML(
-              globalInstance.frameProgressContainer,
-              "Wrong Product"
-            )
-            .toggleClass({
-              targetElements: globalInstance.frameProgressContainer,
-              mode: "add",
-              className: "error-message",
-            });
-            break;
+          // Update progress container for an incorrect scan
+          updateProgressContainer("Wrong Product", "error-message", "success-message");
+          break;
       }
     }
 
@@ -531,6 +602,13 @@ function utilityManager() {
       localInstance.orderedSKUs.splice(i, 1);
       console.info(`After splice: ${localInstance.orderedSKUs}`);
       console.groupEnd();
+    }
+
+    async function completeOrder() {
+      disableBarcode();
+      soundInstance.playCompleteSound();
+      wrapUpWhenComplete();
+      await orderInstance.appendOrderNoteAndChangeStatus(localInstance.orderID, localInstance.successMessage);
     }
 
     function wrapUpWhenComplete() { // Decorate and insert text when no more SKU to check
@@ -554,6 +632,7 @@ function utilityManager() {
           "Check a new order"
         );
     }
+    // helper functions ENDS
   }
 
   function disableBarcode() { //To disable barcode input and button
