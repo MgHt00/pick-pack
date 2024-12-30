@@ -175,13 +175,17 @@ function orderManager() {
       const response = await fetchWithTimeout(url, timeout, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
-  
-      if (response.data && response.data.line_items) {
+      console.info("Order data fetched:", response.data);
+
+      if (response.data && response.data.shipping && response.data.line_items) {
+        const customerName = response.data.shipping.first_name; 
+        console.info("Customer name:", customerName);
+
         localInstance.orderItems = response.data.line_items; // Assign WooCommerce order into `localInstance.orderItems`
-        console.info(localInstance.orderItems);
+        console.info("Ordered items:", localInstance.orderItems);
 
         processOrderItems(localInstance.orderItems);
-        setupUIAfterSuccess(orderId);
+        setupUIAfterSuccess(orderId, customerName);
       } else {
         throw new Error("Order not found");
       }
@@ -191,7 +195,7 @@ function orderManager() {
       console.groupEnd();
     }
   
-    // Helper functions 
+    // Helper functions
     function processOrderItems(orderItems) { // To fetch ordered SKUs
       for (const orderItem of orderItems) {
         const { sku, quantity } = orderItem;
@@ -212,13 +216,13 @@ function orderManager() {
         .appendContent(container, skuElement);
     }
 
-    function setupUIAfterSuccess(orderId) {
-      manipulateCSS(orderId);
+    function setupUIAfterSuccess(id, name) {
+      manipulateCSS(id, name);
       soundInstance.playBeepSound();
       utilityInstance.enableBarcode().resetBarcodeInput();
     }
 
-    function manipulateCSS() {
+    function manipulateCSS(id, name) {
       globalInstance
         .toggleClass({
           targetElements: globalInstance.bodyElement,
@@ -235,7 +239,7 @@ function orderManager() {
           , "hide")
         .insertTextContent(
           globalInstance.orderMessage,
-          `${orderId} Loaded.`
+          `${id} - ${name}`
         )
         .toggleClass({
           targetElements: globalInstance.orderMessage,
