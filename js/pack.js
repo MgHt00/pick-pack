@@ -175,13 +175,17 @@ function orderManager() {
       const response = await fetchWithTimeout(url, timeout, {
         headers: { 'Authorization': `Basic ${auth}` }
       });
-  
-      if (response.data && response.data.line_items) {
+      console.info("Order data fetched:", response.data);
+
+      if (response.data && response.data.shipping && response.data.line_items) {
+        const customerName = response.data.shipping.first_name; 
+        console.info("Customer name:", customerName);
+
         localInstance.orderItems = response.data.line_items; // Assign WooCommerce order into `localInstance.orderItems`
-        console.info(localInstance.orderItems);
+        console.info("Ordered items:", localInstance.orderItems);
 
         processOrderItems(localInstance.orderItems);
-        setupUIAfterSuccess(orderId);
+        setupUIAfterSuccess(orderId, customerName);
       } else {
         throw new Error("Order not found");
       }
@@ -191,7 +195,7 @@ function orderManager() {
       console.groupEnd();
     }
   
-    // Helper functions 
+    // Helper functions
     function processOrderItems(orderItems) { // To fetch ordered SKUs
       for (const orderItem of orderItems) {
         const { sku, quantity } = orderItem;
@@ -212,13 +216,13 @@ function orderManager() {
         .appendContent(container, skuElement);
     }
 
-    function setupUIAfterSuccess(orderId) {
-      manipulateCSS(orderId);
+    function setupUIAfterSuccess(id, name) {
+      manipulateCSS(id, name);
       soundInstance.playBeepSound();
       utilityInstance.enableBarcode().resetBarcodeInput();
     }
 
-    function manipulateCSS() {
+    function manipulateCSS(id, name) {
       globalInstance
         .toggleClass({
           targetElements: globalInstance.bodyElement,
@@ -235,7 +239,7 @@ function orderManager() {
           , "hide")
         .insertTextContent(
           globalInstance.orderMessage,
-          `${orderId} Loaded.`
+          `${id} - ${name}`
         )
         .toggleClass({
           targetElements: globalInstance.orderMessage,
@@ -711,7 +715,7 @@ function soundManager() {
     // An oscillator can only be started and stopped once, and it cannot be reused. 
     // ...Keeping it outside the function causes the error when you try to restart it. 
 
-    /*oscillator.type = 'square';
+    oscillator.type = 'square';
     oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 note
     gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
   
@@ -719,12 +723,12 @@ function soundManager() {
     gainNode.connect(audioCtx.destination);
   
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.1); // Play sound for 0.1 seconds*/
+    oscillator.stop(audioCtx.currentTime + 0.1); // Play sound for 0.1 seconds
   }
   
   function playCorrectSound() {
     console.info("playCorrectSound() played");
-    /*const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();  
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
   
@@ -736,7 +740,7 @@ function soundManager() {
     gainNode.connect(audioCtx.destination);
   
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds*/
+    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
   }
   
   function playWrongSound() {
@@ -745,7 +749,7 @@ function soundManager() {
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
   
-    /*oscillator.type = 'sawtooth';
+    oscillator.type = 'sawtooth';
     oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
     gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // 20% volume
   
@@ -753,7 +757,7 @@ function soundManager() {
     gainNode.connect(audioCtx.destination);
   
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds*/
+    oscillator.stop(audioCtx.currentTime + 0.2); // Play sound for 0.2 seconds
   }
   
   function playCompleteSound() {
@@ -762,7 +766,7 @@ function soundManager() {
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
   
-    /*oscillator.type = 'sawtooth';
+    oscillator.type = 'sawtooth';
     oscillator.frequency.setValueAtTime(500, audioCtx.currentTime); // Custom frequency
     gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 20% volume
   
@@ -770,7 +774,7 @@ function soundManager() {
     gainNode.connect(audioCtx.destination);
   
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.5); // Play sound for 0.5 seconds*/
+    oscillator.stop(audioCtx.currentTime + 0.5); // Play sound for 0.5 seconds
   }
 
   return {
