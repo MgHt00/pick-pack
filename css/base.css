@@ -1,3 +1,8 @@
+html{
+  /*--main-background-color: #222222;*/
+  --main-background-color: #fefefe;
+}
+
 /* CSS Reset */
 * {
   margin: 0;
@@ -6,11 +11,11 @@
 }
 
 html {
-  background-color: #fefefe;
+  background-color: var(--main-background-color, #fefefe);
 }
 
 body {
-  background-color: #fefefe;
+  background-color: var(--main-background-color, #fefefe);
   inline-size: 334px;
   margin: 0px auto;
   /*min-height: calc(100vh - 20px);*/
@@ -81,7 +86,7 @@ header h1 {
   height: 58px;
 
   /* Primary */
-  border: 1px solid #5570F1;
+  border: 1px solid #5570f1;
   border-radius: 8px;
 
   /* Inside auto layout */
